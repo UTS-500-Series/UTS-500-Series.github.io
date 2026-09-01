@@ -1,0 +1,38 @@
+# Publishes site/ to GitHub Pages.
+#
+# The published folder is site/, which is neither of the two roots GitHub's simple Pages UI
+# offers ("/" and "/docs"), so this workflow is required rather than optional. Keeping the
+# generator in build/ and the output in site/ is what makes that trade worth it: the sources
+# are not served, and the published tree contains only what a browser needs.
+#
+# One-time setup: Settings -> Pages -> Build and deployment -> Source: GitHub Actions.
+name: Deploy documentation
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v5
