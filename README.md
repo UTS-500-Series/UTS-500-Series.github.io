@@ -3,7 +3,12 @@
 The documentation site for the desk's 500-series modules. One section per module, published
 to GitHub Pages.
 
-Live site: *(add the Pages URL once it is deployed)*
+Live site: **https://uts-500-series.github.io/**
+
+This repository is the organisation site: GitHub Pages requires that repo to be named
+`<org>.github.io` exactly, which is why this one is not called `docs`. It publishes at the
+domain root rather than under a subpath. Every link in `site/` is relative, so the pages
+also render correctly if this is ever demoted to an ordinary project site.
 
 ## What is real and what is not
 
