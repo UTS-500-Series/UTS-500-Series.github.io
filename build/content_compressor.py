@@ -739,6 +739,27 @@ datasheet typicals; this is the one number in the project worth measuring on the
 than trusting.</p>
 
 <div class="note warn">
+  <h4>Both drivers are obsolete</h4>
+  <p>Checked at DigiKey on 2 September 2026: <code>LM3914N-1/NOPB</code> and
+  <code>LM3915N-1/NOPB</code> are <strong>obsolete with no stock</strong> &mdash; and so is
+  every other dot/bar display driver they list. All thirteen, TI and Rohm alike, in every
+  package. The dedicated analogue bargraph driver is an extinct product category, not a part
+  that happens to be out of stock, so there is no drop-in replacement to name.</p>
+  <p>That leaves two routes. Source the LM391x from a distributor that still holds it and
+  accept an end-of-life part in a new design; or rework this sheet around a comparator
+  ladder &mdash; four LM339 quads cover fourteen thresholds and are stocked from about
+  $0.13 each.</p>
+  <p>The comparator route is more viable than the argument at the top of this page implies.
+  That argument compared against seven <em>NE5532s</em>, which is the wrong part: a real
+  comparator draws roughly a milliamp per package rather than eight. What the LM391x
+  actually buys is its dot-mode logic and its programmable constant-current sinks &mdash;
+  a comparator ladder needs a resistor per LED, a divider chain to set the thresholds
+  (two different ones, since the meters follow different laws) and extra steering if dot
+  mode is to be kept.</p>
+  <p>Only this sheet is affected. Sheets 1&ndash;6 use nothing that is at risk.</p>
+</div>
+
+<div class="note warn">
   <h4>Still open</h4>
   <p>Nothing here has been built or simulated. The gain-reduction scale in particular comes from
   a model of the steering pair, not from measurement &mdash; the shape is right, but expect to
