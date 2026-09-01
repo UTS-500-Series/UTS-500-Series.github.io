@@ -47,8 +47,8 @@ def build(name, slug, tagline, blurb, sections, decisions, specs):
 <p>{blurb}</p>
 
 <h2>Specifications</h2>
-<p>Filled in once there is a circuit to measure or calculate from. The rack constraints on
-the right are fixed by the 500-series format and are the only numbers known today.</p>
+<p>Filled in once there is a circuit to measure or calculate from. The rows fixed by the
+500-series format are the only numbers known today.</p>
 """ + table(["Specification", "Value", "Fixed by"],
             [[s, "&mdash;", u] for s, u in specs], ["r", "n", ""]) + f"""
 
