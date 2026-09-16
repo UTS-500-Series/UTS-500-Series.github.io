@@ -49,13 +49,13 @@ way. Put 48&nbsp;V on those inputs and it goes directly into Q1 and Q3. ESP says
 the Project 66 article: adding phantom power to the input needs a protection scheme like the
 one in Project 96's Figure 2.</p>
 
-<h2>What goes in front of the preamp</h2>
-<p>Project 96 has two halves. Its Figure 1 is a mains power supply that makes the 48&nbsp;V
-rail &mdash; a 25&ndash;30&nbsp;V AC transformer, a voltage doubler, and a discrete regulator.
-<strong>A 500-series module does not need that half</strong>, because the rack supplies
-48&nbsp;V (see <a href="rack.html">In a 500-series slot</a>). It is Figure 2, the distribution
-circuit, that belongs on the preamp card:</p>
-<div class="tw"><table><thead><tr><th class="r">Part</th><th class="n">Value</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">Feed resistors</td><td class="n">6.8&nbsp;k&Omega;, matched to within 10&nbsp;&Omega;</td><td class="">Carry 48&nbsp;V to each leg</td></tr><tr><td class="r">Coupling capacitors</td><td class="n">22&nbsp;&micro;F, 50&nbsp;V or higher</td><td class="">Block 48&nbsp;V from the preamp input</td></tr><tr><td class="r">Protection zeners</td><td class="n">10&nbsp;V, 1&nbsp;W, one per leg</td><td class="">Clamp the transient when a cable is plugged in live</td></tr><tr><td class="r">Series resistors</td><td class="n">10&nbsp;&Omega;</td><td class="">Limit the zeners' peak current</td></tr></tbody></table></div>
+<h2>Where the 48&nbsp;V comes from</h2>
+<p>The rack supplies it. The 500-series card connector carries +48&nbsp;V on <strong>pin 15</strong>,
+and this desk's chassis has it connected, so the preamp card takes phantom power straight from
+its edge connector. Nothing on the card has to generate it.</p>
+<p>What the card does need is the distribution circuit from Project 96's Figure 2, fed from
+pin 15:</p>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="n">Value</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">Feed resistors</td><td class="n">6.8&nbsp;k&Omega;, matched to within 10&nbsp;&Omega;</td><td class="">Carry 48&nbsp;V from pin 15 to each leg</td></tr><tr><td class="r">Coupling capacitors</td><td class="n">22&nbsp;&micro;F, 50&nbsp;V or higher</td><td class="">Block 48&nbsp;V from the preamp input</td></tr><tr><td class="r">Protection zeners</td><td class="n">10&nbsp;V, 1&nbsp;W, one per leg</td><td class="">Clamp the transient when a cable is plugged in live</td></tr><tr><td class="r">Series resistors</td><td class="n">10&nbsp;&Omega;</td><td class="">Limit the zeners' peak current</td></tr><tr><td class="r">Phantom switch</td><td class="n">between pin 15 and the feed resistors</td><td class="">Turns phantom on and off for this channel</td></tr></tbody></table></div>
 
 <h3>Matching the feed resistors</h3>
 <p>The two feed resistors must be equal or the phantom voltage is no longer purely common-mode,

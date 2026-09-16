@@ -53,7 +53,7 @@ def blocks():
     {box(350, 88, 140, 60, 'Difference amp', 'U1A, gain 4.55')}
     {arrow(490, 110, 560, 110)}
     {txt(596, 106, 'OUT+')}{txt(596, 124, 'OUT&#8722;', 'middle')}
-    {txt(34, 30, 'P48 via P96', 'start', 'var(--warn)')}
+    {txt(34, 30, '+48 V from pin 15', 'start', 'var(--warn)')}
   </svg></div>
   <figcaption><span>Signal flow &mdash; drawn for this site from ESP's Figure 1</span>
   <a href="{FIG1}" target="_blank" rel="noopener">ESP's schematic &rarr;</a></figcaption>
@@ -268,17 +268,18 @@ way. Put 48&nbsp;V on those inputs and it goes directly into Q1 and Q3. ESP says
 the Project 66 article: adding phantom power to the input needs a protection scheme like the
 one in Project 96's Figure 2.</p>
 
-<h2>What goes in front of the preamp</h2>
-<p>Project 96 has two halves. Its Figure 1 is a mains power supply that makes the 48&nbsp;V
-rail &mdash; a 25&ndash;30&nbsp;V AC transformer, a voltage doubler, and a discrete regulator.
-<strong>A 500-series module does not need that half</strong>, because the rack supplies
-48&nbsp;V (see <a href="rack.html">In a 500-series slot</a>). It is Figure 2, the distribution
-circuit, that belongs on the preamp card:</p>
+<h2>Where the 48&nbsp;V comes from</h2>
+<p>The rack supplies it. The 500-series card connector carries +48&nbsp;V on <strong>pin 15</strong>,
+and this desk's chassis has it connected, so the preamp card takes phantom power straight from
+its edge connector. Nothing on the card has to generate it.</p>
+<p>What the card does need is the distribution circuit from Project 96's Figure 2, fed from
+pin 15:</p>
 """ + table(["Part", "Value", "Job"],
-            [["Feed resistors", "6.8&nbsp;k&Omega;, matched to within 10&nbsp;&Omega;", "Carry 48&nbsp;V to each leg"],
+            [["Feed resistors", "6.8&nbsp;k&Omega;, matched to within 10&nbsp;&Omega;", "Carry 48&nbsp;V from pin 15 to each leg"],
              ["Coupling capacitors", "22&nbsp;&micro;F, 50&nbsp;V or higher", "Block 48&nbsp;V from the preamp input"],
              ["Protection zeners", "10&nbsp;V, 1&nbsp;W, one per leg", "Clamp the transient when a cable is plugged in live"],
-             ["Series resistors", "10&nbsp;&Omega;", "Limit the zeners' peak current"]],
+             ["Series resistors", "10&nbsp;&Omega;", "Limit the zeners' peak current"],
+             ["Phantom switch", "between pin 15 and the feed resistors", "Turns phantom on and off for this channel"]],
             ["r", "n", ""]) + """
 
 <h3>Matching the feed resistors</h3>
@@ -337,7 +338,7 @@ a front panel. Any module fits any slot.</p>
             [["Panel", "1.5&nbsp;in &times; 5.25&nbsp;in &mdash; 38.10 &times; 133.35&nbsp;mm"],
              ["Connector", "15-pin, 0.156&nbsp;in card edge"],
              ["Supply", "&plusmn;16&nbsp;V, 130&nbsp;mA per rail"],
-             ["Phantom", "+48&nbsp;V, provided by the rack on the standard's pin 15"],
+             ["Phantom", "+48&nbsp;V on pin 15"],
              ["Audio", "Balanced in and out"]],
             ["r", "n"]) + """
 
@@ -357,8 +358,8 @@ needs changing.</p>
 <p>The two input halves draw about 6.5&nbsp;mA from each rail between them. The op amp adds its
 own quiescent current &mdash; an NE5532 is typically around 8&nbsp;mA for the whole package, a
 TL071 far less. Either way the preamp needs <strong>well under 20&nbsp;mA per rail</strong>
-against 130&nbsp;mA available. Phantom power is drawn from the separate 48&nbsp;V rail and does
-not count against this.</p>
+against 130&nbsp;mA available. Phantom power comes from the separate 48&nbsp;V rail on pin 15 and does not count against
+this.</p>
 
 <h2>Keeping the rails quiet</h2>
 <p>A preamp at 56&nbsp;dB of gain amplifies whatever reaches its supply along with the signal.
@@ -366,23 +367,13 @@ ESP recommends a post-filter of 10&nbsp;&Omega; and 470&nbsp;&micro;F after the 
 rack the rails are shared with every other module, which makes that filter more worthwhile, not
 less. At this preamp's current the 10&nbsp;&Omega; costs about 0.15&nbsp;V &mdash; nothing.</p>
 
-<div class="note warn">
-  <h4>This desk's chassis does not carry 48&nbsp;V</h4>
-  <p>The 500-series standard puts +48&nbsp;V on pin 15. This desk's chassis wiring leaves pin 15
-  unconnected &mdash; it is listed as P48-NC. As built, a preamp slot receives
-  <strong>no phantom power</strong>. Either pin 15 is wired to a 48&nbsp;V supply in the chassis,
-  or phantom is generated on the preamp card from the &plusmn;16&nbsp;V rails, which costs
-  current, board space and a converter's noise right beside a 56&nbsp;dB gain stage. Wiring the
-  chassis is the cleaner of the two.</p>
-</div>
-
 <h2>Connector pins</h2>
 <p>The preamp uses the same audio pins as the rest of the desk:</p>
 """ + table(["Pin", "Signal", "Preamp use"],
             [["10", "IN+", "Microphone hot"], ["8", "IN&minus;", "Microphone cold"],
              ["2", "OUT+", "R15, the driven output leg"], ["4", "OUT&minus;", "R16, the impedance-balanced leg"],
              ["5", "AGND", "Signal ground"], ["12 / 14", "+16&nbsp;V / &minus;16&nbsp;V", "Supply"],
-             ["13", "PGND", "Power ground"], ["15", "P48", "Phantom &mdash; not connected in this chassis"]],
+             ["13", "PGND", "Power ground"], ["15", "+48&nbsp;V", "Phantom supply, to the 6.8&nbsp;k&Omega; feed resistors"]],
             ["n", "", ""]) + """
 
 <h2>The panel</h2>
@@ -409,7 +400,7 @@ PAGES['build.html'] = ("Building it", f"""
 
 <h2>Changes for this desk</h2>
 """ + table(["Change", "Reason"],
-            [["Add Project 96's Figure 2 distribution circuit at the input",
+            [["Add P96's phantom distribution, fed from pin 15",
               "Phantom power, and the protection the input needs to survive it"],
              ["Add a 10&nbsp;&Omega; / 470&nbsp;&micro;F post-filter on each rail",
               "The rack's rails are shared with other modules"],
