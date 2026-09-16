@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Overview &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
-<meta name="description" content="Planned documentation for the UTS Mini Mixing Desk equaliser module.">
+<meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <link rel="stylesheet" href="../style.css">
 <script>
@@ -19,7 +19,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><h4>Planned sections</h4><a href="input.html"><i>02</i><span>Input buffer</span></a><a href="bands.html"><i>03</i><span>The filter bands</span></a><a href="output.html"><i>04</i><span>Output stage</span></a><a href="power.html"><i>05</i><span>Power &amp; references</span></a><h4>Practical</h4><a href="panel.html"><i>06</i><span>The front panel</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><h4>Filter sections</h4><a href="parametric.html"><i>02</i><span>Parametric band</span></a><a href="lowpass.html"><i>03</i><span>Low-pass filter</span></a><h4>Practical</h4><a href="simulation.html"><i>04</i><span>Simulating it</span></a><a href="status.html"><i>05</i><span>What is left</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -28,40 +28,42 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">equaliser module</p>
-<h1>The equaliser module</h1>
-<p class="lede">A multi-band equaliser for the desk: a small number of bands, each able to lift or cut, on the same 1.5 inch panel as everything else.</p>
+<p class="eyebrow">Equaliser module</p>
+<h1>The equaliser</h1>
+<p class="lede">A multi-band equaliser for the desk, built from filter sections around the
+OPA1641. Two sections are drawn and one has been simulated &mdash; this is a module in
+progress, and these pages say exactly how far along it is.</p>
+
 <div class="note warn">
-  <h4>Nothing here is designed yet</h4>
-  <p>The equaliser module has no schematic, no netlist and no bill of materials. This section is
-  a <strong>template</strong> that mirrors the structure of the
-  <a href="../compressor/index.html">compressor documentation</a>, so the shape of the work is
-  visible before the work starts. Every figure below is deliberately blank rather than
-  guessed.</p>
+  <h4>Work in progress</h4>
+  <p>Written from the <a href="https://github.com/UTS-500-Series/Equaliser">Equaliser repository</a> at commit
+  <code>4c6c1af</code>. The KiCad sheets have their topology drawn but <strong>no component
+  values yet</strong>. The only real numbers on this site come from one LTspice run of one
+  band. Nothing has been built or measured.</p>
 </div>
-<p>The equaliser is the module most constrained by its front panel. Every band needs at least a frequency and a gain control, and a 38 mm wide faceplate runs out of room long before the circuit does &mdash; so the panel layout has to be settled before the circuit is worth drawing.</p>
 
-<h2>Specifications</h2>
-<p>Filled in once there is a circuit to measure or calculate from. The rows fixed by the
-500-series format are the only numbers known today.</p>
-<div class="tw"><table><thead><tr><th class="r">Specification</th><th class="n">Value</th><th class="">Fixed by</th></tr></thead><tbody><tr><td class="r">Number of bands</td><td class="n">&mdash;</td><td class="">to be decided</td></tr><tr><td class="r">Frequency ranges</td><td class="n">&mdash;</td><td class="">to be decided</td></tr><tr><td class="r">Boost / cut range</td><td class="n">&mdash;</td><td class="">to be decided</td></tr><tr><td class="r">Filter Q</td><td class="n">&mdash;</td><td class="">to be decided</td></tr><tr><td class="r">Panel width</td><td class="n">&mdash;</td><td class="">1.5 in / 38.1 mm, 500-series</td></tr><tr><td class="r">Supply</td><td class="n">&mdash;</td><td class="">&plusmn;16 V, 130 mA per rail, 500-series</td></tr></tbody></table></div>
+<h2>What exists</h2>
+<div class="tw"><table><thead><tr><th class="r">Section</th><th class="">Topology</th><th class="">Drawn</th><th class="">Values</th><th class="">Simulated</th></tr></thead><tbody><tr><td class="r"><a href="parametric.html">Parametric band</a></td><td class="">State-variable</td><td class="">Yes &mdash; 4 op amps</td><td class="">Not in KiCad</td><td class="">Yes &mdash; one run</td></tr><tr><td class="r"><a href="lowpass.html">Low-pass filter</a></td><td class="">Sallen-Key, 2nd order</td><td class="">Yes &mdash; 1 op amp</td><td class="">Not in KiCad</td><td class="">No</td></tr><tr><td class="r">Bill of materials</td><td class="">&mdash;</td><td class="">Template only</td><td class="">&mdash;</td><td class="">&mdash;</td></tr></tbody></table></div>
 
-<h2>What has to be decided first</h2>
-<p>These are the choices that determine everything else. Until they are made, the pages in
-this section have nothing to say.</p>
-<div class="tw"><table><thead><tr><th class="r">Decision</th><th class="">Why it drives the rest</th></tr></thead><tbody><tr><td class="r">How many bands</td><td class="">Drives the op-amp count, the current budget and the panel layout all at once.</td></tr><tr><td class="r">Filter topology per band</td><td class="">Shelving, gyrator and state-variable sections have different part counts, different tuning behaviour and different panel needs.</td></tr><tr><td class="r">Panel layout before circuit</td><td class="">This is the one module where the faceplate is the binding constraint. Concentric controls buy space at the cost of feel; deciding late means redrawing the circuit.</td></tr><tr><td class="r">Whether the desk wants matched stereo pairs</td><td class="">Matched EQ channels need tolerance parts in every frequency-determining position.</td></tr></tbody></table></div>
+<h2>Why the OPA1641</h2>
+<p>Every section uses the OPA1641, not the NE5532 the compressor is built on. That is a
+sensible choice for filters. It is a JFET-input part, so its input bias current is
+picoamps rather than the NE5532's hundreds of nanoamps &mdash; which matters when the
+frequency-setting resistors are tens of kilohms and a pot wiper sits on a high-impedance
+node. Bias current through those resistors is offset, and offset through a pot is a click
+every time the knob turns.</p>
+<p>The cost is that the desk now carries two op-amp types, which the bill of materials and
+the spares box both need to account for.</p>
 
-<h2>How this section will be built</h2>
-<p>The compressor section is generated from a single source of truth: a
-<code>design.py</code> holding the netlist as data, which the KiCad schematic is verified
-against pin by pin. The interactive schematics, the component data behind them and the
-bill-of-materials counts all come from that one file.</p>
-<p>This module follows the same route. Nothing here becomes real documentation until there
-is a <code>design.py</code> to generate it from.</p>
+<h2>How the repository is laid out</h2>
+<div class="tw"><table><thead><tr><th class="r">Folder</th><th class="">What is in it</th></tr></thead><tbody><tr><td class="r"><code>LBP/</code></td><td class="">The current parametric band schematic, edited 16 Sep</td></tr><tr><td class="r"><code>LBPF/</code></td><td class="">An earlier copy of the same band, plus the LTspice model <code>BandA.asc</code> and its results</td></tr><tr><td class="r"><code>LPF/LPF/</code></td><td class="">The low-pass filter schematic and a PDF of it</td></tr><tr><td class="r"><code>EQ BOM.docx</code></td><td class="">A bill-of-materials table with its columns set up and no rows filled</td></tr></tbody></table></div>
+<p>Worth knowing before editing: <code>LBP/</code> and <code>LBPF/</code> are two copies of
+the same band that have now diverged. The simulation belongs to the <code>LBPF/</code> copy;
+the schematic work since has gone into <code>LBP/</code>.</p>
 
-<div class="next"><span></span><a href="input.html">Input buffer &rarr;</a></div>
+<div class="next"><span></span><a href="parametric.html">Parametric band &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; template &mdash; no circuit exists yet<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4c6c1af<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

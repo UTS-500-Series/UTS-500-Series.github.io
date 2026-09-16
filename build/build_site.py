@@ -19,6 +19,7 @@ from modules import MODULES
 
 BADGE = {'built':    ('Built',    'ok'),
          'designed': ('Designed', 'ok'),
+         'progress': ('In progress', 'warn'),
          'planned':  ('Template', 'warn')}
 
 
@@ -78,14 +79,15 @@ built that way.</p>
 {chr(10).join(cards)}
 </div>
 
-<h2>What "template" means</h2>
-<p>Only the compressor has been designed. Its pages are generated from a netlist that the
-KiCad schematic is verified against, pin by pin, so the figures in it come from the design
-rather than from memory.</p>
-<p>The preamp and equaliser sections are <strong>templates</strong>. They carry no circuit
-values, no part numbers and no performance figures, because none exist yet. What they do
-carry is the shape of the work: which sections a module needs, and which decisions have to
-be made before any of it can be drawn. They are checklists, not documentation.</p>
+<h2>How far along each module is</h2>
+<p>The compressor has been designed. Its pages are generated from a netlist that the KiCad
+schematic is verified against, pin by pin, so the figures in it come from the design rather
+than from memory.</p>
+<p>The equaliser is <strong>in progress</strong>: its filter sections are drawn and one band
+has been simulated, but the schematics carry no values yet. Its pages say which numbers are
+real and which are not.</p>
+<p>The preamp section is a <strong>template</strong>. It carries no circuit values, no part
+numbers and no performance figures &mdash; it is a checklist, not documentation.</p>
 
 <h2>The format</h2>
 <p>Every module shares the same constraints, which is most of what makes a rack of them

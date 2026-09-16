@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Low-pass filter &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
+<meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Filter sections</h4><a href="parametric.html"><i>02</i><span>Parametric band</span></a><a href="lowpass.html" class="on"><i>03</i><span>Low-pass filter</span></a><h4>Practical</h4><a href="simulation.html"><i>04</i><span>Simulating it</span></a><a href="status.html"><i>05</i><span>What is left</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Filter section 03</p>
+<h1>The low-pass filter</h1>
+<p class="lede">A second-order Sallen-Key low-pass with a variable control &mdash; the
+simplest active filter there is, and the only section that needs just one op amp.</p>
+
+<figure>
+  <div class="pane tall"><img src="img/lpf.svg" alt="Low pass Sallen-Key variable equaliser &mdash; LPF/LPF/LPF.kicad_sch at 4c6c1af" loading="lazy"></div>
+  <figcaption><span>Low pass Sallen-Key variable equaliser &mdash; LPF/LPF/LPF.kicad_sch at 4c6c1af</span><a href="img/lpf.svg" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<h2>How it works</h2>
+<p>The signal passes through two resistors in series into the op amp's non-inverting input,
+with C2 from that input to ground. C1 feeds the <em>output</em> back to the point between
+the resistors. At low frequencies C1 does nothing and the op amp simply buffers. Towards the
+cutoff, C1's positive feedback props the response up, which is what lets two capacitors give
+a sharper, flatter-topped roll-off than two plain RC stages would. Above cutoff the response
+falls at 12&nbsp;dB per octave.</p>
+<p>R3 and R4 set the stage's gain, 1&nbsp;+&nbsp;R3/R4. In a Sallen-Key that gain is not just
+a level control: it sets how much positive feedback C1 applies, and so it sets the Q of the
+filter. Gain near 1 gives a gentle roll-off; push it towards 3 and the filter peaks, then
+oscillates.</p>
+<p>With the resistors called R<sub>a</sub> and R<sub>b</sub>, the cutoff is</p>
+<p style="text-align:center"><em>f</em><sub>c</sub> = 1 &frasl; (2&pi; &radic;(R<sub>a</sub> R<sub>b</sub> C1 C2))</p>
+
+<h2>The variable control does not sweep cutoff</h2>
+<p>RV1 sits between R1 and R2 with its wiper carrying C1's feedback tap. Turning it does not
+change the total resistance &mdash; it slides the tap point along the chain, moving resistance
+from one side of C1 to the other. So R<sub>a</sub>&nbsp;+&nbsp;R<sub>b</sub> stays constant
+while their <em>product</em> changes, and a product with a fixed sum is largest when the two
+are equal.</p>
+<p>The consequence: <strong>cutoff falls to its lowest at the centre of the pot's travel and
+rises again towards either end.</strong> This holds for any values. As a check, with example
+values R1&nbsp;=&nbsp;R2&nbsp;=&nbsp;1&nbsp;k&Omega;, RV1&nbsp;=&nbsp;10&nbsp;k&Omega; and both
+capacitors 10&nbsp;nF:</p>
+<div class="tw"><table><thead><tr><th class="r">RV1 position</th><th class="n">0%</th><th class="n">25%</th><th class="n">50%</th><th class="n">75%</th><th class="n">100%</th></tr></thead><tbody><tr><td class="r">Cutoff</td><td class="n">4.80 kHz</td><td class="n">2.92 kHz</td><td class="n">2.65 kHz</td><td class="n">2.92 kHz</td><td class="n">4.80 kHz</td></tr></tbody></table></div>
+<p>With R1 and R2 equal, the two halves of the knob do the same thing &mdash; a panel legend
+cannot be drawn for it. The Q moves as well, because the resistor ratio feeds into the
+feedback. The values above are illustrative, since the sheet has none yet; the shape of the
+problem is not.</p>
+<p>If the aim is a knob that sweeps cutoff, the usual fix is a <strong>dual-gang pot</strong>
+with one gang in place of each resistor, so R<sub>a</sub> and R<sub>b</sub> rise and fall
+together and Q stays put.</p>
+
+<div class="next"><a href="parametric.html">&larr; Parametric band</a><a href="simulation.html">Simulating it &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4c6c1af<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

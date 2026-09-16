@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulating it &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
+<meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Filter sections</h4><a href="parametric.html"><i>02</i><span>Parametric band</span></a><a href="lowpass.html"><i>03</i><span>Low-pass filter</span></a><h4>Practical</h4><a href="simulation.html" class="on"><i>04</i><span>Simulating it</span></a><a href="status.html"><i>05</i><span>What is left</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Practical</p>
+<h1>Simulating it</h1>
+<p class="lede">Band A was simulated in LTspice and the results are in the repository. As
+committed, though, the simulation will not run on anyone else's machine &mdash; and the most
+recent attempt failed on the original one too.</p>
+
+<h2>The failure</h2>
+<p>The newest log, <code>LBPF/BandA/BandA.log</code>, stops on the same error for all four op
+amps:</p>
+<pre><code>This sub-circuit name is not defined.</code></pre>
+<p>The results plotted on the <a href="parametric.html">parametric band page</a> come from an
+<em>earlier</em> run: <code>BandA.raw</code> is stamped 29&nbsp;Aug 18:28, and the failing log
+19:10 the same evening. Something changed in between.</p>
+
+<h2>Two things to fix</h2>
+<div class="tw"><table><thead><tr><th class="r">Problem</th><th class="">Where</th><th class="">Fix</th></tr></thead><tbody><tr><td class="r">The op-amp model is referenced by an absolute Windows path, <code>C:\Users\&hellip;\Downloads\sbom627d\OPA164x.LIB</code></td><td class="">Each op amp's <code>ModelFile</code> in <code>BandA.asc</code>, and the symbol <code>OPA164x.asy</code></td><td class="">Point them at the copy already committed beside the schematic, <code>BandA/OPA164x.LIB</code>, with a relative path. As it stands the model is found only on the machine it was drawn on.</td></tr><tr><td class="r">The error names the subcircuit <code>OPA164</code>; the library defines <code>OPA164x</code></td><td class="">The netlist lines quoted in the log</td><td class="">Once the path resolves, confirm the name LTspice asks for matches <code>.SUBCKT OPA164x</code> in the library exactly.</td></tr></tbody></table></div>
+<p>The first is certain. The second is what the log reports, but the symbol's own value field
+reads <code>OPA164x</code>, so the mismatch may disappear once the path is fixed &mdash; re-run
+and read the log before editing names.</p>
+
+<h2>Re-running it</h2>
+<ol>
+  <li>Open <code>LBPF/BandA.asc</code> in LTspice.</li>
+  <li>Fix the model path as above.</li>
+  <li>Run. The analysis is already set: <code>.ac dec 100 10 100k</code>, 100 points per decade
+  from 10&nbsp;Hz to 100&nbsp;kHz.</li>
+  <li>Plot <code>V(output)</code>. It should reproduce the +5.2&nbsp;dB peak near 520&nbsp;Hz.
+  If it does not, the circuit changed after the 18:28 run.</li>
+</ol>
+<p>Committing the regenerated <code>.raw</code> with the fix means the plot on this site can be
+refreshed from a result that is known to come from the current file.</p>
+
+<div class="next"><a href="lowpass.html">&larr; Low-pass filter</a><a href="status.html">What is left &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4c6c1af<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

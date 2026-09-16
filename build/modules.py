@@ -11,7 +11,7 @@ class Module:
     def __init__(self, slug, name, tagline, status, description, footer,
                  content, repo=None):
         self.slug, self.name, self.tagline = slug, name, tagline
-        self.status = status                  # 'built' | 'designed' | 'planned'
+        self.status = status                  # 'built' | 'designed' | 'progress' | 'planned'
         self.description = description
         self.footer = footer
         self.content = content                # python module holding NAV and PAGES
@@ -47,10 +47,11 @@ MODULES = [
            content='content_preamp'),
 
     Module('equaliser', 'Equaliser',
-           'Multi-band equaliser. Not yet designed.',
-           'planned',
-           'Planned documentation for the UTS Mini Mixing Desk equaliser module.',
-           'template &mdash; no circuit exists yet',
+           'State-variable parametric bands and a Sallen-Key low-pass, around the OPA1641. '
+           'Drawn and partly simulated.',
+           'progress',
+           'How the UTS Mini Mixing Desk equaliser module works, and how far along it is.',
+           'written from the Equaliser repository at 4c6c1af',
            content='content_equaliser'),
 ]
 
