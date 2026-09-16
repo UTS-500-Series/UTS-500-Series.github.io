@@ -40,10 +40,11 @@ MODULES = [
            content='content_compressor', repo='compressor'),
 
     Module('preamp', 'Preamp',
-           'Microphone preamplifier with phantom power. Not yet designed.',
-           'planned',
-           'Planned documentation for the UTS Mini Mixing Desk preamp module.',
-           'template &mdash; no circuit exists yet',
+           'ESP Project 66 low-noise balanced mic preamp, with Project 96 phantom power, '
+           'in a 500-series slot.',
+           'designed',
+           'How the UTS Mini Mixing Desk microphone preamp works, based on ESP Project 66.',
+           'based on ESP Projects 66 and 96 by Rod Elliott, sound-au.com',
            content='content_preamp'),
 
     Module('equaliser', 'Equaliser',

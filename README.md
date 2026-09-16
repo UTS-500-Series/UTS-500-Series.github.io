@@ -15,7 +15,7 @@ also render correctly if this is ever demoted to an ordinary project site.
 | Module | Status | Source |
 |---|---|---|
 | Compressor | **Designed** — schematic complete, verified, not built | [`../compressor`](../compressor) |
-| Preamp | Template — no circuit exists | — |
+| Preamp | **Published design** — ESP Project 66, with Project 96 phantom power | [ESP P66](https://sound-au.com/project66.htm), [P96](https://sound-au.com/project96.htm) |
 | Equaliser | **In progress** — sections drawn, one band simulated, no values on the schematics | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
 
 Only the compressor has a design. Its pages are generated from `design.py` in the compressor
@@ -24,10 +24,7 @@ from the design rather than from memory.
 
 The equaliser section is written from its own repository and says plainly which numbers are real: the only measured-looking figures come from one committed LTspice run, and its schematic images (`site/equaliser/img/`) are KiCad exports cropped to their content by hand. Regenerate and re-crop them when the sheets change.
 
-The preamp section is a **template**. They contain no circuit values, no part
-numbers and no performance figures, because none exist. What they do contain is the shape of
-the work — the sections a module needs, and the decisions that have to be made before any of
-it can be drawn. Read them as checklists.
+The preamp section explains **ESP Project 66** by Rod Elliott, with phantom power from Project 96, and credits it throughout. It is written from ESP's articles, not from the KiCad redraw in `../preamp`. Measured figures are ESP's; the ±16 V operating points and the input impedance with phantom fitted are our own calculations and are labelled so. ESP's schematic is linked, not copied onto the site.
 
 ## Layout
 

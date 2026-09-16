@@ -43,7 +43,17 @@ amps:</p>
 19:10 the same evening. Something changed in between.</p>
 
 <h2>Two things to fix</h2>
-<div class="tw"><table><thead><tr><th class="r">Problem</th><th class="">Where</th><th class="">Fix</th></tr></thead><tbody><tr><td class="r">The op-amp model is referenced by an absolute Windows path, <code>C:\Users\&hellip;\Downloads\sbom627d\OPA164x.LIB</code></td><td class="">Each op amp's <code>ModelFile</code> in <code>BandA.asc</code>, and the symbol <code>OPA164x.asy</code></td><td class="">Point them at the copy already committed beside the schematic, <code>BandA/OPA164x.LIB</code>, with a relative path. As it stands the model is found only on the machine it was drawn on.</td></tr><tr><td class="r">The error names the subcircuit <code>OPA164</code>; the library defines <code>OPA164x</code></td><td class="">The netlist lines quoted in the log</td><td class="">Once the path resolves, confirm the name LTspice asks for matches <code>.SUBCKT OPA164x</code> in the library exactly.</td></tr></tbody></table></div>
+<h3>1. The model is linked by an absolute Windows path</h3>
+<p>Every op amp's <code>ModelFile</code> in <code>BandA.asc</code>, and the symbol
+<code>OPA164x.asy</code>, point at a folder on the machine the file was drawn on:</p>
+<pre><code>C:\Users\...\Downloads\sbom627d\OPA164x.LIB</code></pre>
+<p>A copy of the library is already committed beside the schematic, at
+<code>LBPF/BandA/OPA164x.LIB</code>. Point the model at that with a relative path and the
+simulation will find it on any machine.</p>
+<h3>2. The subcircuit name</h3>
+<p>The log names the subcircuit <code>OPA164</code>; the library defines
+<code>.SUBCKT OPA164x</code>. Once the path resolves, confirm the name LTspice asks for matches
+exactly.</p>
 <p>The first is certain. The second is what the log reports, but the symbol's own value field
 reads <code>OPA164x</code>, so the mismatch may disappear once the path is fixed &mdash; re-run
 and read the log before editing names.</p>

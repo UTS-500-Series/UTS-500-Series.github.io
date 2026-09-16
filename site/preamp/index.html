@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Overview &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
-<meta name="description" content="Planned documentation for the UTS Mini Mixing Desk preamp module.">
+<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, based on ESP Project 66.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <link rel="stylesheet" href="../style.css">
 <script>
@@ -19,7 +19,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Preamp module</span></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><h4>Planned sections</h4><a href="input.html"><i>02</i><span>Mic input &amp; phantom</span></a><a href="gain.html"><i>03</i><span>The gain stage</span></a><a href="output.html"><i>04</i><span>Output stage</span></a><a href="power.html"><i>05</i><span>Power &amp; references</span></a><h4>Practical</h4><a href="panel.html"><i>06</i><span>The front panel</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><h4>The circuit</h4><a href="input.html"><i>02</i><span>Input stage</span></a><a href="gain.html"><i>03</i><span>Gain control</span></a><a href="output.html"><i>04</i><span>Output stage</span></a><h4>In the desk</h4><a href="phantom.html"><i>05</i><span>48 V phantom power</span></a><a href="rack.html"><i>06</i><span>In a 500-series slot</span></a><a href="build.html"><i>07</i><span>Building it</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -28,40 +28,61 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">preamp module</p>
-<h1>The preamp module</h1>
-<p class="lede">A microphone preamplifier for the desk: balanced mic input, switchable phantom power, and enough clean gain to bring a dynamic microphone up to line level.</p>
-<div class="note warn">
-  <h4>Nothing here is designed yet</h4>
-  <p>The preamp module has no schematic, no netlist and no bill of materials. This section is
-  a <strong>template</strong> that mirrors the structure of the
-  <a href="../compressor/index.html">compressor documentation</a>, so the shape of the work is
-  visible before the work starts. Every figure below is deliberately blank rather than
-  guessed.</p>
+<p class="eyebrow">Preamp module</p>
+<h1>The microphone preamp</h1>
+<p class="lede">A discrete, very low-noise balanced microphone preamp: two transistor pairs
+doing the gain, one op amp turning it into a balanced line output, and a single knob covering
+most of a 60&nbsp;dB range.</p>
+
+<div class="note">
+  <h4>Whose design this is</h4>
+  <p>This is <a href="https://sound-au.com/project66.htm">ESP Project 66</a> by Rod Elliott, with phantom power from
+  <a href="https://sound-au.com/project96.htm">Project 96</a>. We did not design it. These pages explain it in our own
+  words for the desk; the schematic itself is <a href="https://sound-au.com/p66-f1.gif">ESP's Figure 1</a>. ESP allows
+  construction for personal use, not commercial manufacture.</p>
 </div>
-<p>The preamp is the first module in the chain and sets the noise floor for everything after it. That makes its input stage the part that matters most: the compressor can be rebuilt without touching the desk's noise performance, but the preamp cannot.</p>
+
+<figure>
+  <div style="background:var(--surface-2);border:1px solid var(--rule);border-radius:8px;padding:10px">
+  <svg viewBox="0 0 640 230" role="img" style="width:100%;height:auto;display:block"
+       aria-label="Signal flow: balanced input to two Sziklai pairs joined by a gain control, then a difference amplifier to the balanced output">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="var(--sig)"/></marker></defs>
+    <text x="34" y="72" text-anchor="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="11">+IN</text><text x="34" y="172" text-anchor="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="11">&#8722;IN</text>
+    <line x1="56" y1="68" x2="118" y2="68" stroke="var(--sig)" stroke-width="2" marker-end="url(#ah)"/><line x1="56" y1="168" x2="118" y2="168" stroke="var(--sig)" stroke-width="2" marker-end="url(#ah)"/>
+    <rect x="120" y="40" width="140" height="56" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="190.0" y="62.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Sziklai pair</text><text x="190.0" y="78.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">Q3 + Q4</text>
+    <rect x="120" y="140" width="140" height="56" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="190.0" y="162.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Sziklai pair</text><text x="190.0" y="178.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">Q1 + Q2</text>
+    <line x1="190" y1="96" x2="190" y2="140" stroke="var(--ctl)" stroke-width="2" stroke-dasharray="4 3"/>
+    <rect x="200" y="105" width="96" height="26" rx="5" fill="var(--surface)" stroke="var(--ctl)"/>
+    <text x="248" y="122" text-anchor="middle" fill="var(--ctl)" font-family="var(--mono)" font-size="11">gain: R9 VR1</text>
+    <line x1="260" y1="68" x2="348" y2="108" stroke="var(--sig)" stroke-width="2" marker-end="url(#ah)"/><line x1="260" y1="168" x2="348" y2="128" stroke="var(--sig)" stroke-width="2" marker-end="url(#ah)"/>
+    <rect x="350" y="88" width="140" height="60" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="420.0" y="112.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Difference amp</text><text x="420.0" y="128.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">U1A, gain 4.55</text>
+    <line x1="490" y1="110" x2="560" y2="110" stroke="var(--sig)" stroke-width="2" marker-end="url(#ah)"/>
+    <text x="596" y="106" text-anchor="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="11">OUT+</text><text x="596" y="124" text-anchor="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="11">OUT&#8722;</text>
+    <text x="34" y="30" text-anchor="start" fill="var(--warn)" font-family="var(--mono)" font-size="11">P48 via P96</text>
+  </svg></div>
+  <figcaption><span>Signal flow &mdash; drawn for this site from ESP's Figure 1</span>
+  <a href="https://sound-au.com/p66-f1.gif" target="_blank" rel="noopener">ESP's schematic &rarr;</a></figcaption>
+</figure>
+
+<h2>What it does</h2>
+<p>A microphone delivers millivolts. The desk wants line level. The preamp's whole job is to
+supply that gain while adding as little noise as possible, because everything after it
+&mdash; the compressor, the equaliser &mdash; can only ever be as quiet as what the preamp
+hands on.</p>
+<p>Most preamps do this with an op amp or a dedicated mic preamp IC. This one uses discrete
+transistors at the input, which is where noise is decided, and only brings in an op amp once
+the signal is large enough that the op amp's own noise no longer matters.</p>
 
 <h2>Specifications</h2>
-<p>Filled in once there is a circuit to measure or calculate from. The rows fixed by the
-500-series format are the only numbers known today.</p>
-<div class="tw"><table><thead><tr><th class="r">Specification</th><th class="n">Value</th><th class="">Fixed by</th></tr></thead><tbody><tr><td class="r">Gain range</td><td class="n">&mdash;</td><td class="">to be decided</td></tr><tr><td class="r">Equivalent input noise</td><td class="n">&mdash;</td><td class="">to be measured</td></tr><tr><td class="r">Maximum input level</td><td class="n">&mdash;</td><td class="">to be decided</td></tr><tr><td class="r">Input impedance</td><td class="n">&mdash;</td><td class="">to be decided</td></tr><tr><td class="r">Phantom power</td><td class="n">&mdash;</td><td class="">48 V, 500-series standard</td></tr><tr><td class="r">Panel width</td><td class="n">&mdash;</td><td class="">1.5 in / 38.1 mm, 500-series</td></tr><tr><td class="r">Supply</td><td class="n">&mdash;</td><td class="">&plusmn;16 V, 130 mA per rail, 500-series</td></tr></tbody></table></div>
+<p>All measured figures are ESP's, from their workshop unit.</p>
+<div class="tw"><table><thead><tr><th class="r">Parameter</th><th class="n">Value</th><th class="">Source</th></tr></thead><tbody><tr><td class="r">Equivalent input noise</td><td class="n">0.27&nbsp;&micro;V RMS (20&nbsp;kHz, 200&nbsp;&Omega; source)</td><td class="">ESP, measured</td></tr><tr><td class="r">Noise density</td><td class="n">1.9&nbsp;nV/&radic;Hz</td><td class="">ESP, measured</td></tr><tr><td class="r">Noise figure</td><td class="n">0.9&nbsp;dB (vs 200&nbsp;&Omega;)</td><td class="">ESP, measured</td></tr><tr><td class="r">Maximum gain</td><td class="n">56&nbsp;dB with R9 at 22&nbsp;&Omega; (60&nbsp;dB nominal)</td><td class="">ESP</td></tr><tr><td class="r">Output stage gain</td><td class="n">4.55, 13&nbsp;dB</td><td class="">100k / 22k</td></tr><tr><td class="r">Maximum input</td><td class="n">about 1.5&nbsp;V RMS before clipping</td><td class="">ESP</td></tr><tr><td class="r">Input impedance</td><td class="n">6.6&nbsp;k&Omega;; 4.4&nbsp;k&Omega; with phantom feed fitted</td><td class="">ESP; ours</td></tr><tr><td class="r">CMRR</td><td class="n">well over 60&nbsp;dB</td><td class="">ESP</td></tr><tr><td class="r">Bandwidth</td><td class="n">beyond 100&nbsp;kHz</td><td class="">ESP</td></tr><tr><td class="r">Supply</td><td class="n">&plusmn;15&nbsp;V in the article; &plusmn;16&nbsp;V in the rack</td><td class="">ESP; 500-series</td></tr></tbody></table></div>
+<p>For scale: 1.9&nbsp;nV/&radic;Hz matches the SSM2017, a dedicated professional mic preamp
+IC, which ESP uses as their point of comparison.</p>
 
-<h2>What has to be decided first</h2>
-<p>These are the choices that determine everything else. Until they are made, the pages in
-this section have nothing to say.</p>
-<div class="tw"><table><thead><tr><th class="r">Decision</th><th class="">Why it drives the rest</th></tr></thead><tbody><tr><td class="r">Transformer or electronic input</td><td class="">Sets the cost, the size, the noise floor and the whole shape of the input sheet.</td></tr><tr><td class="r">Where 48 V comes from</td><td class="">Generating it on-module means a converter and its noise; taking it from the rack means the chassis wiring has to carry it, which today it does not.</td></tr><tr><td class="r">Gain range and how it is set</td><td class="">A switched attenuator and a continuous pot lead to completely different circuits.</td></tr><tr><td class="r">Whether the desk needs matched channels</td><td class="">Stereo work needs channel-to-channel gain matching, which forces switched gain and tolerance parts.</td></tr></tbody></table></div>
-
-<h2>How this section will be built</h2>
-<p>The compressor section is generated from a single source of truth: a
-<code>design.py</code> holding the netlist as data, which the KiCad schematic is verified
-against pin by pin. The interactive schematics, the component data behind them and the
-bill-of-materials counts all come from that one file.</p>
-<p>This module follows the same route. Nothing here becomes real documentation until there
-is a <code>design.py</code> to generate it from.</p>
-
-<div class="next"><span></span><a href="input.html">Mic input &amp; phantom &rarr;</a></div>
+<div class="next"><span></span><a href="input.html">Input stage &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Preamp &middot; template &mdash; no circuit exists yet<br>
+  UTS Mini Mixing Desk &mdash; Preamp &middot; based on ESP Projects 66 and 96 by Rod Elliott, sound-au.com<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

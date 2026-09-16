@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Output stage &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
-<meta name="description" content="Planned documentation for the UTS Mini Mixing Desk preamp module.">
+<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, based on ESP Project 66.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <link rel="stylesheet" href="../style.css">
 <script>
@@ -19,7 +19,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Preamp module</span></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Planned sections</h4><a href="input.html"><i>02</i><span>Mic input &amp; phantom</span></a><a href="gain.html"><i>03</i><span>The gain stage</span></a><a href="output.html" class="on"><i>04</i><span>Output stage</span></a><a href="power.html"><i>05</i><span>Power &amp; references</span></a><h4>Practical</h4><a href="panel.html"><i>06</i><span>The front panel</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>The circuit</h4><a href="input.html"><i>02</i><span>Input stage</span></a><a href="gain.html"><i>03</i><span>Gain control</span></a><a href="output.html" class="on"><i>04</i><span>Output stage</span></a><h4>In the desk</h4><a href="phantom.html"><i>05</i><span>48 V phantom power</span></a><a href="rack.html"><i>06</i><span>In a 500-series slot</span></a><a href="build.html"><i>07</i><span>Building it</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -28,27 +28,49 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">Planned section 04</p>
+<p class="eyebrow">The circuit &mdash; 04</p>
 <h1>The output stage</h1>
-<p class="lede">Driving the balanced output back into the rack, and the metering tap.</p>
-<div class="note warn">
-  <h4>Nothing here is designed yet</h4>
-  <p>The preamp module has no schematic, no netlist and no bill of materials. This section is
-  a <strong>template</strong> that mirrors the structure of the
-  <a href="../compressor/index.html">compressor documentation</a>, so the shape of the work is
-  visible before the work starts. Every figure below is deliberately blank rather than
-  guessed.</p>
-</div>
-<h2>Open questions</h2>
-<ul><li>Balanced output on the same topology as the compressor, or transformer?</li><li>Where the level meter should sense from.</li></ul>
-<h2>What this page will contain</h2>
-<p>Once the section is drawn: an interactive schematic of the sheet, a walk through what each
-part does and why it is that value, and the measurements or calculations behind any figure
-quoted. The compressor section shows the format.</p>
+<p class="lede">A standard op-amp difference amplifier turns the input stage's two outputs
+into one balanced line output, and rejects whatever is common to both.</p>
 
-<div class="next"><a href="gain.html">&larr; The gain stage</a><a href="power.html">Power &amp; references &rarr;</a></div>
+<h2>How it works</h2>
+<p>Each input-stage output sits at about &minus;8.3&nbsp;V, so C2 and C3 block that DC before
+it reaches the op amp. R10 and R11, 22&nbsp;k&Omega;, feed the two op-amp inputs; R12 and R13,
+100&nbsp;k&Omega;, set the gain at 100/22&nbsp;=&nbsp;4.55, about 13&nbsp;dB.</p>
+<p>A difference amplifier only works well if its resistor pairs match. Any mismatch between
+R10/R11 or R12/R13 lets common-mode signal through as if it were audio. ESP recommends 1%
+metal film throughout, and the stage achieves well over 60&nbsp;dB of CMRR &mdash; better than
+any microphone cable needs.</p>
+
+<h2>Headroom</h2>
+<p>Because the output stage has fixed gain, it also fixes how large a signal the preamp can
+take. ESP gives the ceiling as about 1.5&nbsp;V RMS at the input before clipping, which with a
+typical microphone corresponds to more than 150&nbsp;dB SPL. Practically, the preamp will not
+be the thing that overloads.</p>
+
+<h2>Balanced output</h2>
+<p>OUT+ comes from the op amp through R15, 100&nbsp;&Omega;. OUT&minus; is taken to ground
+through R16, also 100&nbsp;&Omega;. So only one leg carries signal, but both legs present the
+same 100&nbsp;&Omega; impedance. That is an <strong>impedance-balanced</strong> output: the
+receiving input still rejects hum picked up along the cable, because the hum arrives equally
+on both legs, and it costs one op amp rather than two.</p>
+
+<h2>Which op amp</h2>
+<p>ESP's text suggests a TL071 or similar; their Figure 1 shows an NE5532. Either works here:
+by this point the signal is large and op-amp noise is swamped. The NE5532 is the natural choice
+for this desk, which already stocks it for the compressor. It is a dual, so the unused half
+needs tying off &mdash; see <a href="build.html">Building it</a>.</p>
+
+<div class="note warn">
+  <h4>Never into a phantom-powered input</h4>
+  <p>ESP warns that this preamp must not be connected to a mixer input supplying phantom power:
+  48&nbsp;V on the output destroys the op amp. If the output could ever meet a phantom-powered
+  input, protect it with zener diodes, series resistors and coupling capacitors.</p>
+</div>
+
+<div class="next"><a href="gain.html">&larr; Gain control</a><a href="phantom.html">48 V phantom power &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Preamp &middot; template &mdash; no circuit exists yet<br>
+  UTS Mini Mixing Desk &mdash; Preamp &middot; based on ESP Projects 66 and 96 by Rod Elliott, sound-au.com<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>
