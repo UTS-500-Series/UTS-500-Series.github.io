@@ -15,12 +15,13 @@ SITE = os.path.join(ROOT, 'site')
 sys.path.insert(0, HERE)
 
 import shell
-from modules import MODULES
+from modules import MODULES, GUIDES
 
 BADGE = {'built':    ('Built',    'ok'),
          'designed': ('Designed', 'ok'),
          'progress': ('In progress', 'warn'),
-         'planned':  ('Template', 'warn')}
+         'planned':  ('Template', 'warn'),
+         'guide':    ('Guide',    'ok')}
 
 
 def copy_module_assets(mod):
@@ -53,9 +54,9 @@ def build_module(mod):
     print('  %-10s %2d pages -> site/%s/' % (mod.slug, len(mod.order), mod.slug))
 
 
-def home():
+def cards_for(mods):
     cards = []
-    for m in MODULES:
+    for m in mods:
         label, tone = BADGE[m.status]
         pages = len(m.order)
         cards.append(f"""  <a class="mod {tone}" href="{m.slug}/index.html">
@@ -64,6 +65,10 @@ def home():
     <p>{m.tagline}</p>
     <span class="mod-more">{pages} pages &rarr;</span>
   </a>""")
+    return chr(10).join(cards)
+
+
+def home():
     return shell.head('%s &mdash; module documentation' % shell.SUITE,
                       'Documentation for the UTS Mini Mixing Desk 500-series modules.',
                       up='') + f"""
@@ -76,7 +81,13 @@ each one section by section &mdash; what the circuit does, how it does it, and w
 built that way.</p>
 
 <div class="mods">
-{chr(10).join(cards)}
+{cards_for(MODULES)}
+</div>
+
+<h2>Guides</h2>
+<p>Shared by every module.</p>
+<div class="mods">
+{cards_for(GUIDES)}
 </div>
 
 <h2>How far along each module is</h2>
@@ -113,9 +124,9 @@ work together.</p>
 
 if __name__ == '__main__':
     print('building %s' % SITE)
-    for m in MODULES:
+    for m in MODULES + GUIDES:
         build_module(m)
     open(os.path.join(SITE, 'index.html'), 'w').write(home())
     print('  home page -> site/index.html')
-    total = sum(len(m.order) for m in MODULES) + 1
-    print('%d pages across %d modules' % (total, len(MODULES)))
+    total = sum(len(m.order) for m in MODULES + GUIDES) + 1
+    print('%d pages across %d modules and %d guide(s)' % (total, len(MODULES), len(GUIDES)))

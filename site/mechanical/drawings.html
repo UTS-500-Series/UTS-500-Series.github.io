@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Export drawings &middot; UTS Mini Mixing Desk &mdash; Mechanical design</title>
+<meta name="description" content="How to model the UTS Mini Mixing Desk modules and faceplates in Fusion 360 and export dimensioned drawings.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Mechanical design guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Which software</span></a><h4>The format</h4><a href="dimensions.html"><i>02</i><span>Numbers to design to</span></a><h4>Workflow</h4><a href="pcb.html"><i>03</i><span>PCB into Fusion</span></a><a href="faceplate.html"><i>04</i><span>Model the faceplate</span></a><a href="assembly.html"><i>05</i><span>Assemble and check</span></a><a href="drawings.html" class="on"><i>06</i><span>Export drawings</span></a><h4>Practical</h4><a href="modules.html"><i>07</i><span>Per-module notes</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Workflow, step D</p>
+<h1>Export the drawings</h1>
+<p class="lede">An outline drawing is a sheet with a zoned border, a title block that states
+units, tolerances and scale, a revision table, third-angle views of the whole product and only
+overall dimensions. Fusion's Drawing workspace does all of that.</p>
+
+<h2>Set up a template once</h2>
+<ol>
+  <li>From any module design, <em>File &rarr; New Drawing &rarr; From Design</em>. Choose
+  <strong>Standard: ISO</strong>, <strong>Units: mm</strong>, <strong>Sheet size: A3</strong>.
+  A whole 500-series module fits at 1:1 on A3.</li>
+  <li>In the drawing's document settings, set <strong>Projection angle: Third angle</strong>, as
+  AS 1100 prefers.</li>
+  <li>Double-click the title block to fill it: title, part number, drawn by, checked, date,
+  scale, sheet <em>n of m</em>. Add a general tolerance note: <em>Dimensions in millimetres. No
+  decimal &plusmn;0.5, one decimal &plusmn;0.2, two decimal &plusmn;0.1. Angular &plusmn;30&prime;.
+  Remove all burrs and sharp edges. Do not scale.</em></li>
+  <li>Add a revision table and a notes block. Then <em>File &rarr; Save as Template</em> so all
+  three modules share the same sheet.</li>
+</ol>
+
+<h2>Sheets for each module</h2>
+<div class="tw"><table><thead><tr><th class="r">Sheet</th><th class="">Views</th><th class="">Dimensions</th></tr></thead><tbody><tr><td class="r">1. Outline</td><td class="">Front, side, top and an isometric of the whole module with knobs</td><td class="">Overall height, width and depth only, including knob protrusion.</td></tr><tr><td class="r">2. Faceplate</td><td class="">Front view at 1:1, section through one mounting hole</td><td class="">Ordinate dimensions from the top-left corner to every hole centre, hole callouts, countersink note, finish and material.</td></tr><tr><td class="r">3. PCB</td><td class="">Top view of the board, side view showing the fingers</td><td class="">Outline, finger position and pitch, mounting and bracket holes, maximum component height.</td></tr></tbody></table></div>
+
+<h2>Build each sheet</h2>
+<ol>
+  <li><strong>Place views.</strong> <em>Base View</em> of the assembly in front orientation, then
+  <em>Projected View</em> to drag out the side, top and isometric. In each view's settings
+  choose <em>Visible edges</em> and hide tangent edges for a clean line style.</li>
+  <li><strong>Dimension.</strong> Use <em>Dimension</em> for overall sizes and <em>Ordinate
+  Dimension</em> for the hole pattern, with the origin at the panel's top-left corner. That
+  matches the drill schedule already in the compressor's panel README, so the drawing and the
+  table can be checked against each other.</li>
+  <li><strong>Annotate.</strong> <em>Center Mark</em> and <em>Centerline</em> on every hole,
+  <em>Hole and Thread Note</em> on the mounting holes so the countersink reads automatically,
+  and a <em>Parts List</em> with balloons on sheet 1 if you want the parts on the drawing.</li>
+  <li><strong>Export.</strong> <em>Output &rarr; PDF</em> for submission and review, <em>Output
+  &rarr; DWG</em> or <em>DXF</em> if a panel shop or the UTS workshop wants CAD.</li>
+</ol>
+
+<div class="note warn">
+  <h4>For cutting, send the sketch</h4>
+  <p>For laser or CNC cutting, send the faceplate sketch DXF from step B, not the drawing DXF.
+  The drawing DXF includes the border, title block and dimensions, which a cutter will try to
+  cut.</p>
+</div>
+
+<div class="next"><a href="assembly.html">&larr; Assemble and check</a><a href="modules.html">Per-module notes &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Mechanical design &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

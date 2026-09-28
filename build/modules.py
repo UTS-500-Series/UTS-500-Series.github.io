@@ -9,9 +9,10 @@ are committed here, so building the pages never needs the module repositories pr
 
 class Module:
     def __init__(self, slug, name, tagline, status, description, footer,
-                 content, repo=None):
+                 content, repo=None, brand=None):
         self.slug, self.name, self.tagline = slug, name, tagline
-        self.status = status                  # 'built' | 'designed' | 'progress' | 'planned'
+        self.brand = brand or '%s module' % name   # subtitle under the suite name in the sidebar
+        self.status = status                  # 'built' | 'designed' | 'progress' | 'planned' | 'guide'
         self.description = description
         self.footer = footer
         self.content = content                # python module holding NAV and PAGES
@@ -56,4 +57,17 @@ MODULES = [
            content='content_equaliser'),
 ]
 
-BY_SLUG = {m.slug: m for m in MODULES}
+# Sections that cover all three modules rather than one. Built exactly like a module and
+# listed separately on the home page.
+GUIDES = [
+    Module('mechanical', 'Mechanical design',
+           'Bringing each KiCad board into Fusion 360, designing a faceplate round it, and '
+           'exporting dimensioned drawings.',
+           'guide',
+           'How to model the UTS Mini Mixing Desk modules and faceplates in Fusion 360 and '
+           'export dimensioned drawings.',
+           'a guide shared by all three modules',
+           content='content_mechanical', brand='Mechanical design guide'),
+]
+
+BY_SLUG = {m.slug: m for m in MODULES + GUIDES}
