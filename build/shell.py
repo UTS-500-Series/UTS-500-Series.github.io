@@ -107,7 +107,7 @@ def shell(mod, fname, title, body):
                 mod.description) + f"""
 <div class="shell">
 <aside class="side">
-  <a class="brand" href="../index.html"><b>{SUITE}</b><span>{mod.name} module</span></a>
+  <a class="brand" href="../index.html"><b>{SUITE}</b><span>{mod.brand}</span></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
   <nav>{''.join(nav)}</nav>
   <div class="side-foot">

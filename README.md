@@ -41,6 +41,7 @@ build/
   content_compressor.py the compressor's pages
   content_preamp.py     ┐ built from scaffold.py, which deliberately emits
   content_equaliser.py  ┘ no values for hardware that does not exist
+  content_mechanical.py the mechanical design guide (Fusion 360, faceplates, drawings)
   scaffold.py           the not-yet-designed-module template
   _data.py              viewer data, generated from a module's KiCad project
 ```
@@ -48,6 +49,13 @@ build/
 `site/` holds one folder per module plus a shared `style.css`, `viewer.js` and
 `vendor/cytoscape.min.js`. The generated `data/` and `img/` files are committed, so the site
 builds and publishes with no module repositories checked out.
+
+## Guides
+
+Sections that cover every module rather than one live in `GUIDES` in `build/modules.py`.
+They are built exactly like a module and listed under their own heading on the home page.
+The only one so far is **Mechanical design** (`site/mechanical/`): taking each KiCad board
+into Fusion 360, designing a faceplate round it, and exporting dimensioned drawings.
 
 ## Building
 

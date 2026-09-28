@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Per-module notes &middot; UTS Mini Mixing Desk &mdash; Mechanical design</title>
+<meta name="description" content="How to model the UTS Mini Mixing Desk modules and faceplates in Fusion 360 and export dimensioned drawings.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Mechanical design guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Which software</span></a><h4>The format</h4><a href="dimensions.html"><i>02</i><span>Numbers to design to</span></a><h4>Workflow</h4><a href="pcb.html"><i>03</i><span>PCB into Fusion</span></a><a href="faceplate.html"><i>04</i><span>Model the faceplate</span></a><a href="assembly.html"><i>05</i><span>Assemble and check</span></a><a href="drawings.html"><i>06</i><span>Export drawings</span></a><h4>Practical</h4><a href="modules.html" class="on"><i>07</i><span>Per-module notes</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Practical</p>
+<h1>Per-module notes</h1>
+<p class="lede">Where each module's mechanical work starts from, as of 28 September 2026.</p>
+<div class="tw"><table><thead><tr><th class="r">Module</th><th class="">Where it is</th><th class="">First step</th></tr></thead><tbody><tr><td class="r"><a href="https://github.com/UTS-500-Series/Compressor">Compressor</a></td><td class="">Full panel defined in <code>panel/make_panel.py</code>, with <code>faceplate.dxf</code> and a dimensioned drawing. Schematic done, no PCB layout.</td><td class="">In the faceplate sketch, <em>Insert &rarr; Insert DXF</em> the existing <code>faceplate.dxf</code> and extrude from it. Pick one of the three layouts first; the DXF is whichever was generated last.</td></tr><tr><td class="r"><a href="https://github.com/UTS-500-Series/Equaliser">Equaliser</a></td><td class="">Separate KiCad projects per filter band. The low band has 15 footprints placed, no traces. No 500-series board or panel yet.</td><td class="">Combine the bands onto one board started from the Pre-Amp template, then export STEP. Fix the missing OPA1641 model first.</td></tr><tr><td class="r"><a href="https://github.com/UTS-500-Series/Pre-Amp">Pre-Amp</a></td><td class="">The repository is the Series 500 KiCad template board, 47 footprints. No panel.</td><td class="">Export STEP now to get the card and connector envelope into Fusion. It doubles as the reference for the other two boards.</td></tr></tbody></table></div>
+<div class="note">
+  <h4>One source of truth per faceplate</h4>
+  <p>If the compressor panel moves into Fusion, treat <code>make_panel.py</code> as retired, or
+  keep the script as master and re-import its DXF whenever it changes. Editing both will
+  drift.</p>
+</div>
+
+<div class="next"><a href="drawings.html">&larr; Export drawings</a><span></span></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Mechanical design &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>
