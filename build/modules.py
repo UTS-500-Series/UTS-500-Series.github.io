@@ -41,12 +41,12 @@ MODULES = [
            content='content_compressor', repo='compressor'),
 
     Module('preamp', 'Preamp',
-           'ESP Project 66 low-noise balanced mic preamp, with Project 96 phantom power, '
-           'in a 500-series slot.',
-           'designed',
-           'How the UTS Mini Mixing Desk microphone preamp works, based on ESP Project 66.',
-           'based on ESP Projects 66 and 96 by Rod Elliott, sound-au.com',
-           content='content_preamp'),
+           'Discrete low-noise balanced mic preamp with switchable phantom power. '
+           'Drawn and laid out; no values yet.',
+           'progress',
+           'How the UTS Mini Mixing Desk microphone preamp works, from its KiCad schematic.',
+           'written from the Pre-Amp repository at 5e6a308',
+           content='content_preamp', repo='Pre-Amp'),
 
     Module('equaliser', 'Equaliser',
            'State-variable parametric bands and a Sallen-Key low-pass, around the OPA1641. '

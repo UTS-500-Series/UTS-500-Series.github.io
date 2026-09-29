@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gain control &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
-<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, based on ESP Project 66.">
+<title>Gain stage &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
+<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, from its KiCad schematic.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <link rel="stylesheet" href="../style.css">
 <script>
@@ -19,7 +19,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Preamp module</span></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>The circuit</h4><a href="input.html"><i>02</i><span>Input stage</span></a><a href="gain.html" class="on"><i>03</i><span>Gain control</span></a><a href="output.html"><i>04</i><span>Output stage</span></a><h4>In the desk</h4><a href="phantom.html"><i>05</i><span>48 V phantom power</span></a><a href="rack.html"><i>06</i><span>In a 500-series slot</span></a><a href="build.html"><i>07</i><span>Building it</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="input.html"><i>03</i><span>Input and phantom power</span></a><a href="gain.html" class="on"><i>04</i><span>Gain stage</span></a><a href="output.html"><i>05</i><span>Output stage</span></a><a href="power.html"><i>06</i><span>Power and J1</span></a><h4>Practical</h4><a href="board.html"><i>07</i><span>The board, and what is left</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -28,38 +28,43 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">The circuit &mdash; 03</p>
-<h1>The gain control</h1>
-<p class="lede">One pot, connected between the two halves rather than in the signal path, sets
-gain across most of a 60&nbsp;dB range.</p>
+<p class="eyebrow">The circuit &mdash; 04</p>
+<h1>The gain stage</h1>
+<p class="lede">Two compound transistor pairs, one per input leg, with the gain control floating
+between them. This is where the preamp's noise performance is decided.</p>
 
-<h2>A floating control</h2>
-<p>The gain network joins the emitter nodes of the two compound pairs. It is not referenced to
-ground: it floats between the halves, which is what ESP means by a common-mode gain control.
-The smaller the resistance between the emitters, the more the two halves are coupled, and the
-higher the gain.</p>
-<div class="tw"><table><thead><tr><th class="r">Part</th><th class="n">Value</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">R9</td><td class="n">22&nbsp;&Omega;</td><td class="">The fixed minimum resistance &mdash; sets maximum gain</td></tr><tr><td class="r">VR1</td><td class="n">10&nbsp;k&Omega;</td><td class="">The gain control, wired as a variable resistor</td></tr><tr><td class="r">R14</td><td class="n">100&nbsp;k&Omega;</td><td class="">Across VR1 &mdash; limits the maximum resistance, so minimum gain</td></tr><tr><td class="r">C1</td><td class="n">1,000&nbsp;&micro;F</td><td class="">Keeps the network AC-only, so turning the knob does not disturb DC bias</td></tr></tbody></table></div>
+<h2>A Sziklai pair</h2>
+<p>Each leg pairs a PNP with an NPN. The PNP (Q1 or Q2, 2N3906) takes the input at its base; its
+collector drives the NPN's base (Q3 or Q4, BC549); the NPN's collector returns to the PNP's
+emitter. The two behave as one high-gain PNP transistor, far more linear than either device alone
+because the second corrects the first.</p>
+<div class="tw"><table><thead><tr><th class="r">Acts as</th><th class="">Cold leg</th><th class="">Hot leg</th></tr></thead><tbody><tr><td class="r">Base (input)</td><td class="">Q1 base, <code>-PreIN</code></td><td class="">Q2 base, <code>+PreIN</code></td></tr><tr><td class="r">Emitter</td><td class="">Q1 emitter + Q3 collector</td><td class="">Q2 emitter + Q4 collector</td></tr><tr><td class="r">Collector (output)</td><td class="">Q3 emitter</td><td class="">Q4 emitter</td></tr></tbody></table></div>
 
-<h2>How much gain</h2>
-<p>ESP gives full gain as 1,000 times, 60&nbsp;dB &mdash; or 56&nbsp;dB in practice with R9 at
-22&nbsp;&Omega;. The output stage contributes a fixed 13&nbsp;dB of that; the input stage does
-the rest.</p>
-<p>C1 has to be large because it sits in series with a resistance as low as 22&nbsp;&Omega;.
-Anything smaller and it starts to limit gain at low frequencies. It sees almost no DC, so ESP
-notes an ordinary 10 or 16&nbsp;V electrolytic is fine.</p>
+<h2>Biasing</h2>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="">Connected</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">R6 / R7</td><td class="">+16&nbsp;V to the emitter node</td><td class="">Feeds the pair: sets the stage current</td></tr><tr><td class="r">R15 / R16</td><td class="">Across Q3 / Q4 base&ndash;emitter</td><td class="">Sets how much of the current the PNP passes to the NPN</td></tr><tr><td class="r">R19 / R20</td><td class="">Output node to &minus;16&nbsp;V</td><td class="">The pair's load; the output sits between the rails</td></tr></tbody></table></div>
+<p>The two legs are drawn identically, part for part. For the stage to reject hum it must stay
+that way on the board: matched transistors and matched resistors, leg to leg.</p>
 
-<h2>The pot's taper matters</h2>
-<p>Gain rises steeply as resistance falls towards zero, so a linear pot would cram almost all
-of the useful range into the last few degrees of rotation. ESP recommends a <strong>reverse
-log</strong> pot, which spreads the range across the knob &mdash; or a rotary switch with
-6&nbsp;dB steps covering the range, which also makes settings repeatable and stereo pairs
-matchable.</p>
-<p>A reverse log 10&nbsp;k&Omega; pot is the one part ESP flags as hard to find. For a desk
-where two channels might need to match, the switch is worth considering on that ground alone.</p>
+<h2>The gain network</h2>
+<p>The network joins the two emitter nodes. It is not referenced to ground: it floats between the
+halves. The lower its resistance, the more signal current flows between the pairs, and the higher
+the gain.</p>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="">Where</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">R8</td><td class="">From the Q1/Q3 emitter node</td><td class="">Fixed minimum resistance: sets maximum gain</td></tr><tr><td class="r">RV1</td><td class="">After R8, wiper tied to one end</td><td class="">The gain control, wired as a variable resistor</td></tr><tr><td class="r">R5</td><td class="">In parallel with RV1</td><td class="">Caps the network resistance: sets minimum gain</td></tr><tr><td class="r">C6</td><td class="">To the Q2/Q4 emitter node</td><td class="">Blocks DC, so turning the knob does not upset bias</td></tr></tbody></table></div>
+<p>C6 has the largest footprint on the board (13&nbsp;mm radial). It is in series with a
+resistance that falls to just R8 at full gain, so it has to be large or it rolls off the bass at
+high gain. It sees almost no DC, so its voltage rating can be low.</p>
+<p>RV1 is on a 3-pin header, so the pot mounts on the panel. Gain rises steeply as resistance
+falls, so a linear pot crowds most of the range into the end of its travel: a reverse-log pot, or
+a stepped switch, spreads it out.</p>
 
-<div class="next"><a href="input.html">&larr; Input stage</a><a href="output.html">Output stage &rarr;</a></div>
+<h2>Polarity</h2>
+<p>Each pair inverts. The cold-leg pair's output goes to the op amp's non-inverting input and the
+hot leg's to the inverting input, so the second inversion undoes the first: the output is in
+phase with the microphone's hot leg.</p>
+
+<div class="next"><a href="input.html">&larr; Input and phantom power</a><a href="output.html">Output stage &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Preamp &middot; based on ESP Projects 66 and 96 by Rod Elliott, sound-au.com<br>
+  UTS Mini Mixing Desk &mdash; Preamp &middot; written from the Pre-Amp repository at 5e6a308<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

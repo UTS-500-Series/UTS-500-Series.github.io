@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Output stage &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
-<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, based on ESP Project 66.">
+<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, from its KiCad schematic.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <link rel="stylesheet" href="../style.css">
 <script>
@@ -19,7 +19,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Preamp module</span></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>The circuit</h4><a href="input.html"><i>02</i><span>Input stage</span></a><a href="gain.html"><i>03</i><span>Gain control</span></a><a href="output.html" class="on"><i>04</i><span>Output stage</span></a><h4>In the desk</h4><a href="phantom.html"><i>05</i><span>48 V phantom power</span></a><a href="rack.html"><i>06</i><span>In a 500-series slot</span></a><a href="build.html"><i>07</i><span>Building it</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="input.html"><i>03</i><span>Input and phantom power</span></a><a href="gain.html"><i>04</i><span>Gain stage</span></a><a href="output.html" class="on"><i>05</i><span>Output stage</span></a><a href="power.html"><i>06</i><span>Power and J1</span></a><h4>Practical</h4><a href="board.html"><i>07</i><span>The board, and what is left</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -28,49 +28,39 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">The circuit &mdash; 04</p>
+<p class="eyebrow">The circuit &mdash; 05</p>
 <h1>The output stage</h1>
-<p class="lede">A standard op-amp difference amplifier turns the input stage's two outputs
-into one balanced line output, and rejects whatever is common to both.</p>
+<p class="lede">One half of an NE5532, wired as a difference amplifier, turns the two pair
+outputs into a single output and rejects whatever is common to both.</p>
 
-<h2>How it works</h2>
-<p>Each input-stage output sits at about &minus;8.3&nbsp;V, so C2 and C3 block that DC before
-it reaches the op amp. R10 and R11, 22&nbsp;k&Omega;, feed the two op-amp inputs; R12 and R13,
-100&nbsp;k&Omega;, set the gain at 100/22&nbsp;=&nbsp;4.55, about 13&nbsp;dB.</p>
-<p>A difference amplifier only works well if its resistor pairs match. Any mismatch between
-R10/R11 or R12/R13 lets common-mode signal through as if it were audio. ESP recommends 1%
-metal film throughout, and the stage achieves well over 60&nbsp;dB of CMRR &mdash; better than
-any microphone cable needs.</p>
-
-<h2>Headroom</h2>
-<p>Because the output stage has fixed gain, it also fixes how large a signal the preamp can
-take. ESP gives the ceiling as about 1.5&nbsp;V RMS at the input before clipping, which with a
-typical microphone corresponds to more than 150&nbsp;dB SPL. Practically, the preamp will not
-be the thing that overloads.</p>
+<h2>The difference amplifier</h2>
+<p>The pair outputs sit well below ground, so C7 and C8 block that DC first.</p>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="">Connected</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">C7, R10</td><td class="">Q3 emitter to U1 pin 3 (+)</td><td class="">Cold-leg pair output in</td></tr><tr><td class="r">R9</td><td class="">U1 pin 3 to AGND</td><td class="">Non-inverting leg to ground</td></tr><tr><td class="r">C8, R14</td><td class="">Q4 emitter to U1 pin 2 (&minus;)</td><td class="">Hot-leg pair output in</td></tr><tr><td class="r">R17</td><td class="">U1 pin 1 to pin 2</td><td class="">Feedback</td></tr></tbody></table></div>
+<p>Gain is R17&nbsp;/&nbsp;R14, and it only rejects common-mode signal if R9/R10 match
+R17/R14. Any mismatch lets hum through as if it were audio, so these four want tight tolerance
+and should be chosen as two matched pairs.</p>
 
 <h2>Balanced output</h2>
-<p>OUT+ comes from the op amp through R15, 100&nbsp;&Omega;. OUT&minus; is taken to ground
-through R16, also 100&nbsp;&Omega;. So only one leg carries signal, but both legs present the
-same 100&nbsp;&Omega; impedance. That is an <strong>impedance-balanced</strong> output: the
-receiving input still rejects hum picked up along the cable, because the hum arrives equally
-on both legs, and it costs one op amp rather than two.</p>
+<p>U1's output leaves through R11 to <code>+PreOUT</code> (J5). <code>-PreOUT</code> (J6) is
+R18 to ground. Only one leg carries signal, but both present the same impedance if R11 equals
+R18. That is an <strong>impedance-balanced</strong> output: the receiving input still rejects
+hum picked up along the cable, because the hum arrives equally on both legs, and it takes one op
+amp rather than two.</p>
 
-<h2>Which op amp</h2>
-<p>ESP's text suggests a TL071 or similar; their Figure 1 shows an NE5532. Either works here:
-by this point the signal is large and op-amp noise is swamped. The NE5532 is the natural choice
-for this desk, which already stocks it for the compressor. It is a dual, so the unused half
-needs tying off &mdash; see <a href="build.html">Building it</a>.</p>
+<h2>The other half of U1</h2>
+<p>The sheet draws U1's unit A and its power pins; unit B (pins 5, 6 and 7) is not drawn at all,
+so on the board those pins go nowhere. A floating op amp can oscillate and inject noise. Add unit
+B to the sheet and tie it off: non-inverting input to AGND, output to inverting input.</p>
 
 <div class="note warn">
   <h4>Never into a phantom-powered input</h4>
-  <p>ESP warns that this preamp must not be connected to a mixer input supplying phantom power:
-  48&nbsp;V on the output destroys the op amp. If the output could ever meet a phantom-powered
-  input, protect it with zener diodes, series resistors and coupling capacitors.</p>
+  <p>There is no protection on the output. If J5 and J6 ever meet an input supplying phantom
+  power, 48&nbsp;V lands on U1's output through R11.</p>
 </div>
 
-<div class="next"><a href="gain.html">&larr; Gain control</a><a href="phantom.html">48 V phantom power &rarr;</a></div>
+<div class="next"><a href="gain.html">&larr; Gain stage</a><a href="power.html">Power and J1 &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Preamp &middot; based on ESP Projects 66 and 96 by Rod Elliott, sound-au.com<br>
+  UTS Mini Mixing Desk &mdash; Preamp &middot; written from the Pre-Amp repository at 5e6a308<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Input stage &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
-<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, based on ESP Project 66.">
+<title>Input and phantom power &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
+<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, from its KiCad schematic.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <link rel="stylesheet" href="../style.css">
 <script>
@@ -19,7 +19,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Preamp module</span></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>The circuit</h4><a href="input.html" class="on"><i>02</i><span>Input stage</span></a><a href="gain.html"><i>03</i><span>Gain control</span></a><a href="output.html"><i>04</i><span>Output stage</span></a><h4>In the desk</h4><a href="phantom.html"><i>05</i><span>48 V phantom power</span></a><a href="rack.html"><i>06</i><span>In a 500-series slot</span></a><a href="build.html"><i>07</i><span>Building it</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="input.html" class="on"><i>03</i><span>Input and phantom power</span></a><a href="gain.html"><i>04</i><span>Gain stage</span></a><a href="output.html"><i>05</i><span>Output stage</span></a><a href="power.html"><i>06</i><span>Power and J1</span></a><h4>Practical</h4><a href="board.html"><i>07</i><span>The board, and what is left</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -28,55 +28,58 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">The circuit &mdash; 02</p>
-<h1>The input stage</h1>
-<p class="lede">Two compound transistor pairs, one per input leg. This is where the preamp's
-noise performance is won.</p>
+<p class="eyebrow">The circuit &mdash; 03</p>
+<h1>Input and phantom power</h1>
+<p class="lede">Everything between the microphone and the transistor bases: the 48&nbsp;V feed
+for condenser microphones, the capacitors that keep it off the preamp, and the zeners that
+catch what gets through when a cable is plugged in live.</p>
 
-<h2>Why a compound pair</h2>
-<p>A single transistor is not very linear. Pair a PNP with an NPN in a Sziklai connection
-&mdash; here a 2N4403 driving a BC549 &mdash; and the two behave as one transistor with far
-higher gain and much lower distortion, because the second device corrects the first. ESP
-describes the pairs as far more linear than any single transistor, and it is why distortion
-at high gain disappears below the noise floor.</p>
-<p>In each pair the combination acts as a single PNP:</p>
-<div class="tw"><table><thead><tr><th class="r">Acts as</th><th class="">Is really</th><th class="n">Sits at (&plusmn;15&nbsp;V)</th></tr></thead><tbody><tr><td class="r">Base</td><td class="">Q1 base &mdash; the input</td><td class="n">0&nbsp;V</td></tr><tr><td class="r">Emitter</td><td class="">Q1 emitter, joined to Q2 collector</td><td class="n">+0.65&nbsp;V</td></tr><tr><td class="r">Collector</td><td class="">Q2 emitter &mdash; the output</td><td class="n">&minus;8.3&nbsp;V</td></tr></tbody></table></div>
-<p>Those voltages are ESP's, printed in green on their Figure 1. They are also a useful check
-on how the stage is wired, because the currents they imply agree with each other:</p>
-<div class="tw"><table><thead><tr><th class="r">Resistor</th><th class="n">Voltage across it</th><th class="n">Current</th></tr></thead><tbody><tr><td class="r">R2, +15&nbsp;V to the emitter node</td><td class="n">14.35&nbsp;V over 4.7&nbsp;k&Omega;</td><td class="n">3.05&nbsp;mA</td></tr><tr><td class="r">R4, the output node to &minus;15&nbsp;V</td><td class="n">6.7&nbsp;V over 2.2&nbsp;k&Omega;</td><td class="n">3.05&nbsp;mA</td></tr><tr><td class="r">R3, across Q2's base-emitter</td><td class="n">0.65&nbsp;V over 680&nbsp;&Omega;</td><td class="n">0.96&nbsp;mA</td></tr></tbody></table></div>
-<p>The same 3.05&nbsp;mA flows in at the top and out at the bottom, as it must. R3 sets how
-hard Q1 works to drive Q2.</p>
+<h2>The microphone connection</h2>
+<p>The microphone arrives on three single-pin sockets: J2 (hot, <code>+MicIN</code>), J3
+(cold, <code>-MicIN</code>) and J4 (ground, straight to AGND). They are 2&nbsp;mm pin headers
+on the board, so the XLR is wired to the card with flying leads rather than through the edge
+connector.</p>
 
-<h2>A differential pair of pairs</h2>
-<p>The two halves are identical, one on each leg of the balanced input. Anything common to both
-legs &mdash; hum picked up along a microphone cable &mdash; moves both halves together and
-cancels. Only the difference between the legs, which is the microphone's signal, gets
-amplified.</p>
+<h2>Phantom power</h2>
+<p>Condenser microphones take their power down the same two wires as the audio. The same DC
+voltage is put on both legs through a pair of equal resistors, so it is common-mode: invisible
+to a balanced input, but available to the microphone.</p>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="">Connected</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">SW1</td><td class="">J1 pin 15 (+48&nbsp;V) to the feed node</td><td class="">Phantom on/off, on a 2-pin header for a panel switch</td></tr><tr><td class="r">C1</td><td class="">Feed node to AGND</td><td class="">Decouples the switched 48&nbsp;V</td></tr><tr><td class="r">R1</td><td class="">Feed node to <code>+MicIN</code></td><td class="">Feed resistor, hot leg</td></tr><tr><td class="r">R2</td><td class="">Feed node to <code>-MicIN</code></td><td class="">Feed resistor, cold leg</td></tr></tbody></table></div>
+<p>R1 and R2 must match closely. If they differ, the phantom voltage is no longer equal on both
+legs, and the difference appears as signal.</p>
 
-<h2>Input impedance: 6.6&nbsp;k&Omega;, on purpose</h2>
-<p>R1 and R5, 3.3&nbsp;k&Omega; each, set the load the microphone sees. That is higher than
-the microphone's own impedance by design. Matching the load to a 150&ndash;600&nbsp;&Omega;
-microphone would throw away 6&nbsp;dB of signal, and noise does not fall with it. Professional
-preamps sit at 2.2&nbsp;k&Omega; or more; this one sits at 6.6&nbsp;k&Omega; and barely loads
-the microphone at all.</p>
+<h2>Keeping 48&nbsp;V off the transistors</h2>
+<p>C2 and C3 sit in series with each leg and block the phantom DC. The microphone side of each
+sits at 48&nbsp;V whenever SW1 is on, so they need at least a 50&nbsp;V rating, and if they are
+electrolytics, their positive ends go to the microphone side. After them, R3 and R4 lead to
+<code>+PreIN</code> and <code>-PreIN</code>.</p>
 
-<div class="note">
-  <h4>It hisses with nothing plugged in &mdash; that is normal</h4>
-  <p>At high gain with no microphone connected, the output is noisy. That noise is R1 and R5
-  themselves: every resistor generates thermal noise, and 3.3&nbsp;k&Omega; generates a fair
-  amount. Plug a microphone in and its low impedance sits across those resistors and shorts
-  most of it out. ESP points to this as a neat demonstration that resistors make noise just by
-  existing.</p>
+<h2>The clamps</h2>
+<p>A microphone cable is a capacitor. Plug one in with phantom on, or switch phantom with one
+connected, and C2 and C3 charge or discharge abruptly through the input. Each input net has two
+zeners back to back to ground: D1 and D4 on <code>+PreIN</code>, D2 and D3 on
+<code>-PreIN</code>. Whichever way the surge goes, one zener conducts forward and the other at
+its zener voltage, so the base can never swing further than that. R3 and R4 limit the peak
+current through them.</p>
+<p>The zeners are drawn as <code>1N47xxA</code>, the 1&nbsp;W family, with the voltage not yet
+chosen. It has to sit above the largest signal the input will ever see and well below what the
+transistors' bases can take.</p>
+
+<h2>Biasing the bases</h2>
+<p>R13 (<code>+PreIN</code>) and R12 (<code>-PreIN</code>) run from each base to AGND. With C2
+and C3 blocking DC from the microphone, these are what hold the bases at 0&nbsp;V, and with the
+feed resistors they set the input impedance the microphone sees.</p>
+
+<div class="note warn">
+  <h4>Switching phantom</h4>
+  <p>Turning SW1 on or off charges or discharges C2 and C3 through the input, which comes out
+  as a loud thump through everything downstream. Turn the desk down before switching, and never
+  switch phantom with a ribbon microphone connected.</p>
 </div>
 
-<h2>Choosing the transistors</h2>
-<p>The 2N4403 is a switching transistor that happens to be very quiet, and it is not always
-easy to find. ESP says BC559 or BC560 can replace it with a slight increase in noise &mdash; a
-noise figure of 1.2&nbsp;dB rather than 0.9&nbsp;dB.</p>
-
-<div class="next"><a href="index.html">&larr; Overview</a><a href="gain.html">Gain control &rarr;</a></div>
+<div class="next"><a href="schematic.html">&larr; The schematic</a><a href="gain.html">Gain stage &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Preamp &middot; based on ESP Projects 66 and 96 by Rod Elliott, sound-au.com<br>
+  UTS Mini Mixing Desk &mdash; Preamp &middot; written from the Pre-Amp repository at 5e6a308<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>
