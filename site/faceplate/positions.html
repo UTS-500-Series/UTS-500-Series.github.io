@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Get the positions right &middot; UTS Mini Mixing Desk &mdash; Faceplate fit</title>
+<meta name="description" content="How to design a 500-series faceplate that fits the module boards and the rack.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Faceplate fit guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>How a module fits</span></a><h4>Decide</h4><a href="mounting.html"><i>02</i><span>How controls mount</span></a><a href="positions.html" class="on"><i>03</i><span>Get the positions right</span></a><h4>Build</h4><a href="front-board.html"><i>04</i><span>Design the front board</span></a><a href="bracket.html"><i>05</i><span>Bracket and fixings</span></a><a href="holes.html"><i>06</i><span>Holes and clearances</span></a><h4>Finish</h4><a href="rack.html"><i>07</i><span>Fit the rack</span></a><a href="make.html"><i>08</i><span>Make the panel</span></a><a href="compressor.html"><i>09</i><span>Compressor notes</span></a><a href="checklist.html"><i>10</i><span>Before ordering</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Decide</p>
+<h1>Get the positions right</h1>
+<p class="lede">Every control is defined twice: as a hole in the panel and as a footprint on a
+board. Only one of those can be the master. Make the KiCad layout the master, and derive the
+panel holes from it.</p>
+
+<ol>
+  <li><strong>Use one coordinate system.</strong> Measure panel positions from the panel's
+  top-left corner, x to the right and y down, in millimetres. The compressor's
+  <code>panel/README.md</code> already uses this, and so do the drawing sheets in the mechanical
+  guide.</li>
+  <li><strong>Draw the panel into the front board layout.</strong> In the front board's KiCad
+  file, draw the 38.10 &times; 133.35 panel outline on <code>User.Drawings</code> with its
+  top-left corner on a grid point, and set that point as the grid origin (<em>Place &rarr; Grid
+  Origin</em>). The board editor's coordinates now read exactly like the panel's.</li>
+  <li><strong>Place each pot, switch and LED on its panel position.</strong> Press <kbd>E</kbd>
+  on the footprint and type its position. Make sure the position means the shaft centre: for
+  most pot footprints the origin is pin 1, not the shaft, so check the footprint and offset if
+  needed.</li>
+  <li><strong>Export the holes back out.</strong> When the layout is final, plot
+  <code>User.Drawings</code> and the pot and switch courtyards as DXF (<em>File &rarr; Plot
+  &rarr; DXF</em>) and use that as the panel sketch.</li>
+</ol>
+
+<div class="note warn">
+  <h4>The one number to measure</h4>
+  <p>Published figures disagree on how far the main board sits from the panel centreline: both
+  11.13 mm and 7.92 mm appear on <a href="https://groupdiy.com/threads/500-series-dimensions-pcb-offset.89219/">GroupDIY</a>. A front board makes this
+  matter less, because the front board takes its position from the panel and the main board's
+  offset only has to match the connector between the boards. Still, check it in the rack you'll
+  test in before ordering the main board: measure from the centre of a rail mounting hole to the
+  edge socket's slot.</p>
+</div>
+
+<div class="next"><a href="mounting.html">&larr; How controls mount</a><a href="front-board.html">Design the front board &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Faceplate fit &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

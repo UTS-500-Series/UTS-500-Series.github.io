@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Where the board is &middot; UTS Mini Mixing Desk &mdash; PCB layout</title>
+<meta name="description" content="How to lay out a UTS Mini Mixing Desk module board in KiCad, from design rules to Gerbers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>PCB layout guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Where the board is</span></a><h4>Before placing</h4><a href="setup.html"><i>02</i><span>Set up the board</span></a><a href="mechanics.html"><i>03</i><span>Lock the mechanics</span></a><h4>Layout</h4><a href="placement.html"><i>04</i><span>Place the parts</span></a><a href="grounds.html"><i>05</i><span>Plan the grounds</span></a><a href="routing.html"><i>06</i><span>Route</span></a><a href="pours.html"><i>07</i><span>Pours and edge fingers</span></a><h4>Finishing</h4><a href="checks.html"><i>08</i><span>Silkscreen and checks</span></a><a href="fab.html"><i>09</i><span>Send it to a fab</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">PCB layout guide</p>
+<h1>Laying out a 500-series board in KiCad</h1>
+<p class="lede">A working order for turning a finished schematic into a two-layer card that
+plugs into a 500-series rack. The examples use the compressor board as it stands, but every
+step applies to the equaliser and preamp too.</p>
+
+<div class="flow">
+  <b>set up rules</b><i>&rarr;</i><b class="a">lock mechanics</b><i>&rarr;</i>
+  <b>place</b><i>&rarr;</i><b>plan grounds</b><i>&rarr;</i><b>route</b><i>&rarr;</i>
+  <b>pour</b><i>&rarr;</i><b class="c">check and order</b>
+</div>
+
+<h2>Where the compressor board is now</h2>
+<p>The <a href="https://github.com/UTS-500-Series/Compressor/tree/main/kicad_withpcb/compressor_with_pcb">compressor board</a> has all 166 footprints on it, spread roughly
+across the card, with no tracks and no copper pours. The schematic matches the original design
+net for net. Three things to fix before placing properly:</p>
+
+<div class="note warn">
+  <h4>Fix before placing</h4>
+  <p><strong>The power nets are in the wrong net class.</strong> The project still carries the
+  template's net class patterns, which put <code>+16V</code>, <code>-16V</code> and
+  <code>AGND</code> in <em>Default</em> (0.25 mm tracks). <a href="setup.html">Setting up the
+  board</a> moves them to <em>Power</em>.</p>
+  <p><strong>The switch headers are 1.00 mm pitch sockets.</strong> That pitch is very hard to
+  hand-solder and to find mating plugs for. Use 2.54 mm headers or a keyed 2.5 mm connector
+  (JST XH, Molex KK), or move the switches onto a front board as the
+  <a href="../faceplate/index.html">faceplate guide</a> suggests.</p>
+  <p><strong>The pots are <em>Vertical</em> footprints</strong>, which point their shafts
+  straight up out of the board. In a 500-series module the board sits at right angles to the
+  faceplate, so decide how the pots reach the panel (<a href="mechanics.html">lock the
+  mechanics</a>) before placing them.</p>
+</div>
+
+<div class="next"><span></span><a href="setup.html">Set up the board &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; PCB layout &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

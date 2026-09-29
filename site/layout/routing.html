@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Route &middot; UTS Mini Mixing Desk &mdash; PCB layout</title>
+<meta name="description" content="How to lay out a UTS Mini Mixing Desk module board in KiCad, from design rules to Gerbers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>PCB layout guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Where the board is</span></a><h4>Before placing</h4><a href="setup.html"><i>02</i><span>Set up the board</span></a><a href="mechanics.html"><i>03</i><span>Lock the mechanics</span></a><h4>Layout</h4><a href="placement.html"><i>04</i><span>Place the parts</span></a><a href="grounds.html"><i>05</i><span>Plan the grounds</span></a><a href="routing.html" class="on"><i>06</i><span>Route</span></a><a href="pours.html"><i>07</i><span>Pours and edge fingers</span></a><h4>Finishing</h4><a href="checks.html"><i>08</i><span>Silkscreen and checks</span></a><a href="fab.html"><i>09</i><span>Send it to a fab</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Layout</p>
+<h1>Route</h1>
+<p class="lede">Route in order of importance. Use the <em>Interactive Router</em> (<kbd>X</kbd>)
+in <em>Walk around</em> mode, and route by hand. The autorouter makes a mess of audio
+boards.</p>
+
+<ol>
+  <li><strong>Power first.</strong> Run <code>+16V</code> and <code>-16V</code> on the top layer
+  from the power entry to each chip in 0.6 mm tracks; the Power net class does this
+  automatically. Pass each chip's decoupling capacitor on the way to its pin, so the capacitor is
+  between the supply and the chip.</li>
+  <li><strong>Then the balanced input and output.</strong> Route IN+ and IN&minus; together as a
+  pair, the same length and side by side, from the fingers to R5/R6. Do the same for OUT+ and
+  OUT&minus;. A balanced pair only rejects noise if both legs pick up the same noise.</li>
+  <li><strong>Then the audio path through the gain cell,</strong> keeping each connection short.
+  Avoid running audio tracks parallel to the meter or LED tracks.</li>
+  <li><strong>Then control and sidechain,</strong> which are slow signals and can take the long
+  runs to the front of the board.</li>
+  <li><strong>Stay mostly on top.</strong> Every track on the bottom layer cuts the ground pour.
+  Keep bottom tracks short, a few jumps under a row of parts, and never let them cut the pour
+  into islands.</li>
+  <li><strong>Use vias freely for ground.</strong> Wherever a ground pin on top needs to reach
+  the pour, drop a via right next to it.</li>
+</ol>
+
+<div class="next"><a href="grounds.html">&larr; Plan the grounds</a><a href="pours.html">Pours and edge fingers &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; PCB layout &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

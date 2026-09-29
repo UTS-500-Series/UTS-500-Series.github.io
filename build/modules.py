@@ -68,6 +68,22 @@ GUIDES = [
            'export dimensioned drawings.',
            'a guide shared by all three modules',
            content='content_mechanical', brand='Mechanical design guide'),
+
+    Module('layout', 'PCB layout',
+           'Laying out a two-layer 500-series card in KiCad, from board setup to ordering.',
+           'guide',
+           'How to lay out a UTS Mini Mixing Desk module board in KiCad, from design rules '
+           'to Gerbers.',
+           'a guide shared by all three modules',
+           content='content_layout', brand='PCB layout guide'),
+
+    Module('faceplate', 'Faceplate fit',
+           'How the faceplate, controls, boards and rack fit together, with hole sizes and '
+           'a checklist.',
+           'guide',
+           'How to design a 500-series faceplate that fits the module boards and the rack.',
+           'a guide shared by all three modules',
+           content='content_faceplate', brand='Faceplate fit guide'),
 ]
 
 BY_SLUG = {m.slug: m for m in MODULES + GUIDES}

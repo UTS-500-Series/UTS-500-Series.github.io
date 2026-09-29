@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Holes and clearances &middot; UTS Mini Mixing Desk &mdash; Faceplate fit</title>
+<meta name="description" content="How to design a 500-series faceplate that fits the module boards and the rack.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Faceplate fit guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>How a module fits</span></a><h4>Decide</h4><a href="mounting.html"><i>02</i><span>How controls mount</span></a><a href="positions.html"><i>03</i><span>Get the positions right</span></a><h4>Build</h4><a href="front-board.html"><i>04</i><span>Design the front board</span></a><a href="bracket.html"><i>05</i><span>Bracket and fixings</span></a><a href="holes.html" class="on"><i>06</i><span>Holes and clearances</span></a><h4>Finish</h4><a href="rack.html"><i>07</i><span>Fit the rack</span></a><a href="make.html"><i>08</i><span>Make the panel</span></a><a href="compressor.html"><i>09</i><span>Compressor notes</span></a><a href="checklist.html"><i>10</i><span>Before ordering</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Build</p>
+<h1>Holes and clearances</h1>
+<p class="lede">Size every hole from the datasheet of the part you actually buy. The table gives
+typical values to start from.</p>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="">Typical bushing</th><th class="">Panel hole</th><th class="">Notes</th></tr></thead><tbody><tr><td class="r">9 mm pot (Alps RK09K)</td><td class="">M7 &times; 0.75</td><td class="">&Oslash;7.2 to 7.5</td><td class="">Has a small anti-rotation tab. Drill a &Oslash;2.5 hole for it where the datasheet says, or snap the tab off.</td></tr><tr><td class="r">Dual-concentric pot</td><td class="">3/8&Prime; (9.53)</td><td class="">&Oslash;9.8</td><td class="">Bushing size varies by maker. Needs its own six-pin footprint.</td></tr><tr><td class="r">Mini toggle</td><td class="">1/4&Prime; (6.35) or M6</td><td class="">&Oslash;6.5 to 6.8</td><td class="">Check the bushing thread before drilling.</td></tr><tr><td class="r">2 mm LED</td><td class="">none</td><td class="">&Oslash;2.2</td><td class="">Flat-top parts sit flush behind the hole.</td></tr><tr><td class="r">3 mm LED</td><td class="">none</td><td class="">&Oslash;3.2</td><td class="">Or use a panel bezel clip sized for it.</td></tr><tr><td class="r">Rack mounting</td><td class="">none</td><td class="">&Oslash;3.18, csk 82&deg; to &Oslash;5.72</td><td class="">From the 500-series spec, countersunk on the front.</td></tr></tbody></table></div>
+<div class="note warn">
+  <h4>Check the compressor panel's hole sizes</h4>
+  <p><code>panel/README.md</code> lists &Oslash;7.0 for the 9 mm pots and &Oslash;6.0 for the mini
+  toggles. Those are at or below the bushing size of the usual parts, so they may not fit.
+  Confirm against the actual parts before cutting.</p>
+</div>
+
+<div class="next"><a href="bracket.html">&larr; Bracket and fixings</a><a href="rack.html">Fit the rack &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Faceplate fit &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

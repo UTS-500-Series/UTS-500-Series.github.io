@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Before ordering &middot; UTS Mini Mixing Desk &mdash; Faceplate fit</title>
+<meta name="description" content="How to design a 500-series faceplate that fits the module boards and the rack.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Faceplate fit guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>How a module fits</span></a><h4>Decide</h4><a href="mounting.html"><i>02</i><span>How controls mount</span></a><a href="positions.html"><i>03</i><span>Get the positions right</span></a><h4>Build</h4><a href="front-board.html"><i>04</i><span>Design the front board</span></a><a href="bracket.html"><i>05</i><span>Bracket and fixings</span></a><a href="holes.html"><i>06</i><span>Holes and clearances</span></a><h4>Finish</h4><a href="rack.html"><i>07</i><span>Fit the rack</span></a><a href="make.html"><i>08</i><span>Make the panel</span></a><a href="compressor.html"><i>09</i><span>Compressor notes</span></a><a href="checklist.html" class="on"><i>10</i><span>Before ordering</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Finish</p>
+<h1>Before ordering</h1>
+<p class="lede">Six checks that catch nearly every fit problem before it costs money.</p>
+
+<ol>
+  <li>Hole sizes checked against the datasheets of the parts in the BOM.</li>
+  <li>Front board printed 1:1 and laid over the panel drawing, with every hole centre on its
+  part.</li>
+  <li>Main board and front board connectors have the same pin order and net names.</li>
+  <li>3D view of both boards together: no clashes, nothing wider than the panel, and the LEDs
+  reach the panel.</li>
+  <li>Board offset and depth checked in the actual rack.</li>
+  <li>A printed or laser-cut test panel fitted before ordering metal.</li>
+</ol>
+
+<div class="next"><a href="compressor.html">&larr; Compressor notes</a><span></span></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Faceplate fit &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

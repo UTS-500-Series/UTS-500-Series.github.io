@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Silkscreen and checks &middot; UTS Mini Mixing Desk &mdash; PCB layout</title>
+<meta name="description" content="How to lay out a UTS Mini Mixing Desk module board in KiCad, from design rules to Gerbers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>PCB layout guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Where the board is</span></a><h4>Before placing</h4><a href="setup.html"><i>02</i><span>Set up the board</span></a><a href="mechanics.html"><i>03</i><span>Lock the mechanics</span></a><h4>Layout</h4><a href="placement.html"><i>04</i><span>Place the parts</span></a><a href="grounds.html"><i>05</i><span>Plan the grounds</span></a><a href="routing.html"><i>06</i><span>Route</span></a><a href="pours.html"><i>07</i><span>Pours and edge fingers</span></a><h4>Finishing</h4><a href="checks.html" class="on"><i>08</i><span>Silkscreen and checks</span></a><a href="fab.html"><i>09</i><span>Send it to a fab</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Finishing</p>
+<h1>Silkscreen and checks</h1>
+<p class="lede">Label the board for whoever solders it, then make KiCad prove the board and the
+schematic agree.</p>
+
+<h2>Silkscreen</h2>
+<ul>
+  <li>Keep every reference designator visible and next to its part, the same way up where you
+  can. Whoever solders the board uses these alongside the BOM.</li>
+  <li>Mark polarity on every electrolytic, diode and LED, and pin 1 on every IC and header. The
+  standard footprints do this, so don't delete those marks.</li>
+  <li>Label the switch and front-board headers with what each pin is (<em>BYP</em>,
+  <em>HPF</em>, <em>KEY</em>, <em>LINK</em>).</li>
+  <li>Add the module name, board revision, date and team names in a clear area.
+  <em>UTS 500 COMP rev A 2026</em> is enough. Put it on the bottom if the top is crowded.</li>
+  <li>Keep silkscreen off pads. DRC flags this, and fabs clip it anyway.</li>
+</ul>
+
+<h2>Checks</h2>
+<ol>
+  <li><strong>Update from the schematic once more</strong> (<kbd>F8</kbd>) and confirm nothing
+  changes. If it does, the board and schematic had drifted.</li>
+  <li><strong>Run DRC</strong> (<em>Inspect &rarr; Design Rules Checker</em>) with <em>Test for
+  parity between PCB and schematic</em> ticked. Aim for zero errors, and treat each warning as a
+  question.</li>
+  <li><strong>Look for unrouted nets.</strong> The DRC result lists them, and the status bar at
+  the bottom of the board editor shows how many connections are still unrouted.</li>
+  <li><strong>Open the 3D viewer</strong> (<kbd>Alt</kbd>+<kbd>3</kbd>) and look for parts that
+  clash, face the wrong way or overhang the edge. Export a STEP for the faceplate work, as the
+  <a href="../mechanical/pcb.html">mechanical design guide</a> describes.</li>
+  <li><strong>Print it 1:1</strong> (<em>File &rarr; Print</em>, scale 1, top copper and
+  silkscreen). Lay real parts on the paper, especially pots, switches, DIP sockets and the
+  electrolytics, to catch footprints that are the wrong size. Hold the print against the
+  faceplate drawing to check the controls line up.</li>
+</ol>
+
+<div class="next"><a href="pours.html">&larr; Pours and edge fingers</a><a href="fab.html">Send it to a fab &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; PCB layout &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>
