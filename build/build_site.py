@@ -97,9 +97,9 @@ than from memory.</p>
 <p>The equaliser is <strong>in progress</strong>: its filter sections are drawn and one band
 has been simulated, but the schematics carry no values yet. Its pages say which numbers are
 real and which are not.</p>
-<p>The preamp is <strong>ESP Project 66</strong>, a published and measured design by Rod
-Elliott, with phantom power from ESP Project 96. Its pages explain that design for the desk
-and credit it; the measured figures in them are ESP's.</p>
+<p>The preamp is also <strong>in progress</strong>: its schematic is drawn and its board is
+placed and routed, but no component values have been chosen. Its pages are written from its
+KiCad sheet, with the schematic drawn from that file.</p>
 
 <h2>The format</h2>
 <p>Every module shares the same constraints, which is most of what makes a rack of them

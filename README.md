@@ -15,7 +15,7 @@ also render correctly if this is ever demoted to an ordinary project site.
 | Module | Status | Source |
 |---|---|---|
 | Compressor | **Designed** — schematic complete, verified, not built | [`../compressor`](../compressor) |
-| Preamp | **Published design** — ESP Project 66, with Project 96 phantom power | [ESP P66](https://sound-au.com/project66.htm), [P96](https://sound-au.com/project96.htm) |
+| Preamp | **In progress** — schematic drawn and board routed, no component values yet | [`UTS-500-Series/Pre-Amp`](https://github.com/UTS-500-Series/Pre-Amp) |
 | Equaliser | **In progress** — sections drawn, one band simulated, no values on the schematics | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
 
 Only the compressor has a design. Its pages are generated from `design.py` in the compressor
@@ -24,7 +24,7 @@ from the design rather than from memory.
 
 The equaliser section is written from its own repository and says plainly which numbers are real: the only measured-looking figures come from one committed LTspice run, and its schematic images (`site/equaliser/img/`) are KiCad exports cropped to their content by hand. Regenerate and re-crop them when the sheets change.
 
-The preamp section explains **ESP Project 66** by Rod Elliott, with phantom power from Project 96, and credits it throughout. It is written from ESP's articles, not from the KiCad redraw in `../preamp`. Measured figures are ESP's; the ±16 V operating points and the input impedance with phantom fitted are our own calculations and are labelled so. ESP's schematic is linked, not copied onto the site.
+The preamp section is written from its own repository, a single KiCad 10 sheet. KiCad 10 cannot be installed where the site is built, so `build/_kicad_sch.py` draws that sheet as SVG and builds its viewer data straight from the `.kicad_sch` file. The sheet has no component values yet, so the pages describe what each part does and state no values. The topology follows ESP Projects 66 and 96, which the overview credits.
 
 ## Layout
 
@@ -39,13 +39,14 @@ build/
   shell.py              shared page shell, nav, and the fig/pic/table helpers
   modules.py            the module registry — add a module here first
   content_compressor.py the compressor's pages
-  content_preamp.py     ┐ built from scaffold.py, which deliberately emits
-  content_equaliser.py  ┘ no values for hardware that does not exist
+  content_preamp.py     the preamp's pages, written from its KiCad sheet
+  content_equaliser.py  the equaliser's pages, written from its repository
   content_mechanical.py the mechanical design guide (Fusion 360, faceplates, drawings)
   content_layout.py     the PCB layout guide (KiCad, setup to Gerbers)
   content_faceplate.py  the faceplate fit guide (panel, front board, bracket, rack)
   scaffold.py           the not-yet-designed-module template
   _data.py              viewer data, generated from a module's KiCad project
+  _kicad_sch.py         schematic SVG + viewer data straight from a .kicad_sch, no KiCad needed
 ```
 
 `site/` holds one folder per module plus a shared `style.css`, `viewer.js` and
@@ -91,6 +92,16 @@ kicad-cli sch export svg --no-background-color --exclude-drawing-sheet -o /tmp/s
   "../compressor/kicad/UTS Mini Mixing Desk - Compressor.kicad_sch"
 ```
 
+The preamp has no `design.py`, so its sheet image and viewer data come from the
+`.kicad_sch` file itself. With `UTS-500-Series/Pre-Amp` checked out beside this repository as
+`Pre-Amp`:
+
+```bash
+python3 build/_kicad_sch.py --module preamp      # or --repo <path> for another location
+```
+
+It rewrites `site/preamp/img/schematic.svg` and `site/preamp/data/schematic.json`.
+
 `build_site.py` also copies the faceplate artwork out of `../compressor/panel/` when that
 repository is present, so the front-panel page follows whatever layout and finish was last
 generated.
@@ -99,7 +110,7 @@ generated.
 
 1. Add it to `MODULES` in `build/modules.py`.
 2. Create `build/content_<slug>.py`. If the module is not designed yet, build it from
-   `scaffold.py` the way the preamp does; if it is, follow `content_compressor.py`.
+   `scaffold.py`; if it is, follow `content_compressor.py`.
 3. Run `python3 build/build_site.py`.
 
 ## Publishing
@@ -114,8 +125,8 @@ offers, so the included workflow is required:
 
 ## The interactive schematics
 
-Only the compressor has these &mdash; they are generated from a real KiCad project, and
-the template modules have none.
+The compressor and the preamp have these &mdash; they are generated from real KiCad
+projects. The equaliser has static images only.
 
 Each section page carries a live viewer rather than a flat image:
 
