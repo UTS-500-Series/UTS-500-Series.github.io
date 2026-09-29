@@ -74,6 +74,7 @@ def home():
                       up='') + f"""
 <div class="shell home">
 <main class="main"><div class="wrap">
+<img class="home-mark" src="brand/mark.svg" width="72" height="72" alt="">
 <p class="eyebrow">500-series</p>
 <h1>{shell.SUITE}</h1>
 <p class="lede">A rack of 500-series modules built from ordinary parts. This site documents

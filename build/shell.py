@@ -77,6 +77,9 @@ def head(title, description, up='../'):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title>
 <meta name="description" content="{description}">
+<link rel="icon" href="{up}brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="{up}brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{up}brand/apple-touch-icon.png">
 {FONTS}
 <link rel="stylesheet" href="{up}style.css">
 <script>
@@ -107,7 +110,7 @@ def shell(mod, fname, title, body):
                 mod.description) + f"""
 <div class="shell">
 <aside class="side">
-  <a class="brand" href="../index.html"><b>{SUITE}</b><span>{mod.brand}</span></a>
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>{SUITE}</b><span>{mod.brand}</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
   <nav>{''.join(nav)}</nav>
   <div class="side-foot">
