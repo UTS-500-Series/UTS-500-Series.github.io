@@ -19,7 +19,8 @@ NAV = [("Start here", [("index.html", "01", "Overview")]),
        ("Filter sections", [("parametric.html", "02", "Parametric band"),
                             ("lowpass.html", "03", "Low-pass filter")]),
        ("Practical", [("simulation.html", "04", "Simulating it"),
-                      ("status.html", "05", "What is left")])]
+                      ("status.html", "05", "What is left"),
+                      ("files.html", "06", "Design files")])]
 
 
 def response_chart():
@@ -299,3 +300,6 @@ pull-switch pots. Two parametric bands plus a low-pass control is seven knobs be
 switches, so the number of bands is a panel decision as much as a circuit one, and it is worth
 making before values are chosen for sections that may not fit.</p>
 """)
+
+import content_files
+PAGES['files.html'] = content_files.page('equaliser', '06')

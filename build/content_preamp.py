@@ -138,7 +138,8 @@ NAV = [("Start here", [("index.html", "01", "Overview"),
                         ("gain.html", "04", "Gain stage"),
                         ("output.html", "05", "Output stage"),
                         ("power.html", "06", "Power and J1")]),
-       ("Practical", [("board.html", "07", "The board, and what is left")])]
+       ("Practical", [("board.html", "07", "The board, and what is left"),
+                      ("files.html", "08", "Design files")])]
 
 PAGES = {}
 
@@ -458,3 +459,6 @@ this check does not look for.</p>
   <li>Only then try phantom, with a condenser microphone and the output turned down.</li>
 </ol>
 """)
+
+import content_files
+PAGES['files.html'] = content_files.page('preamp', '08')

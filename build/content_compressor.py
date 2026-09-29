@@ -15,7 +15,8 @@ NAV = [
     ("Support", [("power.html", "07", "Power &amp; references"),
                  ("meters.html", "08", "The LED meters")]),
     ("Practical", [("panel.html", "09", "The front panel"),
-                   ("using.html", "10", "Setting up &amp; using it")]),
+                   ("using.html", "10", "Setting up &amp; using it"),
+                   ("files.html", "11", "Design files")]),
 ]
 
 PAGES = {}
@@ -968,3 +969,6 @@ ever goes near a rack.</p>
 </ul>
 """)
 
+
+import content_files
+PAGES['files.html'] = content_files.page('compressor', '11')

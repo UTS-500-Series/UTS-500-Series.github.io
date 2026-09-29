@@ -110,6 +110,22 @@ It rewrites `site/preamp/img/schematic.svg` and `site/preamp/data/schematic.json
 repository is present, so the front-panel page follows whatever layout and finish was last
 generated.
 
+## Regenerating the design files
+
+Each module has a **Design files** page with its schematics as PDF and SVG, and 3D renders and
+layer plots of any board that has been laid out. They are exported with KiCad's own
+`kicad-cli`, so this step needs KiCad installed and the three module repositories checked out
+beside this one under their GitHub names (`Compressor`, `Pre-Amp`, `Equaliser`):
+
+```bash
+python3 build/export_kicad.py            # or --only preamp, --repos /path/to/checkouts
+python3 build/build_site.py
+```
+
+The exports and a `manifest.json` (repository commit, KiCad version, board counts) go to
+`site/<slug>/files/`. Which files each module exports is set in `PROJECTS` at the top of the
+script. A board with no outline or no parts is listed on the page but not rendered.
+
 ## Adding a module
 
 1. Add it to `MODULES` in `build/modules.py`.

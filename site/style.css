@@ -269,3 +269,10 @@ figure .pane.tall img{width:auto;min-width:0;max-width:100%;max-height:660px;
 /* A template module's pages carry the same warning box the compressor uses for real
    caveats, so it must stay visually distinct rather than blending into the prose. */
 .shell.home footer{margin-top:48px}
+
+/* Design files: three 3D renders side by side, stacking on narrow screens */
+.renders{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:26px 0}
+.renders figure{margin:0}
+.renders figure .pane.flush{padding:0}
+.renders figure img{min-width:0}
+@media (max-width:700px){.renders{grid-template-columns:1fr}}

@@ -1,0 +1,55 @@
+{
+ "repo": "https://github.com/UTS-500-Series/Compressor",
+ "commit": "5e6864c",
+ "date": "2026-09-29",
+ "kicad": "10.0.6",
+ "schematics": [
+  {
+   "name": "compressor",
+   "source": "kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_sch",
+   "label": "Single-sheet schematic the board is drawn from",
+   "files": [
+    "compressor.pdf",
+    "compressor.svg"
+   ]
+  },
+  {
+   "name": "compressor-sections",
+   "source": "kicad/UTS Mini Mixing Desk - Compressor.kicad_sch",
+   "label": "Hierarchical schematic, one sheet per section, that these pages document",
+   "files": [
+    "compressor-sections.pdf",
+    "compressor-sections-1-connector.svg",
+    "compressor-sections-2-input.svg",
+    "compressor-sections-3-vca.svg",
+    "compressor-sections-4-output.svg",
+    "compressor-sections-5-sidechain.svg",
+    "compressor-sections-6-power.svg",
+    "compressor-sections-7-meters.svg",
+    "compressor-sections.svg"
+   ]
+  }
+ ],
+ "boards": [
+  {
+   "name": "compressor",
+   "source": "kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_pcb",
+   "label": "The compressor card",
+   "stats": {
+    "footprints": 166,
+    "segments": 0,
+    "vias": 0,
+    "zones": 0,
+    "outline": 10
+   },
+   "files": [
+    "compressor-3d-top.png",
+    "compressor-3d-bottom.png",
+    "compressor-3d-angle.png",
+    "compressor-front.svg",
+    "compressor-back.svg",
+    "compressor-layers.pdf"
+   ]
+  }
+ ]
+}
