@@ -52,6 +52,10 @@ build/
 `vendor/cytoscape.min.js`. The generated `data/` and `img/` files are committed, so the site
 builds and publishes with no module repositories checked out.
 
+`site/brand/` holds the logo and favicons. They are copied from the
+[Logos](https://github.com/UTS-500-Series/Logos) repository, which has the source files and
+every other size; edit them there and copy them across.
+
 ## Guides
 
 Sections that cover every module rather than one live in `GUIDES` in `build/modules.py`.
