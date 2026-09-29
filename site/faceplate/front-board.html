@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design the front board &middot; UTS Mini Mixing Desk &mdash; Faceplate fit</title>
+<meta name="description" content="How to design a 500-series faceplate that fits the module boards and the rack.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Faceplate fit guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>How a module fits</span></a><h4>Decide</h4><a href="mounting.html"><i>02</i><span>How controls mount</span></a><a href="positions.html"><i>03</i><span>Get the positions right</span></a><h4>Build</h4><a href="front-board.html" class="on"><i>04</i><span>Design the front board</span></a><a href="bracket.html"><i>05</i><span>Bracket and fixings</span></a><a href="holes.html"><i>06</i><span>Holes and clearances</span></a><h4>Finish</h4><a href="rack.html"><i>07</i><span>Fit the rack</span></a><a href="make.html"><i>08</i><span>Make the panel</span></a><a href="compressor.html"><i>09</i><span>Compressor notes</span></a><a href="checklist.html"><i>10</i><span>Before ordering</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Build</p>
+<h1>Design the front board</h1>
+<p class="lede">A small second board that carries everything the user touches or looks at.</p>
+
+<ol>
+  <li><strong>Make it a separate KiCad project,</strong> for example
+  <code>compressor_front</code>. Its schematic holds the pots, switches, LEDs and one connector.
+  Keep the connector's pin order identical to the matching connector on the main board, and name
+  the nets the same in both schematics.</li>
+  <li><strong>Size the outline</strong> to about 34 &times; 110 mm. It must clear the panel edges
+  (the panel is 37.8 mm wide once trimmed) and stay about 10 mm clear of each mounting hole, so
+  the countersunk screw heads and rack rails don't hit it.</li>
+  <li><strong>Move the meters onto it.</strong> The two LED bargraphs need 14 LED lines between
+  them. With U9, U10 and their resistors on the front board, only the two meter signals, power
+  and ground cross between the boards. The same applies to anything that exists only to drive
+  the panel.</li>
+  <li><strong>Choose the board-to-board joint.</strong> For a prototype, a short 2.54 mm IDC
+  ribbon cable forgives small position errors. For the finished module, a right-angle 2.54 mm
+  header on the main board's front edge plugging into a straight socket on the front board makes
+  a solid, wire-free L shape. Either way, keep the pin count down by moving panel-only circuitry
+  forward, and put a ground pin between audio lines.</li>
+  <li><strong>Set the LED height.</strong> The LEDs must reach the panel. Use LED spacers
+  (plastic standoffs sold by LED size) cut to the gap between the front board and the panel, or
+  flat-top LEDs that sit just behind the hole. Put the height in the BOM so whoever builds it
+  gets it right.</li>
+  <li><strong>Use PCB-mount switches.</strong> Mini toggles and the bypass button come in
+  versions with PCB pins and a threaded bushing. The bushing goes through the panel and its nut
+  helps clamp the board, like the pots.</li>
+</ol>
+
+<div class="next"><a href="positions.html">&larr; Get the positions right</a><a href="bracket.html">Bracket and fixings &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Faceplate fit &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

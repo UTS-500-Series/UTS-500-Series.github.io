@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plan the grounds &middot; UTS Mini Mixing Desk &mdash; PCB layout</title>
+<meta name="description" content="How to lay out a UTS Mini Mixing Desk module board in KiCad, from design rules to Gerbers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>PCB layout guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Where the board is</span></a><h4>Before placing</h4><a href="setup.html"><i>02</i><span>Set up the board</span></a><a href="mechanics.html"><i>03</i><span>Lock the mechanics</span></a><h4>Layout</h4><a href="placement.html"><i>04</i><span>Place the parts</span></a><a href="grounds.html" class="on"><i>05</i><span>Plan the grounds</span></a><a href="routing.html"><i>06</i><span>Route</span></a><a href="pours.html"><i>07</i><span>Pours and edge fingers</span></a><h4>Finishing</h4><a href="checks.html"><i>08</i><span>Silkscreen and checks</span></a><a href="fab.html"><i>09</i><span>Send it to a fab</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Layout</p>
+<h1>Plan the grounds before routing</h1>
+<p class="lede">The compressor has three ground nets on purpose. Keeping them separate on
+copper is what makes that worthwhile.</p>
+<div class="tw"><table><thead><tr><th class="r">Net</th><th class="">Comes from</th><th class="">How to lay it out</th></tr></thead><tbody><tr><td class="r"><code>AGND</code></td><td class="">J1 pin 5</td><td class="">The audio reference. Make it a copper pour covering most of the bottom layer, so every part has a short, low-impedance path to it.</td></tr><tr><td class="r"><code>PGND</code></td><td class="">J1 pin 13</td><td class="">The rack's power return. It joins AGND at one point only, through R48 (0 &Omega;). Place R48 near the power entry and route PGND as a single track from pin 13 to it, with no pour.</td></tr><tr><td class="r"><code>CHASSIS</code></td><td class="">J1 pin 1</td><td class="">The metalwork. It joins AGND through R52 (100 &Omega;) and C18 (10 nF). Keep both next to pin 1. Chassis also reaches the faceplate through pot bushings and the bracket.</td></tr></tbody></table></div>
+<div class="note">
+  <h4>Meter current</h4>
+  <p>The LM3914 and LM3915 drivers switch up to 14 LEDs on and off, which draws pulses of
+  current. Give U9, U10, the LEDs and C38 their own ground track back towards the power entry,
+  and join it to the main pour there. If those pulses flow through the pour under the audio
+  stages, they can be heard as a faint buzz that follows the meters.</p>
+</div>
+
+<div class="next"><a href="placement.html">&larr; Place the parts</a><a href="routing.html">Route &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; PCB layout &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

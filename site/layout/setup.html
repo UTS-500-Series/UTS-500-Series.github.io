@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Set up the board &middot; UTS Mini Mixing Desk &mdash; PCB layout</title>
+<meta name="description" content="How to lay out a UTS Mini Mixing Desk module board in KiCad, from design rules to Gerbers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>PCB layout guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Where the board is</span></a><h4>Before placing</h4><a href="setup.html" class="on"><i>02</i><span>Set up the board</span></a><a href="mechanics.html"><i>03</i><span>Lock the mechanics</span></a><h4>Layout</h4><a href="placement.html"><i>04</i><span>Place the parts</span></a><a href="grounds.html"><i>05</i><span>Plan the grounds</span></a><a href="routing.html"><i>06</i><span>Route</span></a><a href="pours.html"><i>07</i><span>Pours and edge fingers</span></a><h4>Finishing</h4><a href="checks.html"><i>08</i><span>Silkscreen and checks</span></a><a href="fab.html"><i>09</i><span>Send it to a fab</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Before placing</p>
+<h1>Set up the board</h1>
+<p class="lede">Do this once, before moving a single part. Everything later depends on the
+rules being right, because DRC and the router use them.</p>
+
+<ol>
+  <li><strong>Open Board Setup</strong> (<em>File &rarr; Board Setup</em>). Under <em>Board
+  Stackup &rarr; Physical Stackup</em>, confirm 2 copper layers and a 1.6 mm board. The card-edge
+  socket expects 1.6 mm (0.062&Prime;), so don't change it.</li>
+  <li><strong>Set design rules to suit a student fab.</strong> Under <em>Design Rules &rarr;
+  Constraints</em>, set minimum track 0.2 mm, minimum clearance 0.2 mm, minimum via 0.6 mm with a
+  0.3 mm drill, and copper to edge 0.5 mm. Every cheap fab (JLCPCB, PCBWay, Aisler) makes these
+  without extra cost, and they leave margin.</li>
+  <li><strong>Fix the net classes.</strong> Under <em>Net Classes</em>, keep <em>Default</em> at
+  0.25 mm track and 0.2 mm clearance for signals. Set <em>Power</em> to 0.6 mm track, 0.3 mm
+  clearance and 0.8 mm vias. Then delete the template's leftover patterns in the assignment
+  table at the bottom, and add the ones below.</li>
+  <li><strong>Set a grid.</strong> Use 1.27 mm (50 mil) for placing through-hole parts, since
+  their leads sit on 2.54 mm. Drop to 0.635 mm or 0.25 mm only for routing in tight spots. Put
+  the grid origin at the front bottom corner of the board; the template already uses
+  (50.65, 160).</li>
+</ol>
+<div class="tw"><table><thead><tr><th class="">Pattern</th><th class="">Net class</th></tr></thead><tbody><tr><td class=""><code>+16V*</code>, <code>-16V*</code>, <code>-5V1</code></td><td class="">Power</td></tr><tr><td class=""><code>AGND</code>, <code>PGND</code>, <code>CHASSIS</code></td><td class="">Power</td></tr><tr><td class="">everything else</td><td class="">Default</td></tr></tbody></table></div>
+<p>The <code>*</code> catches the unfiltered <code>+16V-IN</code> and <code>-16V-IN</code> nets
+between the connector and R50/R51.</p>
+
+<div class="next"><a href="index.html">&larr; Where the board is</a><a href="mechanics.html">Lock the mechanics &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; PCB layout &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

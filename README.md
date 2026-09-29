@@ -42,6 +42,8 @@ build/
   content_preamp.py     ┐ built from scaffold.py, which deliberately emits
   content_equaliser.py  ┘ no values for hardware that does not exist
   content_mechanical.py the mechanical design guide (Fusion 360, faceplates, drawings)
+  content_layout.py     the PCB layout guide (KiCad, setup to Gerbers)
+  content_faceplate.py  the faceplate fit guide (panel, front board, bracket, rack)
   scaffold.py           the not-yet-designed-module template
   _data.py              viewer data, generated from a module's KiCad project
 ```
@@ -54,8 +56,14 @@ builds and publishes with no module repositories checked out.
 
 Sections that cover every module rather than one live in `GUIDES` in `build/modules.py`.
 They are built exactly like a module and listed under their own heading on the home page.
-The only one so far is **Mechanical design** (`site/mechanical/`): taking each KiCad board
-into Fusion 360, designing a faceplate round it, and exporting dimensioned drawings.
+There are three:
+
+- **Mechanical design** (`site/mechanical/`): taking each KiCad board into Fusion 360,
+  designing a faceplate round it, and exporting dimensioned drawings.
+- **PCB layout** (`site/layout/`): laying out a two-layer 500-series card in KiCad, from
+  design rules and placement to grounds, routing and ordering.
+- **Faceplate fit** (`site/faceplate/`): how the faceplate, controls, front board, main board
+  and rack fit together, with hole sizes and a pre-order checklist.
 
 ## Building
 

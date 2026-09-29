@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fit the rack &middot; UTS Mini Mixing Desk &mdash; Faceplate fit</title>
+<meta name="description" content="How to design a 500-series faceplate that fits the module boards and the rack.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Faceplate fit guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>How a module fits</span></a><h4>Decide</h4><a href="mounting.html"><i>02</i><span>How controls mount</span></a><a href="positions.html"><i>03</i><span>Get the positions right</span></a><h4>Build</h4><a href="front-board.html"><i>04</i><span>Design the front board</span></a><a href="bracket.html"><i>05</i><span>Bracket and fixings</span></a><a href="holes.html"><i>06</i><span>Holes and clearances</span></a><h4>Finish</h4><a href="rack.html" class="on"><i>07</i><span>Fit the rack</span></a><a href="make.html"><i>08</i><span>Make the panel</span></a><a href="compressor.html"><i>09</i><span>Compressor notes</span></a><a href="checklist.html"><i>10</i><span>Before ordering</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Finish</p>
+<h1>Fit the rack</h1>
+<p class="lede">The rack sets the width, the depth and the ground. Numbers are from the
+<a href="https://medias.audiofanzine.com/files/api-vpr-500-spec-479213.pdf">VPR Alliance 500-series specification</a>.</p>
+
+<ul>
+  <li><strong>Trim the width.</strong> Make the panel 37.6 to 37.8 mm wide rather than the
+  nominal 38.10, so it slides in beside its neighbours after finishing. 132.6 mm is a common
+  practical height.</li>
+  <li><strong>Keep inside the slot.</strong> Nothing on either board, including knobs, may be
+  wider than the panel. The module next door is right there.</li>
+  <li><strong>Keep the card edges clear.</strong> Some racks have card guides that grip the main
+  board's top and bottom edges. Keep about 3 mm there free of parts and copper.</li>
+  <li><strong>Depth is set by the board.</strong> The fingers must reach the socket, 150.83 mm
+  (5.938&Prime;) behind the panel. The template board's length already gives this as long as the
+  main board's front edge sits where the template expects, so don't move the bracket line or
+  shorten the board.</li>
+  <li><strong>Ground the panel.</strong> The panel should connect to <code>CHASSIS</code> (J1 pin
+  1), which the board ties to audio ground through R52 and C18. Anodising is an insulator, so a
+  bare spot is needed: mask the anodise where the bracket or a ground lug under a pot nut
+  touches the panel, and run that to a <code>CHASSIS</code> pad.</li>
+</ul>
+
+<div class="next"><a href="holes.html">&larr; Holes and clearances</a><a href="make.html">Make the panel &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Faceplate fit &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lock the mechanics &middot; UTS Mini Mixing Desk &mdash; PCB layout</title>
+<meta name="description" content="How to lay out a UTS Mini Mixing Desk module board in KiCad, from design rules to Gerbers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>PCB layout guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Where the board is</span></a><h4>Before placing</h4><a href="setup.html"><i>02</i><span>Set up the board</span></a><a href="mechanics.html" class="on"><i>03</i><span>Lock the mechanics</span></a><h4>Layout</h4><a href="placement.html"><i>04</i><span>Place the parts</span></a><a href="grounds.html"><i>05</i><span>Plan the grounds</span></a><a href="routing.html"><i>06</i><span>Route</span></a><a href="pours.html"><i>07</i><span>Pours and edge fingers</span></a><h4>Finishing</h4><a href="checks.html"><i>08</i><span>Silkscreen and checks</span></a><a href="fab.html"><i>09</i><span>Send it to a fab</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Before placing</p>
+<h1>Lock the mechanics first</h1>
+<p class="lede">A 500-series card has three fixed things: the outline, the edge connector, and
+whatever has to line up with the faceplate. Place and lock those before any circuitry, because
+every other part fits around them.</p>
+<figure>
+  <div style="background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px;overflow-x:auto">
+  <svg viewBox="0 0 780 560" role="img" style="width:100%;min-width:560px;height:auto;display:block"
+       aria-label="Top view of the 500-series board outline with suggested placement zones and the edge connector pin order">
+  <defs><marker id="arz" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="var(--sig)"/></marker></defs>
+  <g font-family="var(--mono)" transform="translate(60 60)">
+  <path d="M0,0 H577.4 V66 H605.4 L609.4,70 V312 L605.4,316 H577.4 V420 H0 Z" fill="var(--surface-2)" stroke="var(--ctl)" stroke-width="2"/>
+  <g font-size="12" fill="var(--ink)">
+    <rect x="4" y="4" width="84" height="412" fill="var(--warn-bg)" stroke="var(--sig)" stroke-dasharray="4 3"/>
+    <text x="46" y="190" text-anchor="middle" transform="rotate(-90 46 190)">FRONT EDGE &#183; controls, meters, switch headers</text>
+    <g fill="none" stroke="var(--ink-3)" stroke-dasharray="4 3"><rect x="96" y="4" width="180" height="412"/><rect x="284" y="4" width="160" height="412"/><rect x="452" y="4" width="121" height="250"/></g>
+    <rect x="452" y="262" width="121" height="154" fill="none" stroke="var(--sig)" stroke-dasharray="4 3"/>
+    <text x="186" y="196" text-anchor="middle">Sidechain, detector,</text>
+    <text x="186" y="212" text-anchor="middle">timing (U3, U4, C15),</text>
+    <text x="186" y="228" text-anchor="middle">meter drivers U9, U10</text>
+    <text x="364" y="196" text-anchor="middle">Gain cell:</text>
+    <text x="364" y="212" text-anchor="middle">Q1&#8211;Q9 grouped,</text>
+    <text x="364" y="228" text-anchor="middle">steering ref (U6)</text>
+    <text x="512" y="118" text-anchor="middle">Input and</text>
+    <text x="512" y="134" text-anchor="middle">output amps</text>
+    <text x="512" y="150" text-anchor="middle">U1, U2, U5</text>
+    <text x="512" y="330" text-anchor="middle">Power entry</text>
+    <text x="512" y="346" text-anchor="middle">R50/51, D8/9,</text>
+    <text x="512" y="362" text-anchor="middle">C16/17, &#8722;5V1</text>
+  </g>
+  <g fill="var(--sig)"><rect x="585" y="78.4" width="20" height="6"/><rect x="585" y="94.2" width="20" height="6"/><rect x="585" y="110.1" width="20" height="6"/><rect x="585" y="125.9" width="20" height="6"/><rect x="585" y="141.8" width="20" height="6"/><rect x="585" y="157.6" width="20" height="6"/><rect x="585" y="173.4" width="20" height="6"/><rect x="585" y="189.3" width="20" height="6"/><rect x="585" y="205.1" width="20" height="6"/><rect x="585" y="221.0" width="20" height="6"/><rect x="585" y="236.8" width="20" height="6"/><rect x="585" y="252.6" width="20" height="6"/><rect x="585" y="268.5" width="20" height="6"/><rect x="585" y="284.3" width="20" height="6"/><rect x="585" y="300.2" width="20" height="6"/></g>
+  <g font-size="10" fill="var(--sig)"><text x="614" y="85.0">1 CHASSIS</text><text x="614" y="100.8">2 OUT+</text><text x="614" y="116.7">3 AUXOUT+</text><text x="614" y="132.5">4 OUT&#8722;</text><text x="614" y="148.4">5 AGND</text><text x="614" y="164.2">6 LINK</text><text x="614" y="180.0">7 AUXOUT&#8722;</text><text x="614" y="195.9">8 IN&#8722;</text><text x="614" y="211.7">9 AUXIN&#8722;</text><text x="614" y="227.6">10 IN+</text><text x="614" y="243.4">11 AUXIN+</text><text x="614" y="259.2">12 +16V</text><text x="614" y="275.1">13 PGND</text><text x="614" y="290.9">14 &#8722;16V</text><text x="614" y="306.8">15 +48V nc</text></g>
+  <line x1="0" y1="440" x2="609.4" y2="440" stroke="var(--sig)" marker-start="url(#arz)" marker-end="url(#arz)"/>
+  <text x="304" y="456" text-anchor="middle" font-size="12" fill="var(--sig)">152.35 overall (144.35 to the shoulder)</text>
+  <line x1="-24" y1="0" x2="-24" y2="420" stroke="var(--sig)" marker-start="url(#arz)" marker-end="url(#arz)"/>
+  <text x="-30" y="210" text-anchor="middle" font-size="12" fill="var(--sig)" transform="rotate(-90 -30 210)">105.0</text>
+  <text x="0" y="-14" font-size="12" fill="var(--ink-3)">&#8592; faceplate side</text>
+  <text x="577" y="-14" font-size="12" fill="var(--ink-3)" text-anchor="end">rack socket side &#8594;</text>
+  </g></svg></div>
+  <figcaption><span>Suggested zones for the compressor, to scale on the template outline. Audio
+  flows in and out at the connector and the controls are at the far end, so keep the audio
+  amps near the fingers and send only slow control signals to the front.</span></figcaption>
+</figure>
+<ol>
+  <li><strong>Keep the template outline.</strong> The <code>Edge.Cuts</code> shape is the card
+  and its finger tab. Don't redraw it. Its notes on <code>Dwgs.User</code> mark where to cut the
+  front edge for an L-bracket, and where there's no room between the board and the panel. Turn
+  that layer on while you work.</li>
+  <li><strong>Lock J1.</strong> The edge connector footprint must stay exactly where the template
+  put it (centre at 198.5, 98.9 on the compressor board). Select it and press <kbd>L</kbd> to
+  lock it, so it can't be nudged by accident.</li>
+  <li><strong>Decide how the controls reach the panel.</strong> The
+  <a href="../faceplate/mounting.html">faceplate guide</a> covers the options. In short: either
+  right-angle pots and switches sit on this board's front edge, or a small front board carries
+  them and plugs into this one, or they mount on the panel and wire back to headers. For the
+  compressor's two meters, two toggles, a button and five pots across four columns, a front
+  board is the cleanest. That leaves only a header and the trimmers on the front edge of this
+  board. The meter drivers U9 and U10 and their LEDs can then move to the front board too,
+  which frees space in the zone map above.</li>
+  <li><strong>Mark the keep-outs.</strong> Draw a <em>Rule Area</em> (<em>Place &rarr; Rule
+  Area</em>) across the top and bottom 3 mm of the card, set to keep out footprints and tracks.
+  Many racks have card guides that grip those edges. Draw another over the L-bracket strip at
+  the front if you use one.</li>
+  <li><strong>Know the height limit.</strong> The module slot is 38.1 mm wide and the board is
+  not on its centreline, so the component side has more room than the solder side. Keep parts
+  under about 15 mm tall on top, and leads trimmed to 2 mm underneath, until you've checked the
+  offset in your rack. The 6.3 mm electrolytics and DIP sockets are fine; lay anything taller on
+  its side.</li>
+</ol>
+
+<div class="next"><a href="setup.html">&larr; Set up the board</a><a href="placement.html">Place the parts &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; PCB layout &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

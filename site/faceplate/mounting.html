@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How controls mount &middot; UTS Mini Mixing Desk &mdash; Faceplate fit</title>
+<meta name="description" content="How to design a 500-series faceplate that fits the module boards and the rack.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><b>UTS Mini Mixing Desk</b><span>Faceplate fit guide</span></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>How a module fits</span></a><h4>Decide</h4><a href="mounting.html" class="on"><i>02</i><span>How controls mount</span></a><a href="positions.html"><i>03</i><span>Get the positions right</span></a><h4>Build</h4><a href="front-board.html"><i>04</i><span>Design the front board</span></a><a href="bracket.html"><i>05</i><span>Bracket and fixings</span></a><a href="holes.html"><i>06</i><span>Holes and clearances</span></a><h4>Finish</h4><a href="rack.html"><i>07</i><span>Fit the rack</span></a><a href="make.html"><i>08</i><span>Make the panel</span></a><a href="compressor.html"><i>09</i><span>Compressor notes</span></a><a href="checklist.html"><i>10</i><span>Before ordering</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Decide</p>
+<h1>Choose how the controls mount</h1>
+<p class="lede">Three ways to get a pot shaft through the panel, and when each one makes
+sense.</p>
+<div class="tw"><table><thead><tr><th class="r">Approach</th><th class="">How it works</th><th class="">Good for</th><th class="">Watch out for</th></tr></thead><tbody><tr><td class="r"><strong>Front board</strong> (use)</td><td class="">A small board parallel to the panel carries vertical pots, PCB-mount toggles and LEDs. Pot nuts clamp it to the panel. A connector or ribbon cable joins it to the main board.</td><td class="">Several columns of controls, meters, anything dense. Hole positions come straight from the KiCad layout.</td><td class="">Two boards to design and order. The joint between them needs planning.</td></tr><tr><td class="r"><strong>Right-angle parts on the main board</strong></td><td class="">Pots and switches with bent legs (KiCad's <em>Horizontal</em> footprints) sit along the main board's front edge, shafts pointing forward through the panel. An L-bracket joins board and panel.</td><td class="">One column of controls on a single line. Simple modules like a preamp.</td><td class="">Every shaft sits at the same distance from the board, so all controls end up in one column. Shaft height has to match the board offset.</td></tr><tr><td class="r"><strong>Panel-mounted, wired</strong> (prototype)</td><td class="">Controls bolt to the panel and wires run to headers on the main board.</td><td class="">A first prototype, or when parts arrive before the boards.</td><td class="">Lots of hand wiring, easy to cross two wires, and long wires on audio-path pots can pick up hum.</td></tr></tbody></table></div>
+<p>The compressor's pot footprints (Alps RK09K <em>Vertical</em>) are already the right type
+for a front board. Its switches currently land on header sockets, which suits the wired
+approach but works as the board-to-board connector too.</p>
+
+<div class="next"><a href="index.html">&larr; How a module fits</a><a href="positions.html">Get the positions right &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Faceplate fit &middot; a guide shared by all three modules<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>
