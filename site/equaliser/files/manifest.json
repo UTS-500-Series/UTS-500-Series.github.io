@@ -1,0 +1,76 @@
+{
+ "repo": "https://github.com/UTS-500-Series/Equaliser",
+ "commit": "fdd66cd",
+ "date": "2026-09-25",
+ "kicad": "10.0.6",
+ "schematics": [
+  {
+   "name": "lbp",
+   "source": "Low_Bandpass_Filter/LBP.kicad_sch",
+   "label": "Low band-pass (parametric) section",
+   "files": [
+    "lbp.pdf",
+    "lbp.svg"
+   ]
+  },
+  {
+   "name": "lpf",
+   "source": "Low_Pass_Filter/LPF/LPF.kicad_sch",
+   "label": "Low-pass filter section",
+   "files": [
+    "lpf.pdf",
+    "lpf.svg"
+   ]
+  },
+  {
+   "name": "hbp",
+   "source": "High_Bandpass_Filter/HBP/HBP.kicad_sch",
+   "label": "High band-pass section",
+   "files": [
+    "hbp.pdf",
+    "hbp.svg"
+   ]
+  }
+ ],
+ "boards": [
+  {
+   "name": "lbp",
+   "source": "Low_Bandpass_Filter/LBP.kicad_pcb",
+   "label": "Low band-pass board",
+   "stats": {
+    "footprints": 15,
+    "segments": 0,
+    "vias": 0,
+    "zones": 0,
+    "outline": 0
+   },
+   "files": []
+  },
+  {
+   "name": "lpf",
+   "source": "Low_Pass_Filter/LPF/LPF.kicad_pcb",
+   "label": "Low-pass board",
+   "stats": {
+    "footprints": 0,
+    "segments": 0,
+    "vias": 0,
+    "zones": 0,
+    "outline": 0
+   },
+   "files": []
+  },
+  {
+   "name": "hbp",
+   "source": "High_Bandpass_Filter/HBP/HBP.kicad_pcb",
+   "label": "High band-pass board",
+   "stats": {
+    "footprints": 0,
+    "segments": 0,
+    "vias": 0,
+    "zones": 0,
+    "outline": 0
+   },
+   "files": []
+  }
+ ]
+}

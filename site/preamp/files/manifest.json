@@ -1,0 +1,39 @@
+{
+ "repo": "https://github.com/UTS-500-Series/Pre-Amp",
+ "commit": "5e6a308",
+ "date": "2026-09-18",
+ "kicad": "10.0.6",
+ "schematics": [
+  {
+   "name": "preamp",
+   "source": "Series-500.kicad_sch",
+   "label": "The preamp schematic",
+   "files": [
+    "preamp.pdf",
+    "preamp.svg"
+   ]
+  }
+ ],
+ "boards": [
+  {
+   "name": "preamp",
+   "source": "Series-500.kicad_pcb",
+   "label": "The preamp card",
+   "stats": {
+    "footprints": 46,
+    "segments": 156,
+    "vias": 0,
+    "zones": 0,
+    "outline": 15
+   },
+   "files": [
+    "preamp-3d-top.png",
+    "preamp-3d-bottom.png",
+    "preamp-3d-angle.png",
+    "preamp-front.svg",
+    "preamp-back.svg",
+    "preamp-layers.pdf"
+   ]
+  }
+ ]
+}

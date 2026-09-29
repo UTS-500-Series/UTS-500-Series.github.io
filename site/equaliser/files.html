@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design files &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
+<meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Filter sections</h4><a href="parametric.html"><i>02</i><span>Parametric band</span></a><a href="lowpass.html"><i>03</i><span>Low-pass filter</span></a><h4>Practical</h4><a href="simulation.html"><i>04</i><span>Simulating it</span></a><a href="status.html"><i>05</i><span>What is left</span></a><a href="files.html" class="on"><i>06</i><span>Design files</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+<p class="eyebrow">Practical &mdash; 06</p>
+<h1>Design files</h1>
+<p class="lede">The KiCad schematics and boards, exported straight from the repository so they can
+be read, printed or downloaded without KiCad.</p>
+<p>Exported from <a href="https://github.com/UTS-500-Series/Equaliser">Equaliser</a> at <a href="https://github.com/UTS-500-Series/Equaliser/commit/fdd66cd"><code>fdd66cd</code></a>
+(2026-09-25) with KiCad 10.0.6. These are snapshots: the repository is the source, and
+<code>build/export_kicad.py</code> regenerates this page when it changes.</p>
+<h2>Schematics</h2>
+<h3>Low band-pass (parametric) section</h3>
+<p><a href="https://github.com/UTS-500-Series/Equaliser/blob/fdd66cd/Low_Bandpass_Filter/LBP.kicad_sch"><code>Low_Bandpass_Filter/LBP.kicad_sch</code></a>. The PDF has every sheet;
+<a href="files/lbp.pdf">download it</a>.</p>
+<figure>
+  <div class="pane"><img src="files/lbp.svg" alt="Low band-pass (parametric) section" loading="lazy"></div>
+  <figcaption><span>Low band-pass (parametric) section</span><a href="files/lbp.svg" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+<h3>Low-pass filter section</h3>
+<p><a href="https://github.com/UTS-500-Series/Equaliser/blob/fdd66cd/Low_Pass_Filter/LPF/LPF.kicad_sch"><code>Low_Pass_Filter/LPF/LPF.kicad_sch</code></a>. The PDF has every sheet;
+<a href="files/lpf.pdf">download it</a>.</p>
+<figure>
+  <div class="pane"><img src="files/lpf.svg" alt="Low-pass filter section" loading="lazy"></div>
+  <figcaption><span>Low-pass filter section</span><a href="files/lpf.svg" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+<h3>High band-pass section</h3>
+<p><a href="https://github.com/UTS-500-Series/Equaliser/blob/fdd66cd/High_Bandpass_Filter/HBP/HBP.kicad_sch"><code>High_Bandpass_Filter/HBP/HBP.kicad_sch</code></a>. The PDF has every sheet;
+<a href="files/hbp.pdf">download it</a>.</p>
+<figure>
+  <div class="pane"><img src="files/hbp.svg" alt="High band-pass section" loading="lazy"></div>
+  <figcaption><span>High band-pass section</span><a href="files/hbp.svg" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+<h2>Boards</h2>
+<h3>Low band-pass board</h3>
+<p><a href="https://github.com/UTS-500-Series/Equaliser/blob/fdd66cd/Low_Bandpass_Filter/LBP.kicad_pcb"><code>Low_Bandpass_Filter/LBP.kicad_pcb</code></a></p>
+<p>Not laid out yet: 15 footprints imported but no board outline drawn, so there is nothing to render.</p>
+<h3>Low-pass board</h3>
+<p><a href="https://github.com/UTS-500-Series/Equaliser/blob/fdd66cd/Low_Pass_Filter/LPF/LPF.kicad_pcb"><code>Low_Pass_Filter/LPF/LPF.kicad_pcb</code></a></p>
+<p>Not laid out yet: no parts placed, so there is nothing to render.</p>
+<h3>High band-pass board</h3>
+<p><a href="https://github.com/UTS-500-Series/Equaliser/blob/fdd66cd/High_Bandpass_Filter/HBP/HBP.kicad_pcb"><code>High_Bandpass_Filter/HBP/HBP.kicad_pcb</code></a></p>
+<p>Not laid out yet: no parts placed, so there is nothing to render.</p>
+
+<div class="next"><a href="status.html">&larr; What is left</a><span></span></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4c6c1af<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>
