@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Power and J1 &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
+<meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, from its KiCad schematic.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Preamp module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="input.html"><i>03</i><span>Input and phantom power</span></a><a href="gain.html"><i>04</i><span>Gain stage</span></a><a href="output.html"><i>05</i><span>Output stage</span></a><a href="power.html" class="on"><i>06</i><span>Power and J1</span></a><h4>Practical</h4><a href="board.html"><i>07</i><span>The board, and what is left</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">The circuit &mdash; 06</p>
+<h1>Power and the edge connector</h1>
+<p class="lede">The card takes &plusmn;16&nbsp;V, ground and +48&nbsp;V from the rack. Its audio
+does not go through the edge connector at all.</p>
+
+<h2>J1, as drawn</h2>
+<p>J1 comes from the KiCad card template the project is built on, with its pin labels. Only the
+rows in bold connect to anything; the rest carry no-connect flags.</p>
+<div class="tw"><table><thead><tr><th class="n">Pin</th><th class="">Template label</th><th class="">Connected to</th></tr></thead><tbody><tr><td class="n">1</td><td class="">CHASSIS</td><td class="">&mdash;</td></tr><tr><td class="n">2</td><td class="">+OUT+4</td><td class="">&mdash;</td></tr><tr><td class="n">3</td><td class="">+OUT-2</td><td class="">&mdash;</td></tr><tr><td class="n">4</td><td class="">-OUT</td><td class="">&mdash;</td></tr><tr><td class="n"><strong>5</strong></td><td class=""><strong>AGND</strong></td><td class=""><strong>AGND</strong></td></tr><tr><td class="n">6</td><td class="">SC_LINK</td><td class="">&mdash;</td></tr><tr><td class="n">7</td><td class="">-IN-2</td><td class="">&mdash;</td></tr><tr><td class="n">8</td><td class="">-IN+4</td><td class="">&mdash;</td></tr><tr><td class="n">9</td><td class="">+IN-2</td><td class="">&mdash;</td></tr><tr><td class="n">10</td><td class="">+IN+4</td><td class="">&mdash;</td></tr><tr><td class="n">11</td><td class="">GAIN_ADJ</td><td class="">&mdash;</td></tr><tr><td class="n"><strong>12</strong></td><td class=""><strong>+16V</strong></td><td class=""><strong>R6, R7, U1 pin 8, C4, C5</strong></td></tr><tr><td class="n">13</td><td class="">Earth</td><td class="">An earth symbol only, not joined to AGND</td></tr><tr><td class="n"><strong>14</strong></td><td class=""><strong>-16V</strong></td><td class=""><strong>R19, R20, U1 pin 4, C4, C9</strong></td></tr><tr><td class="n"><strong>15</strong></td><td class=""><strong>+48V</strong></td><td class=""><strong>SW1, the phantom switch</strong></td></tr></tbody></table></div>
+
+<div class="note warn">
+  <h4>The audio is on flying leads</h4>
+  <p>The microphone comes in on J2&ndash;J4 and the output leaves on J5 and J6, all single-pin
+  headers. That works for a bench build, but in the rack the preamp should take its input and
+  send its output through the card edge like the other modules. Wiring J2/J3 and J5/J6 to J1's
+  audio pins, using the same pinout as the <a href="../compressor/connector.html">compressor's
+  edge connector</a>, is the change that makes it a drop-in 500-series card.</p>
+</div>
+
+<h2>Decoupling</h2>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="">Connected</th><th class="">Kind</th></tr></thead><tbody><tr><td class="r">C5</td><td class="">+16&nbsp;V to AGND</td><td class="">Polarised, 8&nbsp;mm radial</td></tr><tr><td class="r">C9</td><td class="">AGND to &minus;16&nbsp;V</td><td class="">Polarised, 8&nbsp;mm radial</td></tr><tr><td class="r">C4</td><td class="">+16&nbsp;V to &minus;16&nbsp;V</td><td class="">Ceramic disc, near U1</td></tr></tbody></table></div>
+<p>There is no series resistor or filter on either rail. The rack's rails are shared with every
+other module, and a preamp at high gain amplifies whatever reaches its supply, so a small
+resistor ahead of C5 and C9 on each rail would be cheap insurance.</p>
+
+<h2>Current</h2>
+<p>The two pairs draw from the rails through R6, R7, R19 and R20; U1 adds its own quiescent
+current. With no values yet, the total cannot be worked out, but a circuit of this size is far
+inside the 130&nbsp;mA per rail a 500-series slot allows. Phantom comes from the separate 48&nbsp;V
+rail and does not count against it.</p>
+
+<div class="next"><a href="output.html">&larr; Output stage</a><a href="board.html">The board, and what is left &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Preamp &middot; written from the Pre-Amp repository at 5e6a308<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>
