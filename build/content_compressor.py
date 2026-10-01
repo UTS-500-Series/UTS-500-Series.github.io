@@ -119,7 +119,7 @@ PAGES['connector.html'] = ("500-series interface", """
 <p class="lede">A 500-series module is a card that plugs into a rack. The rack supplies power
 and carries audio in and out on a single 15-pin edge connector.</p>
 
-""" + fig("connector", "Sheet 1 &mdash; edge connector J1") + """
+""" + fig("connector", "Sheet 1 &mdash; edge connector J1 and the front-board header J2") + """
 
 <h2>What the rack gives you</h2>
 <p>Everything arrives on one card-edge connector: a 15-pin EDAC at 0.156&Prime; pitch. There is
@@ -279,7 +279,7 @@ PAGES['vca.html'] = ("The gain cell", """
 voltage. This is the part of a compressor that actually compresses, and the part where the
 design decisions matter most.</p>
 
-""" + fig("vca", "Sheet 3 &mdash; the steering cell Q1&ndash;Q9 and recovery amplifier U1B") + """
+""" + fig("vca", "Sheet 3 &mdash; the steering cell Q1&ndash;Q9 and the recovery amplifier") + """
 
 <h2>The problem</h2>
 <p>You need an amplifier whose gain a control voltage can set, over a wide range, without
@@ -525,9 +525,9 @@ error on both inputs and cancels rather than shifting the resting point.</p>
 <div class="note warn">
   <h4>The one place worth deviating from NE5532</h4>
   <p>An NE5532's inputs draw around 200 nA. On a 220 k&Omega; timing node that can leave enough
-  offset to hold the compressor in about a decibel of gain reduction at idle. Fitting a
-  <strong>TL072 or OPA2134 for U4 only</strong> &mdash; both pin-compatible &mdash; removes the
-  problem entirely, because FET inputs draw essentially no current.</p>
+  offset to hold the compressor in about a decibel of gain reduction at idle. So the
+  schematic specifies a <strong>TL072 for U4 only</strong> (an OPA2134 is also pin-compatible),
+  which removes the problem entirely, because FET inputs draw essentially no current.</p>
 </div>
 
 <h2>Stereo link</h2>
@@ -647,11 +647,11 @@ is the only reason they fit the power budget at all.</p>
 fourteen comparators out of NE5532s means seven more packages and roughly <strong>56 mA</strong>
 &mdash; on rails that only have about 70 mA of headroom left. It does not fit.</p>
 <p>So this is the one place the module steps outside its NE5532-and-BC549 palette.
-<code>U8</code> and <code>U9</code> are LM391x display drivers: ten comparators, a reference and
+<code>U9</code> and <code>U10</code> are LM391x display drivers: ten comparators, a reference and
 the LED current sinks in one 18-pin package.</p>
 <p>They are pin-identical but follow different laws, which is the whole reason there are two
-different part numbers. <code>U8</code> is an <strong>LM3914</strong>, whose ten steps are
-evenly spaced in volts. <code>U9</code> is an <strong>LM3915</strong>, whose steps are 3 dB
+different part numbers. <code>U9</code> is an <strong>LM3914</strong>, whose ten steps are
+evenly spaced in volts. <code>U10</code> is an <strong>LM3915</strong>, whose steps are 3 dB
 apart. Gain reduction is read off a control voltage; output level is read in dB. Fitting them
 the wrong way round gives two meters that both read badly.</p>
 
@@ -678,7 +678,7 @@ both meters use the same pair.</p>
 segments match without sorting parts. <code>RHI</code> ties to <code>REFOUT</code> and
 <code>RLO</code> to ground, so each ladder spans 0 V to 5.05 V.</p>
 
-<h2>Gain reduction &mdash; U8</h2>
+<h2>Gain reduction &mdash; U9</h2>
 <p>The control voltage <code>CTRL-B</code> rests at 0 V and swings to about &minus;10 V at full
 compression, so it needs inverting before a meter can read it. That much is easy. The problem is
 what happens next.</p>
@@ -695,15 +695,15 @@ meter that steps evenly in volts and the scale bunches horribly:</p>
 <p>Three of seven segments inside the first 2 dB, then a jump from 6 dB to 40 dB across the last
 three. No trim setting fixes it, because the spacing is wrong, not the span.</p>
 <p><code>R93</code> (18 k&Omega;) solves it by making <code>U7B</code> a <em>summing</em>
-inverting stage: it subtracts a fixed offset taken from <code>U8</code>'s own reference before
+inverting stage: it subtracts a fixed offset taken from <code>U9</code>'s own reference before
 the signal reaches the driver. The seven even voltage steps then land on the useful middle of
 the sigmoid, and the scale comes out close to the classic 1/2/3/6/9/14/19 dB progression.</p>
 <p>The cost is that <code>U7B</code> now sits at about <strong>&minus;2.1 V</strong> with no
 compression happening. <code>R94</code> and <code>D12</code> clamp the driver input at
-&minus;0.7 V so that idle offset never reaches <code>U8</code>. <code>RV7</code> trims the
+&minus;0.7 V so that idle offset never reaches <code>U9</code>. <code>RV7</code> trims the
 slope, which moves the whole scale together.</p>
 
-<h2>Output level &mdash; U9</h2>
+<h2>Output level &mdash; U10</h2>
 <p>The level meter watches <code>OUT-A</code>, the makeup amplifier's output. That is the last
 point in the signal path that is still a low-impedance op-amp output: metering after
 <code>R28</code> would put the meter's input divider across the module's balanced output and
@@ -717,7 +717,7 @@ accurate down to a few millivolts &mdash; a bare diode and capacitor would read 
     [["<code>R87</code> &times; <code>C35</code>", "1k &times; 2&micro;2", "2.2 ms attack &mdash; fast enough to catch peaks"],
      ["<code>R88</code> &times; <code>C35</code>", "100k &times; 2&micro;2", "220 ms decay &mdash; slow enough to read"]],
     ["r", "n", ""]) + """
-<p>From there <code>U9</code>'s 3 dB steps give a seven-segment scale spanning
+<p>From there <code>U10</code>'s 3 dB steps give a seven-segment scale spanning
 <strong>18 dB</strong>. Outputs 4&ndash;10 drive the LEDs, so the top segment is full scale and
 the bottom is 18 dB below it; outputs 1&ndash;3 are unused.</p>
 
@@ -740,7 +740,7 @@ signal generator and a voltmeter.</p>
 """ + table(
     ["Draw", "+16 V", "&minus;16 V"],
     [["<code>U7</code> NE5532", "8 mA", "8 mA"],
-     ["<code>U8</code> + <code>U9</code> quiescent", "~12 mA", "&mdash;"],
+     ["<code>U9</code> + <code>U10</code> quiescent", "~12 mA", "&mdash;"],
      ["Two lit LEDs at 4.6 mA", "9 mA", "&mdash;"],
      ["<strong>Added by this sheet</strong>", "<strong>~29 mA</strong>", "<strong>8 mA</strong>"],
      ["<strong>Module total</strong>", "<strong>~90 mA</strong>", "<strong>~70 mA</strong>"]],
@@ -951,8 +951,8 @@ the same net names, in the front board's own schematic.</p>
   <li><strong>The matched pair and quad</strong> (<code>Q1</code>/<code>Q2</code> and
       <code>Q6</code>&ndash;<code>Q9</code>) are placed touching, flat faces together, so they
       can be glued and stay at one temperature.</li>
-  <li><strong>All seven op amps are socketed.</strong> That lets <code>U4</code> become a
-      TL072 or OPA2134 (see <a href="sidechain.html">the sidechain</a>) and makes a damaged
+  <li><strong>All seven op amps are socketed.</strong> That lets <code>U4</code>, a TL072,
+      be swapped for an OPA2134 (see <a href="sidechain.html">the sidechain</a>) and makes a damaged
       chip a swap rather than a desoldering job.</li>
   <li><strong>The trimmers</strong> <code>RV1</code>, <code>RV7</code> and <code>RV8</code>
       stay on the main board. They are set once at bring-up.</li>
@@ -1087,7 +1087,7 @@ ever goes near a rack.</p>
 <h2>If something is wrong</h2>
 """ + table(
     ["Symptom", "Likely cause"],
-    [["Compressing with no signal", "<code>VREFA</code> too high, or U4 bias current &mdash; see the TL072 note"],
+    [["Compressing with no signal", "<code>VREFA</code> too high, or an NE5532 fitted at U4 &mdash; see the TL072 note"],
      ["No compression at any setting", "Check <code>STB</code> moves when you feed signal; check <code>D7</code> orientation"],
      ["Audible thump on fast attack", "<code>R21</code>&ndash;<code>R24</code> not matched"],
      ["Poor common-mode rejection", "<code>R1</code>&ndash;<code>R4</code> not matched to 0.1%"],
