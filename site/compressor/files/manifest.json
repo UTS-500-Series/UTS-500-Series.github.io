@@ -1,6 +1,6 @@
 {
  "repo": "https://github.com/UTS-500-Series/Compressor",
- "commit": "c506150",
+ "commit": "6b7a70d",
  "date": "2026-10-01",
  "kicad": "10.0.6",
  "schematics": [
@@ -46,8 +46,8 @@
    "label": "Main board: the card that plugs into the rack",
    "stats": {
     "footprints": 137,
-    "segments": 1068,
-    "vias": 71,
+    "segments": 1069,
+    "vias": 72,
     "zones": 4,
     "outline": 10
    },
