@@ -34,12 +34,15 @@ PROJECTS = {
                  'Front board schematic: the panel controls, meters and ribbon header'),
                 ('compressor-sections', 'kicad/UTS Mini Mixing Desk - Compressor.kicad_sch',
                  'Hierarchical schematic, one sheet per section, that these pages document')],
+        # the angled view's near corner falls off the bottom at the default framing
         'pcb': [('main-board', 'kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_pcb',
-                 'Main board: the card that plugs into the rack'),
+                 'Main board: the card that plugs into the rack',
+                 {'angle': {'zoom': '0.95', 'pan': '0,1.5,0'}}),
                 # 35 x 110 mm and drawn upright, so turn it on its side to fill a wide render
                 ('front-board', 'kicad_withpcb/compressor_front/compressor_front.kicad_pcb',
                  'Front board: sits behind the faceplate, joined to the main board by a ribbon',
-                 {'top': '0,0,90', 'bottom': '0,0,90', 'angle': '-40,0,120'})],
+                 {'top': {'rotate': '0,0,90'}, 'bottom': {'rotate': '0,0,90'},
+                  'angle': {'rotate': '-40,0,120'}})],
     }),
     'preamp': ('Pre-Amp', {
         'sch': [('preamp', 'Series-500.kicad_sch', 'The preamp schematic')],
@@ -58,9 +61,9 @@ PROJECTS = {
 FRONT = 'F.Cu,F.SilkS,F.Mask,Edge.Cuts'
 BACK = 'B.Cu,B.SilkS,B.Mask,Edge.Cuts'
 ALL_LAYERS = 'F.Cu,B.Cu,F.SilkS,B.SilkS,F.Mask,B.Mask,F.Fab,B.Fab,F.CrtYd,B.CrtYd,Edge.Cuts'
-RENDERS = [('top', ['--side', 'top'], None),
-           ('bottom', ['--side', 'bottom'], None),
-           ('angle', ['--side', 'top', '--perspective'], '-40,0,30')]
+RENDERS = [('top', ['--side', 'top'], {}),
+           ('bottom', ['--side', 'bottom'], {}),
+           ('angle', ['--side', 'top', '--perspective'], {'rotate': '-40,0,30'})]
 
 
 def cli(*args):
@@ -100,14 +103,15 @@ def board_stats(src):
             'zones': n('zone'), 'outline': text.count('(layer "Edge.Cuts")')}
 
 
-def export_pcb(src, name, out, rotate=None):
-    """`rotate` optionally maps a render view to its own --rotate, for boards drawn upright."""
+def export_pcb(src, name, out, views=None):
+    """`views` optionally maps a render view to its own --rotate, --zoom or --pan, for boards
+    that need their own framing (drawn upright, or cut off at the defaults)."""
     files = []
-    for view, args, rot in RENDERS:
-        rot = (rotate or {}).get(view, rot)
+    for view, args, opts in RENDERS:
+        opts = {'zoom': '1.15', **opts, **(views or {}).get(view, {})}
         dst = '%s-3d-%s.png' % (name, view)
-        cli('pcb', 'render', '--quality', 'high', '-w', '1600', '-h', '1000', '--zoom', '1.15',
-            *args, *(['--rotate', rot] if rot else []), '-o', os.path.join(out, dst), src)
+        cli('pcb', 'render', '--quality', 'high', '-w', '1600', '-h', '1000', *args,
+            *[a for k, v in opts.items() for a in ('--' + k, v)], '-o', os.path.join(out, dst), src)
         files.append(dst)
     for side, layers, extra in [('front', FRONT, []), ('back', BACK, ['--mirror'])]:
         dst = '%s-%s.svg' % (name, side)
@@ -140,13 +144,13 @@ def export_module(slug, repos):
         manifest['schematics'].append({'name': name, 'source': path, 'label': label,
                                        'files': export_sch(src, name, out)})
         print('    %-22s schematic' % name)
-    for name, path, label, *rotate in spec['pcb']:
+    for name, path, label, *views in spec['pcb']:
         src = os.path.join(repo, path)
         stats = board_stats(src)
         # Footprints with no outline have only been dropped in from the schematic, and
         # KiCad renders them against a default slab the size of the drawing sheet.
         laid_out = stats['footprints'] and stats['outline']
-        files = export_pcb(src, name, out, *rotate) if laid_out else []
+        files = export_pcb(src, name, out, *views) if laid_out else []
         manifest['boards'].append({'name': name, 'source': path, 'label': label,
                                    'stats': stats, 'files': files})
         print('    %-22s board, %s' % (name, 'exported' if files else 'not laid out, skipped'))
