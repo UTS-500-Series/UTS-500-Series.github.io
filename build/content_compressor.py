@@ -959,6 +959,11 @@ the same net names, in the front board's own schematic.</p>
 </ul>
 <p>The front edge of the board is set back 24 mm from the panel to clear the front board, its
 header and the ribbon plug.</p>
+<p>KiCad's DRC only checks the board against its own schematic, so it can't catch a wiring
+slip in the schematic itself. The schematic is also compared net by net against the
+reference netlist, <code>tools/design.py</code>. That comparison caught a wire joining
+<code>Q2</code>'s collector to the gain cell's tail (<code>Q3</code>, <code>R14</code>,
+<code>R15</code>), which was fixed and re-routed on 1 October.</p>
 
 <h2>The front board</h2>
 <ul>
