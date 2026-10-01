@@ -232,3 +232,23 @@ below 900 px for the same reason.
 
 The plain SVG is still one click away under each viewer, for printing or for reading at full
 size.
+
+## Licence
+
+Copyright 2026 the UTS 500 Series team.
+
+This source describes Open Hardware and is licensed under the CERN-OHL-S v2.
+
+You may redistribute and modify this source and make products using it under
+the terms of the [CERN-OHL-S v2](https://ohwr.org/cern_ohl_s_v2.txt).
+
+This source is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY, INCLUDING
+OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
+Please see the CERN-OHL-S v2 for applicable conditions.
+
+Source location: https://github.com/UTS-500-Series/UTS-500-Series.github.io
+
+The full licence text is in [LICENSE](LICENSE).
+
+`site/vendor/cytoscape.min.js` is [Cytoscape.js](https://js.cytoscape.org/), copyright
+The Cytoscape Consortium, under the MIT licence given at the top of that file.
