@@ -108,7 +108,13 @@
 
     /* ---------- pan and zoom ---------- */
     var z = 1, tx = 0, ty = 0, drag = null;
-    function apply() { stage.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + z + ')'; }
+    // Zoom by resizing the stage, not with a CSS scale(): a scaled <img> is the bitmap the
+    // browser drew at the unzoomed size, stretched, so the drawing blurs as you zoom in.
+    // Resized, the SVG is redrawn at the new size and stays sharp.
+    function apply() {
+      stage.style.left = tx + 'px'; stage.style.top = ty + 'px';
+      stage.style.width = stage.style.height = (z * 100) + '%';
+    }
     function zoomTo(nz, cx, cy) {
       nz = Math.max(0.5, Math.min(8, nz));
       var rect = pane.getBoundingClientRect();
