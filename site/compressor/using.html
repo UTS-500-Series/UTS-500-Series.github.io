@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="using.html" class="on"><i>10</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>11</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="using.html" class="on"><i>11</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>12</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -81,17 +81,21 @@ ever goes near a rack.</p>
 
 <h2>Project files</h2>
 <ul>
-  <li><code>kicad/</code> &mdash; the KiCad project. Open the <code>.kicad_pro</code> in
-      KiCad 9; it holds seven sheets.</li>
+  <li><code>kicad/</code> &mdash; the hierarchical schematic these pages document, seven sheets,
+      KiCad 9.</li>
+  <li><code>kicad_withpcb/compressor_with_pcb/</code> &mdash; the single-sheet schematic and the
+      main board, KiCad 10.</li>
+  <li><code>kicad_withpcb/compressor_front/</code> &mdash; the front board. Run
+      <code>sh tools/get_3d_models.sh</code> once to fetch the pot's 3D model.</li>
   <li><code>tools/design.py</code> &mdash; the authoritative netlist as data.
       The schematic is generated and verified against it.</li>
   <li><code>panel/</code> &mdash; the faceplate generator: mockups, a 1:1 drawing and DXF.</li>
-  <li><code>docs/</code> &mdash; this site. Rebuild the pages with
-      <code>python3 _build.py</code>, and the viewer data with <code>python3 _data.py</code>
-      after any schematic change.</li>
+  <li>This site lives in its own repository,
+      <a href="https://github.com/UTS-500-Series/UTS-500-Series.github.io">UTS-500-Series.github.io</a>,
+      and its README explains how to regenerate these pages.</li>
 </ul>
 
-<div class="next"><a href="panel.html">&larr; The front panel</a><a href="files.html">Design files &rarr;</a></div>
+<div class="next"><a href="boards.html">&larr; The boards</a><a href="files.html">Design files &rarr;</a></div>
 <footer>
   UTS Mini Mixing Desk &mdash; Compressor &middot; documentation generated from the KiCad project<br>
   <a href="../index.html">All modules</a>

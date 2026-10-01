@@ -239,7 +239,7 @@ taken straight off the board.</p>
   first. Start a sketch on the back face of the panel and use <em>Sketch &rarr; Project</em> on
   each pot and switch bushing in the inserted STEP. The projected circle's centre is exactly
   where that part sits on the real board. Put a <em>Hole</em> on each, sized for the hardware.
-  The compressor uses 7.0 mm for 9 mm pots, 6.0 mm for mini toggles and 2.2 mm for 2 mm LEDs;
+  The compressor uses 7.2 mm for its RK09K pots, 5.2 mm for its sub-miniature toggles and 2.2 mm for 2 mm LEDs;
   check against the parts you actually buy.</li>
   <li><strong>Legends.</strong> Sketch text on the front face. For engraving, <em>Emboss</em> it
   0.2 mm into the panel. For a UV-printed or screen-printed finish, keep it as sketch text so it

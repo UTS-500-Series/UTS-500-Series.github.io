@@ -37,9 +37,8 @@ try {
 thing.</p>
 <div class="tw"><table><thead><tr><th class="r">Method</th><th class="">What you send</th><th class="">Notes</th></tr></thead><tbody><tr><td class="r"><strong>Machined aluminium</strong></td><td class="">Panel sketch as DXF (holes and outline only) plus a PDF drawing</td><td class="">The real thing: 3 mm stock, anodised, legends engraved or UV printed. The <a href="../mechanical/faceplate.html">mechanical guide</a> covers modelling and the drawing.</td></tr><tr><td class="r"><strong>Panel as a PCB</strong></td><td class="">Gerbers from a KiCad board that is just the panel</td><td class="">Cheapest and fastest. Outline on <code>Edge.Cuts</code>, holes as NPTH pads, legends in silkscreen, black mask with white print. Thinner than spec (1.6 to 2.0 mm), which is fine for testing but flexes more. Aluminium-core boards are stiffer.</td></tr><tr><td class="r"><strong>3D print or laser-cut acrylic</strong></td><td class="">STL or DXF</td><td class="">A fit check only. Make one before ordering metal to catch misplaced holes.</td></tr></tbody></table></div>
 <p>Whichever you choose, generate it from the front board layout rather than retyping
-coordinates. The compressor's <code>panel/make_panel.py</code> is the existing source for its
-panel. If the front board becomes the master, either update the script's positions to match or
-retire it, so there's only one source.</p>
+coordinates. The compressor does this: its front board is the master, and
+<code>panel/make_panel.py</code> copies its hole positions from the board.</p>
 
 <div class="next"><a href="rack.html">&larr; Fit the rack</a><a href="compressor.html">Compressor notes &rarr;</a></div>
 <footer>

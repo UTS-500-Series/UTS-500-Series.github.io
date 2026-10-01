@@ -92,9 +92,10 @@ built that way.</p>
 </div>
 
 <h2>How far along each module is</h2>
-<p>The compressor has been designed. Its pages are generated from a netlist that the KiCad
-schematic is verified against, pin by pin, so the figures in it come from the design rather
-than from memory.</p>
+<p>The compressor has been designed and both of its boards are laid out and routed: a main
+card and a front board behind the faceplate, joined by a ribbon. Nothing has been ordered or
+built yet. Its pages are generated from a netlist that the KiCad schematic is verified
+against, pin by pin, so the figures in it come from the design rather than from memory.</p>
 <p>The equaliser is <strong>in progress</strong>: its filter sections are drawn and one band
 has been simulated, but the schematics carry no values yet. Its pages say which numbers are
 real and which are not.</p>

@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="using.html"><i>10</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>11</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="using.html"><i>11</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>12</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -50,9 +50,9 @@ schematic: what it does, how it does it, and why it was built that way.</p>
   <div><dt>Format</dt><dd>500 series</dd></div>
   <div><dt>Supply</dt><dd>&plusmn;16 V</dd></div>
   <div><dt>Gain reduction</dt><dd>~40 dB max</dd></div>
-  <div><dt>Components</dt><dd>128</dd></div>
-  <div><dt>Nets</dt><dd>83</dd></div>
-  <div><dt>Sheets</dt><dd>6</dd></div>
+  <div><dt>Components</dt><dd>166</dd></div>
+  <div><dt>Nets</dt><dd>110</dd></div>
+  <div><dt>Boards</dt><dd>2, routed</dd></div>
 </dl>
 
 <h2>What a compressor actually does</h2>
@@ -98,11 +98,13 @@ is far more forgiving of component tolerance. Most classic bus compressors work 
   <a class="card" href="sidechain.html"><b>The sidechain</b><span>Measuring loudness and turning it into a control voltage, with attack and release.</span></a>
   <a class="card" href="power.html"><b>Power &amp; references</b><span>Rails, the &minus;5.1 V reference, and the bias voltages everything else depends on.</span></a>
   <a class="card" href="panel.html"><b>The front panel</b><span>Nine functions in 38 mm, three ways to arrange them, and why each one is a compromise.</span></a>
+  <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both laid out and routed.</span></a>
 </div>
 
 <div class="note warn">
   <h4>Read this before building</h4>
-  <p>Nothing here has been built or simulated. Every performance figure on this site is
+  <p>Both boards are laid out and routed, but nothing has been ordered, built or simulated.
+  Every performance figure on this site is
   <strong>calculated from the design</strong>, not measured. The netlist has been verified
   against the schematic automatically, and ERC passes with no errors, but that only proves the
   drawing is self-consistent &mdash; not that the circuit behaves as predicted.</p>
