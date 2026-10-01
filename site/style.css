@@ -153,7 +153,7 @@ footer{margin-top:70px;padding-top:20px;border-top:1px solid var(--rule);
 .iv-pane{position:relative;overflow:hidden;background:#fff;cursor:grab;touch-action:none}
 .iv-pane.grabbing{cursor:grabbing}
 .iv-hide{display:none}
-.iv-stage{position:absolute;inset:0;transform-origin:0 0}
+.iv-stage{position:absolute;left:0;top:0;width:100%;height:100%}
 .iv-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
 .iv-ov{position:absolute;inset:0;width:100%;height:100%}
 .iv-hot{fill:transparent;stroke:transparent;stroke-width:.4;cursor:pointer}
