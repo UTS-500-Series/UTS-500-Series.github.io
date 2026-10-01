@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The boards &middot; UTS Mini Mixing Desk &mdash; Compressor</title>
+<meta name="description" content="How the UTS Mini Mixing Desk compressor module works, section by section.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html" class="on"><i>10</i><span>The boards</span></a><a href="using.html"><i>11</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>12</i><span>Design files</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Practical</p>
+<h1>The boards</h1>
+<p class="lede">The compressor is two boards. The main board is the card that plugs into the
+rack; a small front board sits behind the faceplate and carries everything you touch or read.
+A 30-way ribbon joins them. Both are laid out, routed and pass DRC, and neither has been
+ordered yet.</p>
+
+<figure>
+  <div class="pane"><img src="files/main-board-3d-angle.png" alt="Main board, KiCad 3D render" loading="lazy"></div>
+  <figcaption><span>Main board, KiCad 3D render</span><a href="files/main-board-3d-angle.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+<figure>
+  <div class="pane"><img src="files/front-board-3d-angle.png" alt="Front board, KiCad 3D render. The side shown faces the panel" loading="lazy"></div>
+  <figcaption><span>Front board, KiCad 3D render. The side shown faces the panel</span><a href="files/front-board-3d-angle.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<div class="tw"><table><thead><tr><th class="r"></th><th class="">Main board</th><th class="">Front board</th></tr></thead><tbody><tr><td class="r">Size</td><td class="">Standard 500-series card, from the template outline</td><td class="">35 &times; 110 mm</td></tr><tr><td class="r">Parts</td><td class="">137 (including two mounting holes)</td><td class="">33</td></tr><tr><td class="r">Carries</td><td class="">The whole audio path, sidechain, power, references and trimmers</td><td class="">Five pots, four toggles, both LED meters and their drivers</td></tr><tr><td class="r">Copper</td><td class="">Two layers, AGND poured on the bottom</td><td class="">Two layers</td></tr><tr><td class="r">Held by</td><td class="">An L-bracket from the back of the panel</td><td class="">The nuts on the pot and toggle bushings</td></tr></tbody></table></div>
+
+<p>Track counts, layer plots and the PDFs of every layer are on the
+<a href="files.html">design files</a> page.</p>
+
+<h2>Why two boards</h2>
+<p>In a 500-series module the card stands at right angles to the faceplate, so a pot mounted
+on the card would point its shaft at the rack's side wall. Putting every panel part on a board
+of its own, parallel to the panel, lets the pots and toggles stand straight up through their
+holes and makes the hole positions a property of one board. The panel drawing now takes its
+coordinates from the front board rather than the other way round.</p>
+<p>The panel parts stay drawn in the main schematic, so the circuit still reads as one piece.
+They are excluded from the main board and its parts list and drawn again, pin for pin and with
+the same net names, in the front board's own schematic.</p>
+
+<h2>The main board</h2>
+<p>Parts are grouped by section, following the signal:</p>
+<ul>
+  <li><strong>Power entry</strong> sits by edge pins 12 to 14. <code>+16V</code>,
+      <code>-16V</code> and <code>-5V1</code> run on the top layer in 0.6 mm tracks to each
+      chip, with decoupling against pins 8 and 4 of every op amp.</li>
+  <li><strong>Grounds stay separate</strong>, as the <a href="power.html">power page</a>
+      explains. <code>PGND</code> is a single track from pin 13 to <code>R48</code>,
+      <code>CHASSIS</code> stays by pin 1, and <code>AGND</code> is a pour on the bottom layer
+      with every pad also tied in by its own track.</li>
+  <li><strong>The input and output stages</strong> sit next to the edge fingers, the
+      <strong>gain cell</strong> in the middle, and the <strong>sidechain</strong> towards the
+      front, next to the ribbon header.</li>
+  <li><strong>The matched pair and quad</strong> (<code>Q1</code>/<code>Q2</code> and
+      <code>Q6</code>&ndash;<code>Q9</code>) are placed touching, flat faces together, so they
+      can be glued and stay at one temperature.</li>
+  <li><strong>All seven op amps are socketed.</strong> That lets <code>U4</code> become a
+      TL072 or OPA2134 (see <a href="sidechain.html">the sidechain</a>) and makes a damaged
+      chip a swap rather than a desoldering job.</li>
+  <li><strong>The trimmers</strong> <code>RV1</code>, <code>RV7</code> and <code>RV8</code>
+      stay on the main board. They are set once at bring-up.</li>
+</ul>
+<p>The front edge of the board is set back 24 mm from the panel to clear the front board, its
+header and the ribbon plug.</p>
+
+<h2>The front board</h2>
+<ul>
+  <li><strong>Pots:</strong> Alps RK09K, vertical, for THRESHOLD, RATIO, ATTACK, RELEASE and
+      MAKEUP.</li>
+  <li><strong>Toggles:</strong> Jaycar ST0300 sub-miniature SPDT for HPF, KEY and LINK, and the
+      ST0310 DPDT for BYPASS.</li>
+  <li><strong>Meters:</strong> the fourteen LEDs in two columns, with the LM3914 and LM3915
+      (<code>U9</code>, <code>U10</code>) either side. The driver chips are soldered rather than
+      socketed, because a socket would overlap the LEDs.</li>
+  <li><strong>On the back:</strong> the ribbon header <code>J1</code> and <code>C38</code>,
+      which is too tall for the panel side.</li>
+</ul>
+<p>The toggle bodies are 8.64 mm deep and rest on the board, so the board sits <strong>about
+8.7 mm behind the panel</strong>. That sets two things: the LEDs need spacers of about 6 mm to
+reach their holes, and the pots probably stand a little short of the panel, which a nut behind
+the panel can make up.</p>
+
+<h2>Joining and fixing them</h2>
+<ul>
+  <li><strong>Ribbon.</strong> 30-way, 2.54 mm pitch, with an IDC socket crimped on each end. It
+      carries 24 signals with ground between the audio pairs. The main board's <code>J2</code>
+      is a shrouded header but the front board's <code>J1</code> is a plain one, so it is not
+      keyed: put the red stripe on pin 1 at both ends (pin 1 is marked on the silkscreen).</li>
+  <li><strong>Ribbon length.</strong> About 150 mm, folded once. It depends on where the board
+      sits in your rack, so lay the boards out before crimping.</li>
+  <li><strong>Front board to panel:</strong> just the nine bushing nuts.</li>
+  <li><strong>Main board to panel:</strong> an L-bracket (25 &times; 25 mm aluminium angle, or a
+      short angle on standoffs) from the back of the panel to the two M3 holes
+      <code>H1</code> and <code>H2</code> near the board's front edge. <code>H2</code> is plated
+      and tied to <code>CHASSIS</code>, so the bracket also grounds the panel. Mask the anodise
+      where the bracket touches it.</li>
+</ul>
+<p>The <a href="../faceplate/index.html">faceplate fit guide</a> covers the same joint for every
+module.</p>
+
+<h2>3D models</h2>
+<p>Every part has a 3D model, so KiCad's 3D viewer and a STEP export for the Fusion 360
+assembly show both boards complete. The pots use Alps' own RK09K model, which is not kept in
+the repository: run <code>sh tools/get_3d_models.sh</code> once to download it. The toggles use
+simple models built to the Jaycar datasheet.</p>
+
+<div class="note warn">
+  <h4>Check before ordering boards</h4>
+  <ul>
+    <li><strong>Some tracks need tidying by hand.</strong> The routing passes DRC but has not
+        been reviewed: a few autorouted runs want straightening, including the input and output
+        pairs, bottom-layer runs that split the ground pour, and the timing node at
+        <code>C15</code> and <code>U4</code>.</li>
+    <li><strong>The ST0310's lug rows are unmeasured.</strong> Jaycar publishes no drawing for
+        it, so its footprint assumes the ST0300's 2.54 mm pitch with rows 4.7 mm apart. Measure
+        one first.</li>
+    <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the toggles under 1 mm of
+        thread: counterbore those holes or use a thinner panel
+        (<a href="panel.html">front panel</a>).</li>
+    <li><strong>Pot height and ribbon length</strong> are estimates until the parts are in hand
+        and the boards are in a rack.</li>
+  </ul>
+</div>
+
+<div class="next"><a href="panel.html">&larr; The front panel</a><a href="using.html">Setting up &amp; using it &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Compressor &middot; documentation generated from the KiCad project<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

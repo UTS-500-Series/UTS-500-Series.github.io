@@ -1,16 +1,25 @@
 {
  "repo": "https://github.com/UTS-500-Series/Compressor",
- "commit": "5e6864c",
- "date": "2026-09-29",
+ "commit": "c506150",
+ "date": "2026-10-01",
  "kicad": "10.0.6",
  "schematics": [
   {
    "name": "compressor",
    "source": "kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_sch",
-   "label": "Single-sheet schematic the board is drawn from",
+   "label": "Single-sheet schematic the main board is drawn from",
    "files": [
     "compressor.pdf",
     "compressor.svg"
+   ]
+  },
+  {
+   "name": "front-board",
+   "source": "kicad_withpcb/compressor_front/compressor_front.kicad_sch",
+   "label": "Front board schematic: the panel controls, meters and ribbon header",
+   "files": [
+    "front-board.pdf",
+    "front-board.svg"
    ]
   },
   {
@@ -32,23 +41,43 @@
  ],
  "boards": [
   {
-   "name": "compressor",
+   "name": "main-board",
    "source": "kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_pcb",
-   "label": "The compressor card",
+   "label": "Main board: the card that plugs into the rack",
    "stats": {
-    "footprints": 166,
-    "segments": 0,
-    "vias": 0,
-    "zones": 0,
+    "footprints": 137,
+    "segments": 1068,
+    "vias": 71,
+    "zones": 4,
     "outline": 10
    },
    "files": [
-    "compressor-3d-top.png",
-    "compressor-3d-bottom.png",
-    "compressor-3d-angle.png",
-    "compressor-front.svg",
-    "compressor-back.svg",
-    "compressor-layers.pdf"
+    "main-board-3d-top.png",
+    "main-board-3d-bottom.png",
+    "main-board-3d-angle.png",
+    "main-board-front.svg",
+    "main-board-back.svg",
+    "main-board-layers.pdf"
+   ]
+  },
+  {
+   "name": "front-board",
+   "source": "kicad_withpcb/compressor_front/compressor_front.kicad_pcb",
+   "label": "Front board: sits behind the faceplate, joined to the main board by a ribbon",
+   "stats": {
+    "footprints": 33,
+    "segments": 390,
+    "vias": 10,
+    "zones": 1,
+    "outline": 4
+   },
+   "files": [
+    "front-board-3d-top.png",
+    "front-board-3d-bottom.png",
+    "front-board-3d-angle.png",
+    "front-board-front.svg",
+    "front-board-back.svg",
+    "front-board-layers.pdf"
    ]
   }
  ]

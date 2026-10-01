@@ -235,10 +235,12 @@ typical values to start from.</p>
               "From the 500-series spec, countersunk on the front."]],
             ["r", "", "", ""]) + """
 <div class="note warn">
-  <h4>Check the compressor panel's hole sizes</h4>
-  <p><code>panel/README.md</code> lists &Oslash;7.0 for the 9 mm pots and &Oslash;6.0 for the mini
-  toggles. Those are at or below the bushing size of the usual parts, so they may not fit.
-  Confirm against the actual parts before cutting.</p>
+  <h4>Sub-miniature toggles have short bushings</h4>
+  <p>The compressor uses Jaycar's ST0300 and ST0310 sub-miniature toggles, which need a
+  &Oslash;5.2 hole for their 10-48 bushing rather than the mini toggle's &Oslash;6.5. Their
+  bushing is only 4.06 mm long, so a 3.18 mm panel leaves under 1 mm of thread for the nut:
+  counterbore those holes from the back or use a thinner panel. Confirm every size against the
+  actual parts before cutting.</p>
 </div>
 """)
 
@@ -288,28 +290,35 @@ thing.</p>
               "A fit check only. Make one before ordering metal to catch misplaced holes."]],
             ["r", "", ""]) + """
 <p>Whichever you choose, generate it from the front board layout rather than retyping
-coordinates. The compressor's <code>panel/make_panel.py</code> is the existing source for its
-panel. If the front board becomes the master, either update the script's positions to match or
-retire it, so there's only one source.</p>
+coordinates. The compressor does this: its front board is the master, and
+<code>panel/make_panel.py</code> copies its hole positions from the board.</p>
 """)
 
 PAGES['compressor.html'] = ("Compressor notes", f"""
 <p class="eyebrow">Finish</p>
 <h1>Compressor notes</h1>
-<p class="lede">Where the <a href="{ORG}/Compressor">compressor</a> stands against this guide,
-as of 28 September 2026.</p>
+<p class="lede">How the <a href="{ORG}/Compressor">compressor</a> followed this guide, as of
+1 October 2026. Its <a href="../compressor/boards.html">boards page</a> has the full
+description.</p>
 
 <ul>
-  <li>The committed panel files and <code>panel/README.md</code> describe different layouts. The
-  files show five separate pots plus a LINK toggle (SW4). The README describes dual-concentric
-  knobs and a pull-switch on MAKEUP. Pick one before designing the front board.</li>
-  <li>If you keep dual-concentric pots, RV3/RV4 and RV5/RV6 each become one six-pin part, and the
-  schematic's single RK09K footprints need to change to a concentric footprint from the maker's
-  datasheet.</li>
-  <li>The switches currently use 1.00 mm pin sockets on the main board. With a front board, the
-  switches move there and those sockets become part of a 2.54 mm board-to-board connector.</li>
-  <li>The meter LEDs sit at x = 13.6 and 24.5 in the panel file, 10.9 mm apart. A front board
-  with U9, U10 and 14 LEDs fits comfortably in that area.</li>
+  <li><strong>Layout:</strong> the <code>toggle</code> layout, five single RK09K pots with four
+  toggles beside them. The dual-concentric and pull-switch layouts were dropped.</li>
+  <li><strong>Front board:</strong> 35 &times; 110 mm, carrying the pots, the Jaycar ST0300 and
+  ST0310 toggles, both meters and their LM3914/LM3915 drivers. It sits about 8.7 mm behind the
+  panel with the toggle bodies resting on it, held only by the bushing nuts.</li>
+  <li><strong>Master:</strong> the panel and its holes are drawn on the front board's
+  User.Drawings layer with the origin on the panel's top-left corner, and
+  <code>panel/make_panel.py</code> takes its positions from there. The meter columns ended up
+  9.9 mm apart so the drivers fit either side.</li>
+  <li><strong>Connector:</strong> the old 1.00 mm switch sockets are gone. A 30-way ribbon runs
+  from a shrouded 2 &times; 15 header on the main board to a plain one on the front board, so
+  put the stripe on pin 1 at both ends.</li>
+  <li><strong>Main board:</strong> front edge set back 24 mm, fixed to the panel with an L-bracket
+  on two M3 holes. One of them is plated to CHASSIS, which grounds the panel.</li>
+  <li><strong>Still open:</strong> the panel thickness for the short toggle bushings, the
+  ST0310's unmeasured lug rows, the pot height at an 8.7 mm gap, and the ribbon length in a real
+  rack.</li>
 </ul>
 """)
 

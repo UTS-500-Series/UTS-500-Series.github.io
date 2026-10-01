@@ -5,6 +5,14 @@ checked against tools/design.py in the compressor repository; do not edit values
 """
 from shell import fig, pic, table
 
+
+def render(name, caption):
+    """A board render or plot exported by build/export_kicad.py into files/."""
+    return f"""<figure>
+  <div class="pane"><img src="files/{name}" alt="{caption}" loading="lazy"></div>
+  <figcaption><span>{caption}</span><a href="files/{name}" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>"""
+
 NAV = [
     ("Start here", [("index.html", "01", "Overview")]),
     ("Signal path", [("connector.html", "02", "500-series interface"),
@@ -15,8 +23,9 @@ NAV = [
     ("Support", [("power.html", "07", "Power &amp; references"),
                  ("meters.html", "08", "The LED meters")]),
     ("Practical", [("panel.html", "09", "The front panel"),
-                   ("using.html", "10", "Setting up &amp; using it"),
-                   ("files.html", "11", "Design files")]),
+                   ("boards.html", "10", "The boards"),
+                   ("using.html", "11", "Setting up &amp; using it"),
+                   ("files.html", "12", "Design files")]),
 ]
 
 PAGES = {}
@@ -42,9 +51,9 @@ schematic: what it does, how it does it, and why it was built that way.</p>
   <div><dt>Format</dt><dd>500 series</dd></div>
   <div><dt>Supply</dt><dd>&plusmn;16 V</dd></div>
   <div><dt>Gain reduction</dt><dd>~40 dB max</dd></div>
-  <div><dt>Components</dt><dd>128</dd></div>
-  <div><dt>Nets</dt><dd>83</dd></div>
-  <div><dt>Sheets</dt><dd>6</dd></div>
+  <div><dt>Components</dt><dd>166</dd></div>
+  <div><dt>Nets</dt><dd>110</dd></div>
+  <div><dt>Boards</dt><dd>2, routed</dd></div>
 </dl>
 
 <h2>What a compressor actually does</h2>
@@ -90,11 +99,13 @@ is far more forgiving of component tolerance. Most classic bus compressors work 
   <a class="card" href="sidechain.html"><b>The sidechain</b><span>Measuring loudness and turning it into a control voltage, with attack and release.</span></a>
   <a class="card" href="power.html"><b>Power &amp; references</b><span>Rails, the &minus;5.1 V reference, and the bias voltages everything else depends on.</span></a>
   <a class="card" href="panel.html"><b>The front panel</b><span>Nine functions in 38 mm, three ways to arrange them, and why each one is a compromise.</span></a>
+  <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both laid out and routed.</span></a>
 </div>
 
 <div class="note warn">
   <h4>Read this before building</h4>
-  <p>Nothing here has been built or simulated. Every performance figure on this site is
+  <p>Both boards are laid out and routed, but nothing has been ordered, built or simulated.
+  Every performance figure on this site is
   <strong>calculated from the design</strong>, not measured. The netlist has been verified
   against the schematic automatically, and ERC passes with no errors, but that only proves the
   drawing is self-consistent &mdash; not that the circuit behaves as predicted.</p>
@@ -842,9 +853,11 @@ because both are set once and then left.</p>
 modifies needs no label to explain the relationship.</p>
 
 <div class="note good">
-  <h4>This is the layout the schematic already matches</h4>
+  <h4>This is the layout the boards are built for</h4>
   <p>The <code>toggle</code> layout uses four discrete switches &mdash; exactly what
-  <code>SW1</code>&ndash;<code>SW4</code> are in <code>design.py</code>. The other two need the
+  <code>SW1</code>&ndash;<code>SW4</code> are in <code>design.py</code> &mdash; and it is the one
+  the <a href="boards.html">front board</a> carries. Its hole positions are now taken from that
+  board, so the panel and the board cannot disagree. The other two layouts would need the
   schematic changing: <code>pull</code> wants pull-switch pots, and <code>concentric</code>
   wants dual-concentric pots plus a latching pushbutton.</p>
 </div>
@@ -877,10 +890,133 @@ the repository, alongside the DXF.</p>
 
 <div class="note warn">
   <h4>Before you have one made</h4>
-  <p>Hole sizes assume a 9 mm pot bushing, a mini toggle and 2 mm LEDs. Check them against the
-  parts you actually buy &mdash; bushing diameters vary between manufacturers, and half a
-  millimetre is the difference between a push fit and a rattle. Depth clearance between knobs,
-  switch bodies and the PCB is not modelled at all: this is a 2D drawing.</p>
+  <p>The holes are &Oslash;7.2 for the Alps RK09K pots, &Oslash;5.2 for the Jaycar
+  sub-miniature toggles and &Oslash;2.2 for the 2 mm LEDs. Check them against the parts you
+  actually buy &mdash; half a millimetre is the difference between a push fit and a rattle.</p>
+  <p>The toggles' bushing is only 4.06 mm long, which leaves under 1 mm of thread for the nut
+  through a standard 3.18 mm panel. Either counterbore the back of the panel to about 2 mm
+  round those four holes, or use a 1.6 to 2 mm panel. Depth is covered on
+  <a href="boards.html">the boards</a> page.</p>
+</div>
+""")
+
+# ============================================================ 10 BOARDS
+PAGES['boards.html'] = ("The boards", """
+<p class="eyebrow">Practical</p>
+<h1>The boards</h1>
+<p class="lede">The compressor is two boards. The main board is the card that plugs into the
+rack; a small front board sits behind the faceplate and carries everything you touch or read.
+A 30-way ribbon joins them. Both are laid out, routed and pass DRC, and neither has been
+ordered yet.</p>
+
+""" + render("main-board-3d-angle.png", "Main board, KiCad 3D render") + """
+""" + render("front-board-3d-angle.png", "Front board, KiCad 3D render. The side shown faces the panel") + """
+
+""" + table(
+    ["", "Main board", "Front board"],
+    [["Size", "Standard 500-series card, from the template outline", "35 &times; 110 mm"],
+     ["Parts", "137 (including two mounting holes)", "33"],
+     ["Carries", "The whole audio path, sidechain, power, references and trimmers",
+      "Five pots, four toggles, both LED meters and their drivers"],
+     ["Copper", "Two layers, AGND poured on the bottom", "Two layers"],
+     ["Held by", "An L-bracket from the back of the panel", "The nuts on the pot and toggle bushings"]],
+    ["r", "", ""]) + """
+
+<p>Track counts, layer plots and the PDFs of every layer are on the
+<a href="files.html">design files</a> page.</p>
+
+<h2>Why two boards</h2>
+<p>In a 500-series module the card stands at right angles to the faceplate, so a pot mounted
+on the card would point its shaft at the rack's side wall. Putting every panel part on a board
+of its own, parallel to the panel, lets the pots and toggles stand straight up through their
+holes and makes the hole positions a property of one board. The panel drawing now takes its
+coordinates from the front board rather than the other way round.</p>
+<p>The panel parts stay drawn in the main schematic, so the circuit still reads as one piece.
+They are excluded from the main board and its parts list and drawn again, pin for pin and with
+the same net names, in the front board's own schematic.</p>
+
+<h2>The main board</h2>
+<p>Parts are grouped by section, following the signal:</p>
+<ul>
+  <li><strong>Power entry</strong> sits by edge pins 12 to 14. <code>+16V</code>,
+      <code>-16V</code> and <code>-5V1</code> run on the top layer in 0.6 mm tracks to each
+      chip, with decoupling against pins 8 and 4 of every op amp.</li>
+  <li><strong>Grounds stay separate</strong>, as the <a href="power.html">power page</a>
+      explains. <code>PGND</code> is a single track from pin 13 to <code>R48</code>,
+      <code>CHASSIS</code> stays by pin 1, and <code>AGND</code> is a pour on the bottom layer
+      with every pad also tied in by its own track.</li>
+  <li><strong>The input and output stages</strong> sit next to the edge fingers, the
+      <strong>gain cell</strong> in the middle, and the <strong>sidechain</strong> towards the
+      front, next to the ribbon header.</li>
+  <li><strong>The matched pair and quad</strong> (<code>Q1</code>/<code>Q2</code> and
+      <code>Q6</code>&ndash;<code>Q9</code>) are placed touching, flat faces together, so they
+      can be glued and stay at one temperature.</li>
+  <li><strong>All seven op amps are socketed.</strong> That lets <code>U4</code> become a
+      TL072 or OPA2134 (see <a href="sidechain.html">the sidechain</a>) and makes a damaged
+      chip a swap rather than a desoldering job.</li>
+  <li><strong>The trimmers</strong> <code>RV1</code>, <code>RV7</code> and <code>RV8</code>
+      stay on the main board. They are set once at bring-up.</li>
+</ul>
+<p>The front edge of the board is set back 24 mm from the panel to clear the front board, its
+header and the ribbon plug.</p>
+
+<h2>The front board</h2>
+<ul>
+  <li><strong>Pots:</strong> Alps RK09K, vertical, for THRESHOLD, RATIO, ATTACK, RELEASE and
+      MAKEUP.</li>
+  <li><strong>Toggles:</strong> Jaycar ST0300 sub-miniature SPDT for HPF, KEY and LINK, and the
+      ST0310 DPDT for BYPASS.</li>
+  <li><strong>Meters:</strong> the fourteen LEDs in two columns, with the LM3914 and LM3915
+      (<code>U9</code>, <code>U10</code>) either side. The driver chips are soldered rather than
+      socketed, because a socket would overlap the LEDs.</li>
+  <li><strong>On the back:</strong> the ribbon header <code>J1</code> and <code>C38</code>,
+      which is too tall for the panel side.</li>
+</ul>
+<p>The toggle bodies are 8.64 mm deep and rest on the board, so the board sits <strong>about
+8.7 mm behind the panel</strong>. That sets two things: the LEDs need spacers of about 6 mm to
+reach their holes, and the pots probably stand a little short of the panel, which a nut behind
+the panel can make up.</p>
+
+<h2>Joining and fixing them</h2>
+<ul>
+  <li><strong>Ribbon.</strong> 30-way, 2.54 mm pitch, with an IDC socket crimped on each end. It
+      carries 24 signals with ground between the audio pairs. The main board's <code>J2</code>
+      is a shrouded header but the front board's <code>J1</code> is a plain one, so it is not
+      keyed: put the red stripe on pin 1 at both ends (pin 1 is marked on the silkscreen).</li>
+  <li><strong>Ribbon length.</strong> About 150 mm, folded once. It depends on where the board
+      sits in your rack, so lay the boards out before crimping.</li>
+  <li><strong>Front board to panel:</strong> just the nine bushing nuts.</li>
+  <li><strong>Main board to panel:</strong> an L-bracket (25 &times; 25 mm aluminium angle, or a
+      short angle on standoffs) from the back of the panel to the two M3 holes
+      <code>H1</code> and <code>H2</code> near the board's front edge. <code>H2</code> is plated
+      and tied to <code>CHASSIS</code>, so the bracket also grounds the panel. Mask the anodise
+      where the bracket touches it.</li>
+</ul>
+<p>The <a href="../faceplate/index.html">faceplate fit guide</a> covers the same joint for every
+module.</p>
+
+<h2>3D models</h2>
+<p>Every part has a 3D model, so KiCad's 3D viewer and a STEP export for the Fusion 360
+assembly show both boards complete. The pots use Alps' own RK09K model, which is not kept in
+the repository: run <code>sh tools/get_3d_models.sh</code> once to download it. The toggles use
+simple models built to the Jaycar datasheet.</p>
+
+<div class="note warn">
+  <h4>Check before ordering boards</h4>
+  <ul>
+    <li><strong>Some tracks need tidying by hand.</strong> The routing passes DRC but has not
+        been reviewed: a few autorouted runs want straightening, including the input and output
+        pairs, bottom-layer runs that split the ground pour, and the timing node at
+        <code>C15</code> and <code>U4</code>.</li>
+    <li><strong>The ST0310's lug rows are unmeasured.</strong> Jaycar publishes no drawing for
+        it, so its footprint assumes the ST0300's 2.54 mm pitch with rows 4.7 mm apart. Measure
+        one first.</li>
+    <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the toggles under 1 mm of
+        thread: counterbore those holes or use a thinner panel
+        (<a href="panel.html">front panel</a>).</li>
+    <li><strong>Pot height and ribbon length</strong> are estimates until the parts are in hand
+        and the boards are in a rack.</li>
+  </ul>
 </div>
 """)
 
@@ -958,17 +1094,21 @@ ever goes near a rack.</p>
 
 <h2>Project files</h2>
 <ul>
-  <li><code>kicad/</code> &mdash; the KiCad project. Open the <code>.kicad_pro</code> in
-      KiCad 9; it holds seven sheets.</li>
+  <li><code>kicad/</code> &mdash; the hierarchical schematic these pages document, seven sheets,
+      KiCad 9.</li>
+  <li><code>kicad_withpcb/compressor_with_pcb/</code> &mdash; the single-sheet schematic and the
+      main board, KiCad 10.</li>
+  <li><code>kicad_withpcb/compressor_front/</code> &mdash; the front board. Run
+      <code>sh tools/get_3d_models.sh</code> once to fetch the pot's 3D model.</li>
   <li><code>tools/design.py</code> &mdash; the authoritative netlist as data.
       The schematic is generated and verified against it.</li>
   <li><code>panel/</code> &mdash; the faceplate generator: mockups, a 1:1 drawing and DXF.</li>
-  <li><code>docs/</code> &mdash; this site. Rebuild the pages with
-      <code>python3 _build.py</code>, and the viewer data with <code>python3 _data.py</code>
-      after any schematic change.</li>
+  <li>This site lives in its own repository,
+      <a href="https://github.com/UTS-500-Series/UTS-500-Series.github.io">UTS-500-Series.github.io</a>,
+      and its README explains how to regenerate these pages.</li>
 </ul>
 """)
 
 
 import content_files
-PAGES['files.html'] = content_files.page('compressor', '11')
+PAGES['files.html'] = content_files.page('compressor', '12')

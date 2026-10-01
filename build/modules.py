@@ -34,11 +34,12 @@ class Module:
 
 MODULES = [
     Module('compressor', 'Compressor',
-           'Feedback compressor built round a discrete current-steering gain cell.',
+           'Feedback compressor built round a discrete current-steering gain cell. '
+           'Both boards laid out and routed.',
            'designed',
            'How the UTS Mini Mixing Desk compressor module works, section by section.',
            'documentation generated from the KiCad project',
-           content='content_compressor', repo='compressor'),
+           content='content_compressor', repo='Compressor'),
 
     Module('preamp', 'Preamp',
            'Discrete low-noise balanced mic preamp with switchable phantom power. '

@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html" class="on"><i>09</i><span>The front panel</span></a><a href="using.html"><i>10</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>11</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html" class="on"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="using.html"><i>11</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>12</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -85,9 +85,11 @@ because both are set once and then left.</p>
 modifies needs no label to explain the relationship.</p>
 
 <div class="note good">
-  <h4>This is the layout the schematic already matches</h4>
+  <h4>This is the layout the boards are built for</h4>
   <p>The <code>toggle</code> layout uses four discrete switches &mdash; exactly what
-  <code>SW1</code>&ndash;<code>SW4</code> are in <code>design.py</code>. The other two need the
+  <code>SW1</code>&ndash;<code>SW4</code> are in <code>design.py</code> &mdash; and it is the one
+  the <a href="boards.html">front board</a> carries. Its hole positions are now taken from that
+  board, so the panel and the board cannot disagree. The other two layouts would need the
   schematic changing: <code>pull</code> wants pull-switch pots, and <code>concentric</code>
   wants dual-concentric pots plus a latching pushbutton.</p>
 </div>
@@ -126,13 +128,16 @@ the repository, alongside the DXF.</p>
 
 <div class="note warn">
   <h4>Before you have one made</h4>
-  <p>Hole sizes assume a 9 mm pot bushing, a mini toggle and 2 mm LEDs. Check them against the
-  parts you actually buy &mdash; bushing diameters vary between manufacturers, and half a
-  millimetre is the difference between a push fit and a rattle. Depth clearance between knobs,
-  switch bodies and the PCB is not modelled at all: this is a 2D drawing.</p>
+  <p>The holes are &Oslash;7.2 for the Alps RK09K pots, &Oslash;5.2 for the Jaycar
+  sub-miniature toggles and &Oslash;2.2 for the 2 mm LEDs. Check them against the parts you
+  actually buy &mdash; half a millimetre is the difference between a push fit and a rattle.</p>
+  <p>The toggles' bushing is only 4.06 mm long, which leaves under 1 mm of thread for the nut
+  through a standard 3.18 mm panel. Either counterbore the back of the panel to about 2 mm
+  round those four holes, or use a 1.6 to 2 mm panel. Depth is covered on
+  <a href="boards.html">the boards</a> page.</p>
 </div>
 
-<div class="next"><a href="meters.html">&larr; The LED meters</a><a href="using.html">Setting up &amp; using it &rarr;</a></div>
+<div class="next"><a href="meters.html">&larr; The LED meters</a><a href="boards.html">The boards &rarr;</a></div>
 <footer>
   UTS Mini Mixing Desk &mdash; Compressor &middot; documentation generated from the KiCad project<br>
   <a href="../index.html">All modules</a>

@@ -14,7 +14,7 @@ also render correctly if this is ever demoted to an ordinary project site.
 
 | Module | Status | Source |
 |---|---|---|
-| Compressor | **Designed** — schematic complete, verified, not built | [`../compressor`](../compressor) |
+| Compressor | **Designed** — schematic complete and verified, main and front boards routed, not built | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
 | Preamp | **In progress** — schematic drawn and board routed, no component values yet | [`UTS-500-Series/Pre-Amp`](https://github.com/UTS-500-Series/Pre-Amp) |
 | Equaliser | **In progress** — sections drawn, one band simulated, no values on the schematics | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
 
@@ -87,13 +87,13 @@ repository checked out beside this one:
 python3 build/_data.py --module compressor
 ```
 
-It reads the netlist and the `.kicad_sch` files from `../compressor`, and rewrites
+It reads the netlist and the `.kicad_sch` files from `../Compressor`, and rewrites
 `site/compressor/data/*.json`. The sheet images are separate — export them from KiCad and
 copy them into `site/compressor/img/`:
 
 ```bash
 kicad-cli sch export svg --no-background-color --exclude-drawing-sheet -o /tmp/svg \
-  "../compressor/kicad/UTS Mini Mixing Desk - Compressor.kicad_sch"
+  "../Compressor/kicad/UTS Mini Mixing Desk - Compressor.kicad_sch"
 ```
 
 The preamp has no `design.py`, so its sheet image and viewer data come from the
@@ -106,7 +106,7 @@ python3 build/_kicad_sch.py --module preamp      # or --repo <path> for another 
 
 It rewrites `site/preamp/img/schematic.svg` and `site/preamp/data/schematic.json`.
 
-`build_site.py` also copies the faceplate artwork out of `../compressor/panel/` when that
+`build_site.py` also copies the faceplate artwork out of `../Compressor/panel/` when that
 repository is present, so the front-panel page follows whatever layout and finish was last
 generated.
 
@@ -125,6 +125,11 @@ python3 build/build_site.py
 The exports and a `manifest.json` (repository commit, KiCad version, board counts) go to
 `site/<slug>/files/`. Which files each module exports is set in `PROJECTS` at the top of the
 script. A board with no outline or no parts is listed on the page but not rendered.
+
+The compressor exports both of its boards, the main board and the front board. The front
+board's pots need Alps' RK09K 3D model, which is not committed: run
+`sh tools/get_3d_models.sh` in the Compressor checkout before exporting, or the pots render
+as bare footprints.
 
 ## Adding a module
 

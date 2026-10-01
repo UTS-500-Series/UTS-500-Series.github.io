@@ -48,8 +48,9 @@ def _board(b, m):
         _fig('files/%s-3d-%s.png' % (name, v), '3D render, %s' % label.lower(), ' flush')
         for v, label in VIEWS)
     return '\n'.join([head, counts, renders,
-                      _fig('files/%s-front.svg' % name, 'Front: copper, mask, silkscreen and outline'),
-                      _fig('files/%s-back.svg' % name, 'Back, mirrored as seen from underneath'),
+                      # 'tall' caps the height, so an upright board doesn't run to several screens
+                      _fig('files/%s-front.svg' % name, 'Front: copper, mask, silkscreen and outline', ' tall'),
+                      _fig('files/%s-back.svg' % name, 'Back, mirrored as seen from underneath', ' tall'),
                       '<p>Every layer, one per page: <a href="files/%s-layers.pdf">%s-layers.pdf</a>.</p>'
                       % (name, name)])
 

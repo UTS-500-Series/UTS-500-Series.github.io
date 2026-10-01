@@ -86,12 +86,18 @@ step applies to the equaliser and preamp too.</p>
 </div>
 
 <h2>Where the compressor board is now</h2>
-<p>The <a href="{BOARD}">compressor board</a> has all 166 footprints on it, spread roughly
-across the card, with no tracks and no copper pours. The schematic matches the original design
-net for net. Three things to fix before placing properly:</p>
+<p>As of 1 October 2026 the <a href="{BOARD}">compressor's main board</a> is placed, routed and
+poured, and a separate front board carries the panel controls. Both pass DRC with no errors;
+the <a href="../compressor/boards.html">compressor's boards page</a> describes them. The steps
+in this guide are the ones it went through.</p>
+<p>This guide was first written against the board as it stood on 28 September, with all 166
+footprints spread roughly across the card and no tracks. These were the three things that had
+to be fixed before placing, and how each was settled: the power nets moved to their own net
+classes, the switches moved to a front board on a 2.54 mm ribbon header, and the vertical pots
+went with them so their shafts point at the panel.</p>
 
 <div class="note warn">
-  <h4>Fix before placing</h4>
+  <h4>Fix before placing (as it was on 28 September)</h4>
   <p><strong>The power nets are in the wrong net class.</strong> The project still carries the
   template's net class patterns, which put <code>+16V</code>, <code>-16V</code> and
   <code>AGND</code> in <em>Default</em> (0.25 mm tracks). <a href="setup.html">Setting up the
