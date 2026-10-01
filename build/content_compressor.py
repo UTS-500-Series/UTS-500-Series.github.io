@@ -961,7 +961,6 @@ the same net names, in the front board's own schematic.</p>
 header and the ribbon plug.</p>
 
 <h2>The front board</h2>
-""" + render("front-board-3d-top.png", "Front board from the panel side") + """
 <ul>
   <li><strong>Pots:</strong> Alps RK09K, vertical, for THRESHOLD, RATIO, ATTACK, RELEASE and
       MAKEUP.</li>
