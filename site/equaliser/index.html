@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><h4>Filter sections</h4><a href="parametric.html"><i>02</i><span>Parametric band</span></a><a href="lowpass.html"><i>03</i><span>Low-pass filter</span></a><h4>Practical</h4><a href="simulation.html"><i>04</i><span>Simulating it</span></a><a href="status.html"><i>05</i><span>What is left</span></a><a href="files.html"><i>06</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The main schematic</span></a><h4>The circuit</h4><a href="bands.html"><i>03</i><span>Parametric bands</span></a><a href="filters.html"><i>04</i><span>High- and low-pass filters</span></a><a href="gain.html"><i>05</i><span>Gain stage</span></a><h4>Practical</h4><a href="simulation.html"><i>06</i><span>Simulating it</span></a><a href="status.html"><i>07</i><span>What is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -33,40 +33,63 @@ try {
 
 <p class="eyebrow">Equaliser module</p>
 <h1>The equaliser</h1>
-<p class="lede">A multi-band equaliser for the desk, built from filter sections around the
-OPA1641. Two sections are drawn and one has been simulated &mdash; this is a module in
-progress, and these pages say exactly how far along it is.</p>
+<p class="lede">Two fully parametric bands, low-mid and high-mid, each with its own frequency,
+width and boost/cut, plus a high-pass filter, a low-pass filter and a gain stage. The two bands
+are drawn with values on one sheet; the other three sections are drawn on sheets of their own.</p>
 
 <div class="note warn">
   <h4>Work in progress</h4>
   <p>Written from the <a href="https://github.com/UTS-500-Series/Equaliser">Equaliser repository</a> at commit
-  <code>4c6c1af</code>. The KiCad sheets have their topology drawn but <strong>no component
-  values yet</strong>. The only real numbers on this site come from one LTspice run of one
-  band. Nothing has been built or measured.</p>
+  <code>e2f6864</code>. The bands are complete as circuits, with values, and their response on
+  these pages is worked out from the schematic itself. Nothing is wired to the edge connector
+  yet, the op amps are not on the rack's supply, and nothing has been built or measured.</p>
 </div>
 
-<h2>What exists</h2>
-<div class="tw"><table><thead><tr><th class="r">Section</th><th class="">Topology</th><th class="">Drawn</th><th class="">Values</th><th class="">Simulated</th></tr></thead><tbody><tr><td class="r"><a href="parametric.html">Parametric band</a></td><td class="">State-variable</td><td class="">Yes &mdash; 4 op amps</td><td class="">Not in KiCad</td><td class="">Yes &mdash; one run</td></tr><tr><td class="r"><a href="lowpass.html">Low-pass filter</a></td><td class="">Sallen-Key, 2nd order</td><td class="">Yes &mdash; 1 op amp</td><td class="">Not in KiCad</td><td class="">No</td></tr><tr><td class="r">Bill of materials</td><td class="">&mdash;</td><td class="">Template only</td><td class="">&mdash;</td><td class="">&mdash;</td></tr></tbody></table></div>
+<figure>
+  <div style="background:var(--surface-2);border:1px solid var(--rule);border-radius:8px;padding:10px">
+  <svg viewBox="0 0 720 230" role="img" style="width:100%;height:auto;display:block"
+       aria-label="The main sheet chains a low-mid band into a high-mid band. The high-pass, low-pass and gain stages are on separate sheets, and nothing is wired to the edge connector yet">
+    <defs><marker id="eah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="var(--sig)"/></marker></defs>
+    <text x="14" y="24" text-anchor="start" fill="var(--ctl)" font-family="var(--mono)" font-size="11">ON THE MAIN SHEET</text>
+    <text x="40" y="76" text-anchor="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="11">in</text><line x1="56" y1="72" x2="128" y2="72" stroke="var(--sig)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#eah)"/>
+    <rect x="130" y="40" width="190" height="64" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="225.0" y="66.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Low-mid band</text><text x="225.0" y="82.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC3 &middot; 191 Hz&ndash;1.26 kHz</text>
+    <line x1="320" y1="72" x2="388" y2="72" stroke="var(--sig)" stroke-width="2" marker-end="url(#eah)"/>
+    <rect x="390" y="40" width="190" height="64" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="485.0" y="66.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">High-mid band</text><text x="485.0" y="82.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC2 &middot; 1.05&ndash;6.9 kHz</text>
+    <line x1="580" y1="72" x2="648" y2="72" stroke="var(--sig)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#eah)"/><text x="676" y="76" text-anchor="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="11">out</text>
+    <text x="14" y="148" text-anchor="start" fill="var(--ctl)" font-family="var(--mono)" font-size="11">ON SHEETS OF THEIR OWN, NOT YET JOINED</text>
+    <rect x="40" y="164" width="190" height="52" rx="6" fill="var(--surface)" stroke="var(--rule)" stroke-dasharray="5 4"/><text x="135.0" y="184.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">High-pass filter</text><text x="135.0" y="200.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">OPA1641</text>
+    <rect x="265" y="164" width="190" height="52" rx="6" fill="var(--surface)" stroke="var(--rule)" stroke-dasharray="5 4"/><text x="360.0" y="184.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Low-pass filter</text><text x="360.0" y="200.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">OPA1641</text>
+    <rect x="490" y="164" width="190" height="52" rx="6" fill="var(--surface)" stroke="var(--rule)" stroke-dasharray="5 4"/><text x="585.0" y="184.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Gain stage</text><text x="585.0" y="200.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">OPA1641</text>
+  </svg></div>
+  <figcaption><span>What is drawn, and how much of it is joined up &mdash; dashed lines are not wired yet</span>
+  <a href="schematic.html">The main schematic &rarr;</a></figcaption>
+</figure>
 
-<h2>Why the OPA1641</h2>
-<p>Every section uses the OPA1641, not the NE5532 the compressor is built on. That is a
-sensible choice for filters. It is a JFET-input part, so its input bias current is
-picoamps rather than the NE5532's hundreds of nanoamps &mdash; which matters when the
-frequency-setting resistors are tens of kilohms and a pot wiper sits on a high-impedance
-node. Bias current through those resistors is offset, and offset through a pot is a click
-every time the knob turns.</p>
-<p>The cost is that the desk now carries two op-amp types, which the bill of materials and
-the spares box both need to account for.</p>
+<h2>What exists</h2>
+<div class="tw"><table><thead><tr><th class="r">Section</th><th class="">Where it is drawn</th><th class="">Values</th><th class="">Response</th></tr></thead><tbody><tr><td class="r"><a href="bands.html">Low-mid band</a></td><td class="">Main sheet, IC3</td><td class="">Yes</td><td class="">191&nbsp;Hz&ndash;1.26&nbsp;kHz, &plusmn;9.5&nbsp;dB; matches the team&rsquo;s LTspice run</td></tr><tr><td class="r"><a href="bands.html">High-mid band</a></td><td class="">Main sheet, IC2</td><td class="">Yes</td><td class="">1.05&nbsp;kHz&ndash;6.92&nbsp;kHz, &plusmn;9.5&nbsp;dB</td></tr><tr><td class="r"><a href="filters.html">High-pass filter</a></td><td class="">Own sheet</td><td class="">Yes</td><td class="">Cutoff 4.6&ndash;20&nbsp;kHz as drawn</td></tr><tr><td class="r"><a href="filters.html">Low-pass filter</a></td><td class="">Own sheet</td><td class="">Yes</td><td class="">Will not work as drawn: a capacitor is missing</td></tr><tr><td class="r"><a href="gain.html">Gain stage</a></td><td class="">Own sheet</td><td class="">Yes</td><td class="">Will not work as drawn: its inputs are swapped</td></tr><tr><td class="r">Edge connector</td><td class="">Main sheet, J1</td><td class="">&mdash;</td><td class="">Power pins only; no audio wired</td></tr><tr><td class="r">Board</td><td class=""><code>Combined_EQ.kicad_pcb</code></td><td class="">&mdash;</td><td class="">Card outline and J1 only</td></tr></tbody></table></div>
+
+<h2>Why the OPA164x</h2>
+<p>Every section uses TI's OPA164x family: the quad OPA1644 for the bands, the single OPA1641
+for the other three. That is a sensible choice for filters. It is a JFET-input part, so its
+input bias current is picoamps rather than the NE5532's hundreds of nanoamps &mdash; which
+matters when a pot wiper sits in the signal path. Bias current through a pot is offset, and
+offset through a pot is a click every time the knob turns.</p>
+<p>The cost is that the desk now carries three op-amp types (the compressor and preamp use the
+NE5532), which the bill of materials and the spares box both need to account for. The OPA1644
+footprint on the main sheet is TSSOP-14, a 0.65&nbsp;mm-pitch surface-mount package: fine to
+hand-solder with flux and a fine tip, but worth knowing before ordering.</p>
 
 <h2>How the repository is laid out</h2>
-<div class="tw"><table><thead><tr><th class="r">Folder</th><th class="">What is in it</th></tr></thead><tbody><tr><td class="r"><code>LBP/</code></td><td class="">The current parametric band schematic, edited 16 Sep</td></tr><tr><td class="r"><code>LBPF/</code></td><td class="">An earlier copy of the same band, plus the LTspice model <code>BandA.asc</code> and its results</td></tr><tr><td class="r"><code>LPF/LPF/</code></td><td class="">The low-pass filter schematic and a PDF of it</td></tr><tr><td class="r"><code>EQ BOM.docx</code></td><td class="">A bill-of-materials table with its columns set up and no rows filled</td></tr></tbody></table></div>
-<p>Worth knowing before editing: <code>LBP/</code> and <code>LBPF/</code> are two copies of
-the same band that have now diverged. The simulation belongs to the <code>LBPF/</code> copy;
-the schematic work since has gone into <code>LBP/</code>.</p>
+<div class="tw"><table><thead><tr><th class="r">Folder</th><th class="">What is in it</th></tr></thead><tbody><tr><td class="r"><code>Combined_EQ/</code></td><td class="">The main schematic: both bands and J1. Its board has the card outline and J1 placed.</td></tr><tr><td class="r"><code>Low_Bandpass_Filter/</code></td><td class="">The low-mid band on its own sheet, the team&rsquo;s LTspice model <code>LT_SPICE/BandA.asc</code> and its results, and a board with 15 footprints and no outline</td></tr><tr><td class="r"><code>High_Bandpass_Filter/</code></td><td class="">The high-mid band on its own sheet, and its LTspice model <code>BandB.asc</code></td></tr><tr><td class="r"><code>High_Pass_filter/</code></td><td class="">The high-pass filter sheet and an LTspice model <code>hpf.asc</code></td></tr><tr><td class="r"><code>Low_Pass_Filter/</code></td><td class="">The low-pass filter sheet and <code>lpf.asc</code></td></tr><tr><td class="r"><code>Variable_Gain/</code></td><td class="">The gain stage sheet and <code>variable gain.asc</code></td></tr><tr><td class="r"><code>Combined Equaliser/</code></td><td class="">An empty KiCad project, a leftover from setting up <code>Combined_EQ/</code></td></tr><tr><td class="r"><code>EQ BOM.docx</code></td><td class="">A bill-of-materials table with its columns set up and no rows filled</td></tr></tbody></table></div>
+<p>The band sheets in <code>Low_Bandpass_Filter/</code> and <code>High_Bandpass_Filter/</code>
+are the same circuits as the main sheet&rsquo;s two bands, part for part, with their own
+reference designators. The main sheet is the one to keep editing; the separate copies will
+drift if both are changed.</p>
 
-<div class="next"><span></span><a href="parametric.html">Parametric band &rarr;</a></div>
+<div class="next"><span></span><a href="schematic.html">The main schematic &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4c6c1af<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at e2f6864<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

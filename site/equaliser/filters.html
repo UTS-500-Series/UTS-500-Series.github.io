@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>High- and low-pass filters &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
+<meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The main schematic</span></a><h4>The circuit</h4><a href="bands.html"><i>03</i><span>Parametric bands</span></a><a href="filters.html" class="on"><i>04</i><span>High- and low-pass filters</span></a><a href="gain.html"><i>05</i><span>Gain stage</span></a><h4>Practical</h4><a href="simulation.html"><i>06</i><span>Simulating it</span></a><a href="status.html"><i>07</i><span>What is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">The circuit &mdash; 04</p>
+<h1>The high- and low-pass filters</h1>
+<p class="lede">Two second-order Sallen-Key filters, each on one OPA1641, each on a sheet of its
+own. The high-pass works as drawn. The low-pass is missing a capacitor.</p>
+
+<h2>High-pass filter</h2>
+<figure>
+  <div class="pane tall"><img src="img/hpf.svg" alt="High-pass filter &mdash; High_Pass_filter/HPF/HPF.kicad_sch at e2f6864" loading="lazy"></div>
+  <figcaption><span>High-pass filter &mdash; High_Pass_filter/HPF/HPF.kicad_sch at e2f6864</span><a href="img/hpf.svg" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+<p>R1 (5.6k) and R2 (10k) divide the input down by 3.9&nbsp;dB. C1 and C2 (270&nbsp;pF each)
+then pass the signal to the op amp&rsquo;s + input; R4 plus one gang of RV1 goes from the + input
+to ground, and R3 plus the other gang feeds the output back to the point between the
+capacitors. R6 (16k) and R5 (27k) give the op amp a gain of 1.59, +4.0&nbsp;dB, which cancels the
+input divider and sets the filter&rsquo;s Q at about 0.7.</p>
+<p>RV1 is a 100k <strong>dual-gang</strong> pot, one gang in each resistor, so both resistors
+rise and fall together and the knob sweeps the cutoff cleanly:</p>
+<div class="tw"><table><thead><tr><th class="r">RV1</th><th class="n">Resistance per side</th><th class="n">Cutoff (&minus;3&nbsp;dB)</th></tr></thead><tbody><tr><td class="r">Fully one way</td><td class="n">30k</td><td class="n">20&nbsp;kHz</td></tr><tr><td class="r">Quarter</td><td class="n">55k</td><td class="n">11&nbsp;kHz</td></tr><tr><td class="r">Centre</td><td class="n">80k</td><td class="n">7.6&nbsp;kHz</td></tr><tr><td class="r">Three quarters</td><td class="n">105k</td><td class="n">5.8&nbsp;kHz</td></tr><tr><td class="r">Fully the other way</td><td class="n">130k</td><td class="n">4.6&nbsp;kHz</td></tr></tbody></table></div>
+<div class="note warn">
+  <h4>Is 4.6&ndash;20&nbsp;kHz the range you want?</h4>
+  <p>On a desk channel the high-pass usually trims rumble and handling noise, somewhere from
+  20 to 300&nbsp;Hz. At 270&nbsp;pF this one removes everything below the top of the audio band.
+  If a rumble filter is the aim, scale both capacitors up together: 27&nbsp;nF puts the same
+  knob at 45&ndash;200&nbsp;Hz with nothing else changed.</p>
+</div>
+
+<h2>Low-pass filter</h2>
+<figure>
+  <div class="pane tall"><img src="img/lpf.svg" alt="Low-pass filter &mdash; Low_Pass_Filter/LPF/LPF.kicad_sch at e2f6864" loading="lazy"></div>
+  <figcaption><span>Low-pass filter &mdash; Low_Pass_Filter/LPF/LPF.kicad_sch at e2f6864</span><a href="img/lpf.svg" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+<p>The signal goes through R1 (6.2k), along RV1&rsquo;s 100k track and through R2 (6.2k) to the
+op amp&rsquo;s + input. RV1&rsquo;s wiper carries C1 (20&nbsp;nF) back from the output. R4 and R3
+set the same gain of 1.59.</p>
+
+<div class="note warn">
+  <h4>The capacitor to ground is missing</h4>
+  <p>A Sallen-Key low-pass needs two capacitors: one from the middle of the resistor chain back
+  to the output (C1 here) and one from the op amp&rsquo;s + input to ground. The sheet has only
+  the first. Without the second, no current flows in R2, the + input simply follows the wiper,
+  and C1 is pure positive feedback through a stage with a gain above 1. That makes the circuit
+  unstable: it will latch to a rail rather than filter.</p>
+  <p>The team&rsquo;s LTspice model <code>lpf.asc</code> has the missing part: 10&nbsp;nF to ground.
+  Adding it to the sheet makes this a working filter.</p>
+</div>
+
+<h3>The knob, once the capacitor is back</h3>
+<p>RV1 is a single pot with its wiper as the tap between the two halves. Turning it does not
+change the total resistance; it moves resistance from one side of C1 to the other. The cutoff
+depends on the <em>product</em> of the two sides, and a product with a fixed sum is largest when
+the two are equal. So the cutoff is lowest at the centre and rises towards either end:</p>
+<div class="tw"><table><thead><tr><th class="r">RV1 position</th><th class="n">0%</th><th class="n">25%</th><th class="n">50%</th><th class="n">75%</th><th class="n">100%</th></tr></thead><tbody><tr><td class="r">Corner frequency, with 10&nbsp;nF to ground</td><td class="n">440&nbsp;Hz</td><td class="n">220&nbsp;Hz</td><td class="n">200&nbsp;Hz</td><td class="n">220&nbsp;Hz</td><td class="n">440&nbsp;Hz</td></tr></tbody></table></div>
+<p>Both halves of the knob do the same thing, so no panel legend can be drawn for it, and the Q
+moves as well. The high-pass already shows the fix: a <strong>dual-gang pot</strong> with one gang
+in place of each resistor, so both sides rise and fall together.</p>
+<p>As with the high-pass, the range is worth a second look. A desk low-pass usually trims hiss
+somewhere above a few kilohertz; 200&ndash;440&nbsp;Hz removes most of a voice. Dividing both
+capacitors by 20 (1&nbsp;nF and 470&nbsp;pF) moves it to about 4&ndash;9&nbsp;kHz.</p>
+
+<div class="next"><a href="bands.html">&larr; Parametric bands</a><a href="gain.html">Gain stage &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at e2f6864<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

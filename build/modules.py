@@ -50,12 +50,12 @@ MODULES = [
            content='content_preamp', repo='Pre-Amp'),
 
     Module('equaliser', 'Equaliser',
-           'State-variable parametric bands and a Sallen-Key low-pass, around the OPA1641. '
-           'Drawn and partly simulated.',
+           'Two state-variable parametric bands on OPA1644s, plus high-pass, low-pass and gain '
+           'stages. Bands drawn with values; card not wired yet.',
            'progress',
            'How the UTS Mini Mixing Desk equaliser module works, and how far along it is.',
-           'written from the Equaliser repository at 4c6c1af',
-           content='content_equaliser'),
+           'written from the Equaliser repository at e2f6864',
+           content='content_equaliser', repo='Equaliser'),
 ]
 
 # Sections that cover all three modules rather than one. Built exactly like a module and
