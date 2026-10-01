@@ -29,11 +29,17 @@ KICAD_CLI = next((p for p in [shutil.which('kicad-cli'),
 PROJECTS = {
     'compressor': ('Compressor', {
         'sch': [('compressor', 'kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_sch',
-                 'Single-sheet schematic the board is drawn from'),
+                 'Single-sheet schematic the main board is drawn from'),
+                ('front-board', 'kicad_withpcb/compressor_front/compressor_front.kicad_sch',
+                 'Front board schematic: the panel controls, meters and ribbon header'),
                 ('compressor-sections', 'kicad/UTS Mini Mixing Desk - Compressor.kicad_sch',
                  'Hierarchical schematic, one sheet per section, that these pages document')],
-        'pcb': [('compressor', 'kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_pcb',
-                 'The compressor card')],
+        'pcb': [('main-board', 'kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_pcb',
+                 'Main board: the card that plugs into the rack'),
+                # 35 x 110 mm and drawn upright, so turn it on its side to fill a wide render
+                ('front-board', 'kicad_withpcb/compressor_front/compressor_front.kicad_pcb',
+                 'Front board: sits behind the faceplate, joined to the main board by a ribbon',
+                 {'top': '0,0,90', 'bottom': '0,0,90', 'angle': '-40,0,120'})],
     }),
     'preamp': ('Pre-Amp', {
         'sch': [('preamp', 'Series-500.kicad_sch', 'The preamp schematic')],
@@ -52,9 +58,9 @@ PROJECTS = {
 FRONT = 'F.Cu,F.SilkS,F.Mask,Edge.Cuts'
 BACK = 'B.Cu,B.SilkS,B.Mask,Edge.Cuts'
 ALL_LAYERS = 'F.Cu,B.Cu,F.SilkS,B.SilkS,F.Mask,B.Mask,F.Fab,B.Fab,F.CrtYd,B.CrtYd,Edge.Cuts'
-RENDERS = [('top', ['--side', 'top']),
-           ('bottom', ['--side', 'bottom']),
-           ('angle', ['--side', 'top', '--perspective', '--rotate', '-40,0,30'])]
+RENDERS = [('top', ['--side', 'top'], None),
+           ('bottom', ['--side', 'bottom'], None),
+           ('angle', ['--side', 'top', '--perspective'], '-40,0,30')]
 
 
 def cli(*args):
@@ -94,12 +100,14 @@ def board_stats(src):
             'zones': n('zone'), 'outline': text.count('(layer "Edge.Cuts")')}
 
 
-def export_pcb(src, name, out):
+def export_pcb(src, name, out, rotate=None):
+    """`rotate` optionally maps a render view to its own --rotate, for boards drawn upright."""
     files = []
-    for view, args in RENDERS:
+    for view, args, rot in RENDERS:
+        rot = (rotate or {}).get(view, rot)
         dst = '%s-3d-%s.png' % (name, view)
         cli('pcb', 'render', '--quality', 'high', '-w', '1600', '-h', '1000', '--zoom', '1.15',
-            *args, '-o', os.path.join(out, dst), src)
+            *args, *(['--rotate', rot] if rot else []), '-o', os.path.join(out, dst), src)
         files.append(dst)
     for side, layers, extra in [('front', FRONT, []), ('back', BACK, ['--mirror'])]:
         dst = '%s-%s.svg' % (name, side)
@@ -132,13 +140,13 @@ def export_module(slug, repos):
         manifest['schematics'].append({'name': name, 'source': path, 'label': label,
                                        'files': export_sch(src, name, out)})
         print('    %-22s schematic' % name)
-    for name, path, label in spec['pcb']:
+    for name, path, label, *rotate in spec['pcb']:
         src = os.path.join(repo, path)
         stats = board_stats(src)
         # Footprints with no outline have only been dropped in from the schematic, and
         # KiCad renders them against a default slab the size of the drawing sheet.
         laid_out = stats['footprints'] and stats['outline']
-        files = export_pcb(src, name, out) if laid_out else []
+        files = export_pcb(src, name, out, *rotate) if laid_out else []
         manifest['boards'].append({'name': name, 'source': path, 'label': label,
                                    'stats': stats, 'files': files})
         print('    %-22s board, %s' % (name, 'exported' if files else 'not laid out, skipped'))
