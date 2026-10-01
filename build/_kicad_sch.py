@@ -15,7 +15,8 @@ Both come out in sheet millimetres, so the viewer's clickable boxes line up with
     python3 build/_kicad_sch.py --module preamp
 
 needs the module's repository checked out beside this one (see `repo` in modules.py). It
-writes site/<slug>/img/schematic.svg and site/<slug>/data/schematic.json, which are
+writes site/<slug>/img/schematic.svg and site/<slug>/data/schematic.json, plus a plain
+site/<slug>/img/<name>.svg for each extra sheet the content module lists in SHEETS. All are
 committed, so building the site never needs the repository.
 
 The drawing is ours, not KiCad's: fonts and a few text placements differ from eeschema's
@@ -577,6 +578,10 @@ def main():
     open(out, 'w').write(json.dumps(data, separators=(',', ':')))
     print('schematic  %d parts %d nets  %s x %s mm'
           % (len(data['components']), len(data['nets']), vb.group(1), vb.group(2)))
+    # sections drawn on sheets of their own, shown as plain images: name -> path in the repo
+    for name, path in getattr(content, 'SHEETS', {}).items():
+        open(os.path.join(here, 'img', name + '.svg'), 'w').write(Sheet(os.path.join(repo, path)).svg())
+        print('%-10s %s' % (name, path))
 
 
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Filter sections</h4><a href="parametric.html"><i>02</i><span>Parametric band</span></a><a href="lowpass.html"><i>03</i><span>Low-pass filter</span></a><h4>Practical</h4><a href="simulation.html"><i>04</i><span>Simulating it</span></a><a href="status.html" class="on"><i>05</i><span>What is left</span></a><a href="files.html"><i>06</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The main schematic</span></a><h4>The circuit</h4><a href="bands.html"><i>03</i><span>Parametric bands</span></a><a href="filters.html"><i>04</i><span>High- and low-pass filters</span></a><a href="gain.html"><i>05</i><span>Gain stage</span></a><h4>Practical</h4><a href="simulation.html"><i>06</i><span>Simulating it</span></a><a href="status.html" class="on"><i>07</i><span>What is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -31,21 +31,23 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">Practical</p>
+<p class="eyebrow">Practical &mdash; 07</p>
 <h1>What is left</h1>
 <p class="lede">In rough order &mdash; each step unblocks the next.</p>
-<div class="tw"><table><thead><tr><th class="r">Step</th><th class="">Why it comes here</th></tr></thead><tbody><tr><td class="r">Get the simulation running again</td><td class="">It is the only source of proven values, and it currently fails.</td></tr><tr><td class="r">Merge <code>LBP/</code> and <code>LBPF/</code></td><td class="">Two diverging copies of one band. Decide which is current and delete the other.</td></tr><tr><td class="r">Resolve the <code>TEMP</code> op amp in <code>LBP/</code></td><td class="">A fifth op amp added on 16 Sep; the simulated band uses four.</td></tr><tr><td class="r">Decide what the low-pass knob should do</td><td class="">As drawn it does not sweep cutoff. A dual-gang pot fixes that.</td></tr><tr><td class="r">Carry simulated values onto the schematics</td><td class="">By circuit position &mdash; designators in the simulation do not match the sheet.</td></tr><tr><td class="r">Draw the supply and decoupling</td><td class="">The sheets show the signal path; the OPA1641s need rails and bypass capacitors.</td></tr><tr><td class="r">Decide the band count and panel layout</td><td class="">A 38&nbsp;mm panel runs out of room fast: each parametric band wants three controls.</td></tr><tr><td class="r">Fill in the bill of materials</td><td class=""><code>EQ BOM.docx</code> has columns and no rows.</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="r">Step</th><th class="">Why it comes here</th></tr></thead><tbody><tr><td class="r">Fix the low-pass and gain sheets</td><td class="">Add the low-pass&rsquo;s capacitor to ground, swap the gain stage&rsquo;s inputs. Both are one-minute edits.</td></tr><tr><td class="r">Check the filter ranges</td><td class="">The high-pass sits at 4.6&ndash;20&nbsp;kHz and the low-pass at 200&ndash;440&nbsp;Hz. Confirm that is intended before choosing parts.</td></tr><tr><td class="r">Decide the signal chain</td><td class="">Which order the high-pass, bands, low-pass and gain go in, and what drives J1&rsquo;s balanced input and output.</td></tr><tr><td class="r">Bring every section onto the main sheet</td><td class="">Then the copies in the section folders can go, so there is one place to edit.</td></tr><tr><td class="r">Join the supply</td><td class="">Op amps on <code>VCC</code>/<code>VEE</code>, connector on <code>+16V</code>/<code>-16V</code>: one name for each rail, plus decoupling.</td></tr><tr><td class="r">Wire the audio to J1</td><td class="">Input and output through the card edge, as on the compressor.</td></tr><tr><td class="r">Give every part a footprint</td><td class="">The capacitors and pots have none yet, and the pots set the panel layout.</td></tr><tr><td class="r">Lay out the board</td><td class=""><code>Combined_EQ.kicad_pcb</code> has the card outline and J1 already.</td></tr><tr><td class="r">Fill in the bill of materials</td><td class=""><code>EQ BOM.docx</code> has columns and no rows.</td></tr></tbody></table></div>
 
 <h2>The panel is the binding constraint</h2>
-<p>One parametric band needs frequency, width and gain &mdash; three controls. The compressor
-fits nine functions on the same 38.10&nbsp;mm faceplate only by using concentric and
-pull-switch pots. Two parametric bands plus a low-pass control is seven knobs before any
-switches, so the number of bands is a panel decision as much as a circuit one, and it is worth
-making before values are chosen for sections that may not fit.</p>
+<p>Counting what is drawn: three knobs per band, one each for the high-pass, the low-pass and the
+gain. That is <strong>nine knobs</strong>, before any bypass switch. The compressor fits nine
+functions on the same 38.10&nbsp;mm faceplate only by using concentric and pull-switch pots, and
+three of the equaliser&rsquo;s knobs are dual-gang already, which rules out the simplest
+concentric pairings. Worth settling on the
+<a href="../faceplate/">faceplate</a> before footprints are chosen, because the pot type decides
+the footprint.</p>
 
 <div class="next"><a href="simulation.html">&larr; Simulating it</a><a href="files.html">Design files &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4c6c1af<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at e2f6864<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

@@ -349,10 +349,10 @@ PAGES['modules.html'] = ("Per-module notes", f"""
               "<code>faceplate.dxf</code> and extrude from it. Pick one of the three layouts "
               "first; the DXF is whichever was generated last."],
              [f'<a href="{ORG}/Equaliser">Equaliser</a>',
-              "Separate KiCad projects per filter band. The low band has 15 footprints placed, "
-              "no traces. No 500-series board or panel yet.",
-              "Combine the bands onto one board started from the Pre-Amp template, then export "
-              "STEP. Fix the missing OPA1641 model first."],
+              "Both bands on one sheet (<code>Combined_EQ</code>), its board started from the "
+              "same template outline as the Pre-Amp with only J1 placed. No panel yet.",
+              "Give the pots and capacitors footprints, place them, then export STEP. Fix the "
+              "missing OPA1641 model first."],
              [f'<a href="{ORG}/Pre-Amp">Pre-Amp</a>',
               "The repository is the Series 500 KiCad template board, 47 footprints. No panel.",
               "Export STEP now to get the card and connector envelope into Fusion. It doubles as "

@@ -49,12 +49,17 @@ PROJECTS = {
         'pcb': [('preamp', 'Series-500.kicad_pcb', 'The preamp card')],
     }),
     'equaliser': ('Equaliser', {
-        'sch': [('lbp', 'Low_Bandpass_Filter/LBP.kicad_sch', 'Low band-pass (parametric) section'),
+        'sch': [('combined', 'Combined_EQ/Combined_EQ.kicad_sch',
+                 'Main schematic: both parametric bands and the card edge connector'),
+                ('lbp', 'Low_Bandpass_Filter/LBP.kicad_sch', 'Low-mid band on its own sheet'),
+                ('hbp', 'High_Bandpass_Filter/HBP/HBP.kicad_sch', 'High-mid band on its own sheet'),
+                ('hpf', 'High_Pass_filter/HPF/HPF.kicad_sch', 'High-pass filter section'),
                 ('lpf', 'Low_Pass_Filter/LPF/LPF.kicad_sch', 'Low-pass filter section'),
-                ('hbp', 'High_Bandpass_Filter/HBP/HBP.kicad_sch', 'High band-pass section')],
-        'pcb': [('lbp', 'Low_Bandpass_Filter/LBP.kicad_pcb', 'Low band-pass board'),
-                ('lpf', 'Low_Pass_Filter/LPF/LPF.kicad_pcb', 'Low-pass board'),
-                ('hbp', 'High_Bandpass_Filter/HBP/HBP.kicad_pcb', 'High band-pass board')],
+                ('gain', 'Variable_Gain/GAIN/variablegain/variablegain.kicad_sch',
+                 'Variable gain stage')],
+        'pcb': [('combined', 'Combined_EQ/Combined_EQ.kicad_pcb',
+                 'Main board: card outline and edge connector so far'),
+                ('lbp', 'Low_Bandpass_Filter/LBP.kicad_pcb', 'Low-mid band board')],
     }),
 }
 

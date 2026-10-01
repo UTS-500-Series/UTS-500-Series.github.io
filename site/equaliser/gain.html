@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gain stage &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
+<meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The main schematic</span></a><h4>The circuit</h4><a href="bands.html"><i>03</i><span>Parametric bands</span></a><a href="filters.html"><i>04</i><span>High- and low-pass filters</span></a><a href="gain.html" class="on"><i>05</i><span>Gain stage</span></a><h4>Practical</h4><a href="simulation.html"><i>06</i><span>Simulating it</span></a><a href="status.html"><i>07</i><span>What is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">The circuit &mdash; 05</p>
+<h1>The gain stage</h1>
+<p class="lede">One op amp, one pot, &plusmn;10&nbsp;dB. The idea is sound and the values are
+right; as drawn, the op amp&rsquo;s two inputs are the wrong way round.</p>
+
+<figure>
+  <div class="pane tall"><img src="img/gain.svg" alt="Variable gain stage &mdash; Variable_Gain/GAIN/variablegain/variablegain.kicad_sch at e2f6864" loading="lazy"></div>
+  <figcaption><span>Variable gain stage &mdash; Variable_Gain/GAIN/variablegain/variablegain.kicad_sch at e2f6864</span><a href="img/gain.svg" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<h2>What it is meant to do</h2>
+<p>C1 (100&nbsp;&micro;F) blocks DC at the input. Then R1 (4.7k), the 10k track of RV1 and R2
+(4.7k) run in series from the input to the op amp&rsquo;s output, and the wiper goes to the op
+amp&rsquo;s input. C2 (220&nbsp;pF) sits between that input and the output.</p>
+<p>Wired as an inverting amplifier, the wiper is a virtual earth, and the gain is the resistance
+on the output side of the wiper over the resistance on the input side. Turning the knob moves
+resistance from one side to the other:</p>
+<div class="tw"><table><thead><tr><th class="r">RV1 wiper</th><th class="n">Input side</th><th class="n">Output side</th><th class="n">Gain</th></tr></thead><tbody><tr><td class="r">At the input end</td><td class="n">4.7k</td><td class="n">14.7k</td><td class="n">+9.9&nbsp;dB</td></tr><tr><td class="r">Centre</td><td class="n">9.7k</td><td class="n">9.7k</td><td class="n">0&nbsp;dB</td></tr><tr><td class="r">At the output end</td><td class="n">14.7k</td><td class="n">4.7k</td><td class="n">&minus;9.9&nbsp;dB</td></tr></tbody></table></div>
+<p>That is a neat single-knob trim: unity at the centre detent, symmetrical either side. C2 rolls
+the top off above about 50&nbsp;kHz at full gain. The team&rsquo;s
+LTspice model <code>variable gain.asc</code> has the same values.</p>
+
+<div class="note warn">
+  <h4>Swap pins 2 and 3</h4>
+  <p>On the sheet, the wiper goes to pin 3, the OPA1641&rsquo;s <strong>+</strong> input, and
+  ground to pin 2, the <strong>&minus;</strong> input. The feedback through R2 and C2 then
+  arrives at the + input: positive feedback, so the output swings to a rail and stays there.
+  With the wiper on pin 2 and pin 3 grounded, the stage works as above.</p>
+</div>
+
+<p>The stage inverts, so if it ends up in the chain with the two bands, the module as a whole
+inverts. That only matters for how J1&rsquo;s balanced pins are wired, but it does matter.</p>
+
+<div class="next"><a href="filters.html">&larr; High- and low-pass filters</a><a href="simulation.html">Simulating it &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at e2f6864<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

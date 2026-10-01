@@ -1,16 +1,43 @@
 {
  "repo": "https://github.com/UTS-500-Series/Equaliser",
- "commit": "fdd66cd",
- "date": "2026-09-25",
+ "commit": "e2f6864",
+ "date": "2026-10-01",
  "kicad": "10.0.6",
  "schematics": [
   {
+   "name": "combined",
+   "source": "Combined_EQ/Combined_EQ.kicad_sch",
+   "label": "Main schematic: both parametric bands and the card edge connector",
+   "files": [
+    "combined.pdf",
+    "combined.svg"
+   ]
+  },
+  {
    "name": "lbp",
    "source": "Low_Bandpass_Filter/LBP.kicad_sch",
-   "label": "Low band-pass (parametric) section",
+   "label": "Low-mid band on its own sheet",
    "files": [
     "lbp.pdf",
     "lbp.svg"
+   ]
+  },
+  {
+   "name": "hbp",
+   "source": "High_Bandpass_Filter/HBP/HBP.kicad_sch",
+   "label": "High-mid band on its own sheet",
+   "files": [
+    "hbp.pdf",
+    "hbp.svg"
+   ]
+  },
+  {
+   "name": "hpf",
+   "source": "High_Pass_filter/HPF/HPF.kicad_sch",
+   "label": "High-pass filter section",
+   "files": [
+    "hpf.pdf",
+    "hpf.svg"
    ]
   },
   {
@@ -23,48 +50,42 @@
    ]
   },
   {
-   "name": "hbp",
-   "source": "High_Bandpass_Filter/HBP/HBP.kicad_sch",
-   "label": "High band-pass section",
+   "name": "gain",
+   "source": "Variable_Gain/GAIN/variablegain/variablegain.kicad_sch",
+   "label": "Variable gain stage",
    "files": [
-    "hbp.pdf",
-    "hbp.svg"
+    "gain.pdf",
+    "gain.svg"
    ]
   }
  ],
  "boards": [
   {
+   "name": "combined",
+   "source": "Combined_EQ/Combined_EQ.kicad_pcb",
+   "label": "Main board: card outline and edge connector so far",
+   "stats": {
+    "footprints": 1,
+    "segments": 0,
+    "vias": 0,
+    "zones": 0,
+    "outline": 10
+   },
+   "files": [
+    "combined-3d-top.png",
+    "combined-3d-bottom.png",
+    "combined-3d-angle.png",
+    "combined-front.svg",
+    "combined-back.svg",
+    "combined-layers.pdf"
+   ]
+  },
+  {
    "name": "lbp",
    "source": "Low_Bandpass_Filter/LBP.kicad_pcb",
-   "label": "Low band-pass board",
+   "label": "Low-mid band board",
    "stats": {
     "footprints": 15,
-    "segments": 0,
-    "vias": 0,
-    "zones": 0,
-    "outline": 0
-   },
-   "files": []
-  },
-  {
-   "name": "lpf",
-   "source": "Low_Pass_Filter/LPF/LPF.kicad_pcb",
-   "label": "Low-pass board",
-   "stats": {
-    "footprints": 0,
-    "segments": 0,
-    "vias": 0,
-    "zones": 0,
-    "outline": 0
-   },
-   "files": []
-  },
-  {
-   "name": "hbp",
-   "source": "High_Bandpass_Filter/HBP/HBP.kicad_pcb",
-   "label": "High band-pass board",
-   "stats": {
-    "footprints": 0,
     "segments": 0,
     "vias": 0,
     "zones": 0,

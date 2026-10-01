@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Filter sections</h4><a href="parametric.html"><i>02</i><span>Parametric band</span></a><a href="lowpass.html"><i>03</i><span>Low-pass filter</span></a><h4>Practical</h4><a href="simulation.html" class="on"><i>04</i><span>Simulating it</span></a><a href="status.html"><i>05</i><span>What is left</span></a><a href="files.html"><i>06</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The main schematic</span></a><h4>The circuit</h4><a href="bands.html"><i>03</i><span>Parametric bands</span></a><a href="filters.html"><i>04</i><span>High- and low-pass filters</span></a><a href="gain.html"><i>05</i><span>Gain stage</span></a><h4>Practical</h4><a href="simulation.html" class="on"><i>06</i><span>Simulating it</span></a><a href="status.html"><i>07</i><span>What is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -31,51 +31,50 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">Practical</p>
+<p class="eyebrow">Practical &mdash; 06</p>
 <h1>Simulating it</h1>
-<p class="lede">Band A was simulated in LTspice and the results are in the repository. As
-committed, though, the simulation will not run on anyone else's machine &mdash; and the most
-recent attempt failed on the original one too.</p>
+<p class="lede">The low-mid band&rsquo;s LTspice model now runs, and it agrees with the KiCad
+sheet. It still only runs on the machine it was drawn on.</p>
 
-<h2>The failure</h2>
-<p>The newest log, <code>LBPF/BandA/BandA.log</code>, stops on the same error for all four op
-amps:</p>
-<pre><code>This sub-circuit name is not defined.</code></pre>
-<p>The results plotted on the <a href="parametric.html">parametric band page</a> come from an
-<em>earlier</em> run: <code>BandA.raw</code> is stamped 29&nbsp;Aug 18:28, and the failing log
-19:10 the same evening. Something changed in between.</p>
+<h2>The team&rsquo;s LTspice models</h2>
+<div class="tw"><table><thead><tr><th class="r">File</th><th class="">What it models</th><th class="">Committed results</th></tr></thead><tbody><tr><td class="r"><code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code></td><td class="">Low-mid band, OPA1644 model, pots as resistor pairs</td><td class="">Yes, AC run of 30&nbsp;Sep, completed with no errors</td></tr><tr><td class="r"><code>High_Bandpass_Filter/LTSPICE/BandB.asc</code></td><td class="">High-mid band</td><td class="">Yes</td></tr><tr><td class="r"><code>High_Pass_filter/hpf.asc</code></td><td class="">High-pass, generic op amp</td><td class="">No</td></tr><tr><td class="r"><code>Low_Pass_Filter/lpf.asc</code></td><td class="">Low-pass, generic op amp</td><td class="">No</td></tr><tr><td class="r"><code>Variable_Gain/variable gain.asc</code></td><td class="">Gain stage, generic op amp</td><td class="">No</td></tr></tbody></table></div>
 
-<h2>Two things to fix</h2>
-<h3>1. The model is linked by an absolute Windows path</h3>
-<p>Every op amp's <code>ModelFile</code> in <code>BandA.asc</code>, and the symbol
-<code>OPA164x.asy</code>, point at a folder on the machine the file was drawn on:</p>
-<pre><code>C:\Users\...\Downloads\sbom627d\OPA164x.LIB</code></pre>
-<p>A copy of the library is already committed beside the schematic, at
-<code>LBPF/BandA/OPA164x.LIB</code>. Point the model at that with a relative path and the
-simulation will find it on any machine.</p>
-<h3>2. The subcircuit name</h3>
-<p>The log names the subcircuit <code>OPA164</code>; the library defines
-<code>.SUBCKT OPA164x</code>. Once the path resolves, confirm the name LTspice asks for matches
-exactly.</p>
-<p>The first is certain. The second is what the log reports, but the symbol's own value field
-reads <code>OPA164x</code>, so the mismatch may disappear once the path is fixed &mdash; re-run
-and read the log before editing names.</p>
+<h2>The model is still linked by an absolute path</h2>
+<p>Each op amp&rsquo;s <code>ModelFile</code> in <code>BandA.asc</code> points at a folder on the
+machine the file was drawn on:</p>
+<pre><code>C:\Users\ebul0\Downloads\sbom627d\OPA164x.LIB</code></pre>
+<p>On anyone else&rsquo;s machine the simulation stops with &ldquo;This sub-circuit name is not
+defined&rdquo;. A copy of the library is already committed beside the schematic, at
+<code>LT_SPICE/BandA/OPA164x.LIB</code>. Point the model at that with a relative path and it
+will run anywhere. The <code>hpf</code>, <code>lpf</code> and gain models use LTspice&rsquo;s
+built-in op amp, so they run as they are.</p>
 
-<h2>Re-running it</h2>
+<h2>How this site works out the response</h2>
+<p>LTspice is not available where this site is built, so the response on the
+<a href="bands.html">bands page</a> is worked out from the KiCad sheet directly by
+<code>build/_eq_response.py</code>. It reads the netlist, splits each pot at its wiper into two
+resistors, treats each op amp as a gain of a million, and solves the circuit at 401 frequencies
+from 10&nbsp;Hz to 100&nbsp;kHz &mdash; the same nodal analysis SPICE does for an AC run.</p>
+<p>Ideal op amps are a fair assumption here. The OPA1644 has 11&nbsp;MHz of gain-bandwidth; at
+20&nbsp;kHz that still leaves it hundreds of times more gain than any stage asks for. What it
+cannot show is noise, headroom or the op amps&rsquo; own distortion &mdash; those need the real
+model, or a real board.</p>
+
+<h2>Re-running BandA</h2>
 <ol>
-  <li>Open <code>LBPF/BandA.asc</code> in LTspice.</li>
+  <li>Open <code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code> in LTspice.</li>
   <li>Fix the model path as above.</li>
-  <li>Run. The analysis is already set: <code>.ac dec 100 10 100k</code>, 100 points per decade
-  from 10&nbsp;Hz to 100&nbsp;kHz.</li>
-  <li>Plot <code>V(output)</code>. It should reproduce the +5.2&nbsp;dB peak near 520&nbsp;Hz.
-  If it does not, the circuit changed after the 18:28 run.</li>
+  <li>Run. The analysis is already set: <code>.ac dec 100 10 100k</code>.</li>
+  <li>Plot <code>V(output)</code>. With the file&rsquo;s pot settings it should peak at
+  +9.5&nbsp;dB near 1.26&nbsp;kHz.</li>
 </ol>
-<p>Committing the regenerated <code>.raw</code> with the fix means the plot on this site can be
-refreshed from a result that is known to come from the current file.</p>
+<p>To try other knob positions, change the resistor pairs standing in for each pot (R4/R5
+width, R9/R10 and R13/R14 frequency, R18/R19 boost/cut), keeping each pair&rsquo;s sum at
+10k.</p>
 
-<div class="next"><a href="lowpass.html">&larr; Low-pass filter</a><a href="status.html">What is left &rarr;</a></div>
+<div class="next"><a href="gain.html">&larr; Gain stage</a><a href="status.html">What is left &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4c6c1af<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at e2f6864<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

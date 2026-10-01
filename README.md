@@ -16,13 +16,13 @@ also render correctly if this is ever demoted to an ordinary project site.
 |---|---|---|
 | Compressor | **Designed** — schematic complete and verified, main and front boards routed, not built | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
 | Preamp | **In progress** — schematic drawn and board routed, no component values yet | [`UTS-500-Series/Pre-Amp`](https://github.com/UTS-500-Series/Pre-Amp) |
-| Equaliser | **In progress** — sections drawn, one band simulated, no values on the schematics | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
+| Equaliser | **In progress** — two parametric bands drawn with values on one sheet; filters and gain on their own sheets; not wired to the card edge | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
 
 Only the compressor has a design. Its pages are generated from `design.py` in the compressor
 repository, which the KiCad schematic is verified against pin by pin, so its figures come
 from the design rather than from memory.
 
-The equaliser section is written from its own repository and says plainly which numbers are real: the only measured-looking figures come from one committed LTspice run, and its schematic images (`site/equaliser/img/`) are KiCad exports cropped to their content by hand. Regenerate and re-crop them when the sheets change.
+The equaliser section is written from its own repository. Its main sheet, `Combined_EQ.kicad_sch`, is drawn and given a viewer by `build/_kicad_sch.py --module equaliser`, which also draws the high-pass, low-pass and gain sheets as plain images. The response figures come from `build/_eq_response.py`, which solves the main sheet's netlist (ideal op amps, linear pots) and carries the team's LTspice run alongside to show they agree. Rerun both, with the Equaliser repository checked out beside this one, when the sheets change.
 
 The preamp section is written from its own repository, a single KiCad 10 sheet. KiCad 10 cannot be installed where the site is built, so `build/_kicad_sch.py` draws that sheet as SVG and builds its viewer data straight from the `.kicad_sch` file. The sheet has no component values yet, so the pages describe what each part does and state no values. The topology follows ESP Projects 66 and 96, which the overview credits.
 
@@ -47,6 +47,7 @@ build/
   scaffold.py           the not-yet-designed-module template
   _data.py              viewer data, generated from a module's KiCad project
   _kicad_sch.py         schematic SVG + viewer data straight from a .kicad_sch, no KiCad needed
+  _eq_response.py       the equaliser's frequency response, solved from its KiCad netlist
 ```
 
 `site/` holds one folder per module plus a shared `style.css`, `viewer.js` and
@@ -150,8 +151,8 @@ offers, so the included workflow is required:
 
 ## The interactive schematics
 
-The compressor and the preamp have these &mdash; they are generated from real KiCad
-projects. The equaliser has static images only.
+Every module has these &mdash; they are generated from real KiCad projects. The equaliser's
+high-pass, low-pass and gain sheets, which are not on its main sheet yet, are static images.
 
 Each section page carries a live viewer rather than a flat image:
 

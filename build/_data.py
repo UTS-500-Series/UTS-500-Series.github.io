@@ -44,7 +44,7 @@ KIND = {'R':'res','C':'cap','D':'dio','Q':'tr','U':'ic','RV':'pot','SW':'sw','J'
 # says what the part actually is, so prefer it and keep the prefix only as a fallback.
 SYMKIND = {'R':'res', 'C':'cap', 'C_Polarized':'cap', 'D':'dio', 'D_Zener':'zen', 'LED':'led',
            'BC549':'tr', 'NE5532':'ic', 'LM3914N':'dip', 'R_Potentiometer':'pot',
-           'Conn_01x15':'conn'}
+           'Conn_01x15':'conn', 'OPA1644AIPWR':'ic', 'R_Potentiometer_Dual_Separate':'pot'}
 def kind(ref, sym=''):
     if sym in SYMKIND: return SYMKIND[sym]
     if sym.startswith('SW_'): return 'sw'
