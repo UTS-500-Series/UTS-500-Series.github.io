@@ -85,17 +85,19 @@ Only needed when a module's schematic changes. This step **does** need that modu
 repository checked out beside this one:
 
 ```bash
-python3 build/_data.py --module compressor
+python3 build/_data.py --module compressor            # viewer data
+python3 build/_data.py --module compressor --images   # and the sheet SVGs, needs KiCad
 ```
 
-It reads the netlist and the `.kicad_sch` files from `../Compressor`, and rewrites
-`site/compressor/data/*.json`. The sheet images are separate — export them from KiCad and
-copy them into `site/compressor/img/`:
-
-```bash
-kicad-cli sch export svg --no-background-color --exclude-drawing-sheet -o /tmp/svg \
-  "../Compressor/kicad/UTS Mini Mixing Desk - Compressor.kicad_sch"
-```
+It reads the seven sheets in `../Compressor/kicad/` and rewrites `site/compressor/data/*.json`
+from them: parts, values, footprints and the netlist as drawn, joined across sheets by their
+global labels and power symbols. The sheets are drawn from the routed board's schematic, with
+the panel controls and meters marked as off the board (they are on the front board, behind
+the ribbon header J2); those parts stay clickable and their notes say where they live. Nets
+the sheets leave unnamed take their name from `tools/design.py` where its net has the same
+pins, so the viewer uses the names the pages do. `--images` also exports each sheet with
+`kicad-cli` into `site/compressor/img/<sheet>.svg`; run it whenever the drawing changes,
+because the clickable boxes are placed in that drawing's coordinates.
 
 The preamp has no `design.py`, so its sheet image and viewer data come from the
 `.kicad_sch` file itself. With `UTS-500-Series/Pre-Amp` checked out beside this repository as
@@ -200,13 +202,13 @@ Measured on every sheet, both spacings — node overlaps **0**, wires over parts
 
 | Sheet | Nodes | Wires |
 |---|---|---|
-| Connector | 16 | 15 |
+| Connector | 37 | 40 |
 | Input | 26 | 27 |
 | VCA | 56 | 60 |
 | Output | 37 | 43 |
 | Sidechain | 54 | 66 |
-| Power | 128 | 88 |
-| Meters | 95 | 97 |
+| Power | 131 | 94 |
+| Meters | 79 | 83 |
 
 The check is in the page, not just in this file: `document.querySelector('.iv')._ivDebug()`
 returns the live counts from the browser console.

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Draws a KiCad schematic sheet as SVG, and builds its viewer data, with no KiCad installed.
 
-The compressor's images are exported by kicad-cli and its netlist comes from design.py. The
-preamp has neither: its repository is a plain KiCad 10 project, and KiCad 10 cannot be
-installed where this site is usually built. So this reads the .kicad_sch file directly:
+The compressor's images are exported by kicad-cli, and _data.py builds its viewer data with
+this file's netlister. The preamp has no exports: its repository is a plain KiCad 10 project,
+and KiCad 10 cannot be installed where this site is usually built. So this reads the .kicad_sch file directly:
 
   * the netlist, joined the way eeschema joins it: pins, wires, junctions, labels and power
     symbols that share a point, and wire ends that land on another wire

@@ -1,31 +1,41 @@
 #!/usr/bin/env python3
-"""Builds data/<sheet>.json for the interactive viewer.
+"""Builds data/<sheet>.json for the compressor's interactive viewer.
 
 Two things come out of this:
   * component boxes in sheet millimetres, read from the real .kicad_sch files, so the
-    clickable overlay lines up with the exported SVG whatever the layout looks like
+    clickable overlay lines up with the sheet SVGs kicad-cli exports (page coordinates)
   * the netlist as a bipartite graph (component nodes + net nodes), which is the honest
     way to draw a netlist - a net joins N pins, not 2
 
 Run it against one module:
 
-    python3 build/_data.py --module compressor
+    python3 build/_data.py --module compressor            # viewer data only
+    python3 build/_data.py --module compressor --images   # and the sheet SVGs (needs KiCad)
 
-The module's own repository has to be checked out beside this one, because the netlist and
-the .kicad_sch files live there, not here. The JSON it writes is committed to this
-repository, so building and publishing the site never needs those repositories present."""
-import json, os, re, sys, argparse
+The module's own repository has to be checked out beside this one. The netlist is read from
+the split sheets in kicad/ themselves, joined across sheets by their global labels and power
+symbols, the way eeschema joins them; the sheets are drawn from the routed board's
+schematic, so this is the circuit that gets built. Nets the sheets leave unnamed take their
+name from tools/design.py where its net has exactly the same pins, so the viewer uses the
+names the pages do. The data needs no KiCad installed; --images exports each sheet with
+kicad-cli into site/<slug>/img/<sheet>.svg, which the viewer draws under its hotspots. The JSON it writes is committed to this
+repository, so building and publishing the site never needs the module repositories."""
+import argparse, json, os, re, shutil, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 from modules import BY_SLUG
+from _kicad_sch import Sheet, place
 
-POWER  = {'+16V', '-16V', '-5V1', '+16V-IN', '-16V-IN', 'VBIAS', 'VREF5', 'VREFA'}
+POWER  = {'+16V', '-16V', '-5V1', '+16V-IN', '-16V-IN', '+48V-IN', 'VBIAS', 'VREF5', 'VREFA'}
 GROUND = {'AGND', 'PGND', 'CHASSIS'}
 CONTROL = {'STA','STB','CTRL','CTRL-B','RECT','SC-AMP','SCBUF','SCF','SCSEL','RV3O',
            'RATW','LINKN','ATKO','D7K','RELO','S1','S2','XN','U3BO','KEY','LINK',
-           'NINV3A','NINV3B','NINV4A','INV3A','INV4B','LED-A'}
+           'NINV3A','NINV3B','NINV4A','INV3A','INV4B','LED-A',
+           # names the board's sheets give some of the same nets
+           'TIMING','GR_METER','GR_REF','LVL_METER','RATIO_CW','RATIO_W','THR_W','ATK_W',
+           'REL_W','KEY_SRC','LINK_SW','HPF_A','HPF_B'}
 
 def net_class(n):
     if n in GROUND: return 'gnd'
@@ -85,7 +95,9 @@ NOTES = {
  'U1':'A: input receiver. B: recovery amplifier.',
  'U2':'A: makeup gain. B: output inverter.',
  'U3':'A: sidechain amp. B: rectifier first half.',
- 'U4':'A: rectifier summer. B: control buffer. Fit a TL072 here instead.',
+ 'U4':'TL072. A: rectifier summer. B: control buffer - low bias current, so the timing cap holds.',
+ 'U7':'A: level-meter peak detector. B: gain-reduction meter driver.',
+ 'U9':'LM3914: gain-reduction meter, linear steps.','U10':'LM3915: output-level meter, 3 dB steps.',
  'U5':'A: aux key receiver. B: aux output buffer.',
  'U6':'A: STA reference buffer. B: sidechain input buffer.',
  'RV2':'MAKEUP - 0 to +21 dB.','RV3':'THRESHOLD - wired as a rheostat.',
@@ -95,40 +107,157 @@ NOTES = {
  'SW3':'Shorts out the 72 Hz sidechain filter.','SW4':'Stereo link to pin 6.',
  'LED1':'Gain-reduction indicator. Brightness tracks compression.',
  'J1':'500-series 15-pin card edge.',
+ 'J2':'30-way ribbon header to the front board: pots, switches and meters.',
 }
 
-def boxes(path):
-    root, _ = sexp.parse_one(sexp.tokenize(open(path).read()))
+# Pinned references that changed between design.py and the board: the meter drivers and their
+# decoupling were renumbered when the front board was split off.
+OFF_BOARD = 'On the front board, reached through the ribbon header J2.'
+
+DESIGN_REFS = {'U8': 'U9', 'U9': 'U10', 'C39': 'C41', 'C40': 'C42'}
+OPAMP_HALVES = {'1': '7', '2': '6', '3': '5', '7': '1', '6': '2', '5': '3'}
+
+
+PAPER = {'A4': (297, 210), 'A3': (420, 297), 'A2': (594, 420), 'A1': (841, 594), 'A': (279.4, 215.9),
+         'B': (431.8, 279.4)}
+
+
+def paper(sheet):
+    """The page size in mm, which is the viewBox kicad-cli gives the sheet's SVG."""
+    p = [str(v) for v in next(c for c in sheet.root if isinstance(c, list) and c[0] == 'paper')[1:]]
+    w, h = (float(p[1]), float(p[2])) if p[0] == 'User' else PAPER[p[0]]
+    return (h, w) if 'portrait' in p else (w, h)
+
+
+def off_board(sym):
+    o = next((c for c in sym['node'] if isinstance(c, list) and c[0] == 'on_board'), None)
+    return o is not None and str(o[1]) == 'no'
+
+
+def root_sheets(root):
+    """(slug, file) for each sheet on the root schematic, in sheet-name order ("3 VCA")."""
+    t = open(root).read()
+    out = []
+    for blk in re.findall(r'\n\t\(sheet\n.*?\n\t\)', t, re.S):
+        name = re.search(r'"Sheetname" "([^"]+)"', blk).group(1)
+        f = re.search(r'"Sheetfile" "([^"]+)"', blk).group(1)
+        out.append((natkey(name), f[:-len('.kicad_sch')], f))
+    return [(slug, f) for _, slug, f in sorted(out)]
+
+
+def export_images(root, sheets, here):
+    """Each sheet as kicad-cli draws it, page-sized, so its coordinates are sheet millimetres."""
+    from export_kicad import KICAD_CLI
+    if not KICAD_CLI:
+        sys.exit('--images needs kicad-cli: install KiCad, or put kicad-cli on PATH')
+    stem = os.path.basename(root)[:-len('.kicad_sch')]
+    t = open(root).read()
+    names = {re.search(r'"Sheetfile" "([^"]+)"', b).group(1)[:-len('.kicad_sch')]:
+             re.search(r'"Sheetname" "([^"]+)"', b).group(1)
+             for b in re.findall(r'\n\t\(sheet\n.*?\n\t\)', t, re.S)}
+    with tempfile.TemporaryDirectory() as tmp:
+        r = subprocess.run([KICAD_CLI, 'sch', 'export', 'svg', '--no-background-color',
+                            '--exclude-drawing-sheet', '-o', tmp, root], capture_output=True, text=True)
+        if r.returncode:
+            sys.exit('kicad-cli sch export svg failed:\n%s%s' % (r.stdout, r.stderr))
+        for slug in sheets:
+            shutil.copyfile(os.path.join(tmp, '%s-%s.svg' % (stem, names[slug])),
+                            os.path.join(here, 'img', slug + '.svg'))
+            print('%-10s img/%s.svg' % (slug, slug))
+
+
+def joined(sheets):
+    """The whole design's nets: each sheet's own nets, joined across sheets by name. The
+    sheets connect only through global labels and power symbols, so a shared name is a
+    shared net. Returns {net id: set of (ref, pin)} and {net id: set of names}."""
+    parent = {}
+
+    def find(a):
+        parent.setdefault(a, a)
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]; a = parent[a]
+        return a
+    local = {}
+    for slug, sh in sheets.items():
+        for n, ps in sh.netlist().items():
+            node = (slug, n)
+            find(node)
+            local[node] = ps
+            if not n.startswith('Net-('):
+                for nm in n.split('/'):
+                    parent[find(node)] = find(('name', nm))
+    pins, names = {}, {}
+    for node, ps in local.items():
+        r = find(node)
+        pins.setdefault(r, set()).update(ps)
+        names.setdefault(r, set())
+        if not node[1].startswith('Net-('):
+            names[r].update(node[1].split('/'))
+    return pins, names
+
+
+def design_names(design, pins, parts):
+    """Names for the nets the sheets leave unnamed, from design.py where its net and the
+    sheet's net have the same pins. Resistor ends and op amp halves may be drawn the other
+    way round from design.py, so each part is flipped if that makes more nets agree."""
+    want = {}
+    for p in design.PARTS:
+        if p[0].startswith('#'):
+            continue
+        ref = DESIGN_REFS.get(p[0], p[0])
+        for pn, n in p[6].items():
+            want[(ref, pn)] = n
+    flips = {}
+
+    def dn(rp):
+        r, pn = rp
+        return want.get((r, flips.get(r, {}).get(pn, pn)))
+
+    def agree():
+        return sum(len({dn(p) for p in ps} - {None}) == 1 for ps in pins.values())
+    for ref, sym in sorted(parts.items()):
+        f = ({'1': '2', '2': '1'} if sym in ('R', 'C') else
+             OPAMP_HALVES if sym in ('NE5532', 'TL072') else None)
+        if f is None:
+            continue
+        before = agree(); flips[ref] = f
+        if agree() <= before:
+            del flips[ref]
+    # parts in parallel (a feedback resistor and its capacitor) can only be turned round
+    # together, so try those as one
+    netof = {p: r for r, ps in pins.items() for p in ps}
+    across = {}
+    for ref, sym in parts.items():
+        if sym in ('R', 'C') and (ref, '1') in netof and (ref, '2') in netof:
+            across.setdefault(frozenset((netof[(ref, '1')], netof[(ref, '2')])), []).append(ref)
+    for refs in across.values():
+        if len(refs) > 1:
+            before = agree()
+            for ref in refs:
+                if ref in flips: del flips[ref]
+                else: flips[ref] = {'1': '2', '2': '1'}
+            if agree() <= before:
+                for ref in refs:
+                    if ref in flips: del flips[ref]
+                    else: flips[ref] = {'1': '2', '2': '1'}
+    by_design = {}
+    for rp in want:
+        by_design.setdefault(want[rp], set()).add(rp)
     out = {}
-    for sym in sexp.getall(root, 'symbol'):
-        lib = sexp.get(sym, 'lib_id')
-        if not lib: continue
-        ref = val = None
-        for pr in sexp.getall(sym, 'property'):
-            if str(pr[1]) == 'Reference': ref = str(pr[2])
-            if str(pr[1]) == 'Value': val = str(pr[2])
-        if not ref or ref.startswith('#'): continue
-        at = sexp.get(sym, 'at'); X, Y, rot = float(at[1]), float(at[2]), int(float(at[3]))
-        unit = int(sexp.get(sym, 'unit')[1])
-        geo = symbol_pins(resolve_symbol(*str(lib[1]).split(':')))
-        src = geo.get(unit, {}) or geo.get(1, {})
-        pts = [place_pin(v[0], v[1], X, Y, rot) for v in src.values()] or [(X, Y)]
-        xs = [p[0] for p in pts] + [X]; ys = [p[1] for p in pts] + [Y]
-        pad = 1.6
-        b = [min(xs)-pad, min(ys)-pad, max(xs)-min(xs)+2*pad, max(ys)-min(ys)+2*pad]
-        if ref in out:                      # multi-unit part: union the boxes
-            o = out[ref]['box']
-            x0, y0 = min(o[0], b[0]), min(o[1], b[1])
-            x1, y1 = max(o[0]+o[2], b[0]+b[2]), max(o[1]+o[3], b[1]+b[3])
-            out[ref]['box'] = [x0, y0, x1-x0, y1-y0]
-        else:
-            out[ref] = {'ref': ref, 'value': val, 'box': [round(v, 2) for v in b]}
+    for r, ps in pins.items():
+        ds = {dn(p) for p in ps} - {None}
+        if len(ds) == 1:
+            d = ds.pop()
+            mine = {p for p in ps if dn(p) == d}
+            if len(mine) == len({p for p in by_design[d] if p[0] in parts}):
+                out[r] = d
     return out
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--module', default='compressor', help='module slug, see modules.py')
+    ap.add_argument('--images', action='store_true', help='also export the sheet SVGs with kicad-cli')
     args = ap.parse_args()
     mod = BY_SLUG.get(args.module)
     if mod is None:
@@ -136,79 +265,92 @@ def main():
     if not mod.repo:
         sys.exit('%s has no source repository yet: nothing to generate viewer data from'
                  % mod.slug)
-
     repo = os.path.abspath(os.path.join(ROOT, '..', mod.repo))
     if not os.path.isdir(repo):
         sys.exit('%s not found. Check out the module repository beside this one:\n  %s'
                  % (mod.repo, repo))
-    # the module repository owns the netlist, the sheets and the tooling
-    sys.path.insert(0, os.path.join(repo, 'tools'))
-    global sexp, resolve_symbol, symbol_pins, place_pin
-    import sexp
-    from route_sch import resolve_symbol, symbol_pins, place_pin
-
     here = os.path.join(ROOT, 'site', mod.slug)
     proj = os.path.join(repo, 'kicad')
-    import design
-    from gen_project import SHEETS as SHEET_LIST
-    SHEETS = {k: k + '.kicad_sch' for k, _, _ in SHEET_LIST}
+    root = [f for f in os.listdir(proj) if f.endswith('.kicad_sch')
+            and os.path.exists(os.path.join(proj, f[:-len('.kicad_sch')] + '.kicad_pro'))][0]
+    sheets = {slug: Sheet(os.path.join(proj, f)) for slug, f in root_sheets(os.path.join(proj, root))}
+    if args.images:
+        export_images(os.path.join(proj, root), sheets, here)
 
-    # component -> sheet, and its pin/net map, from the authoritative netlist.
-    # Imported rather than copied: this map used to be duplicated here, and a sheet added
-    # in gen_project.py then crashed this script instead of just working.
-    from gen_project import BLOCK2SHEET
-    # Key by (ref, sheet): an NE5532 has unit A on one sheet, unit B on another and its
-    # supply pins on a third. Merging them would list nets that are not on the sheet you
-    # are looking at, so each sheet only ever sees the pins actually drawn on it.
-    comp = {}
-    for p in design.PARTS:
-        ref, sym, val, fp, blk, pinmap = p[0], p[2], p[3], p[4], p[5], p[6]
-        if ref.startswith('#'): continue
-        sheet = BLOCK2SHEET[blk]
-        c = comp.setdefault((ref, sheet), {'ref': ref, 'value': val, 'fp': fp,
-                                           'sheet': sheet, 'sym': sym, 'pins': {}})
-        c['pins'].update(pinmap)
-
-    # the full netlist, across all sheets
-    nets = {}
-    for c in comp.values():
-        for pn, n in c['pins'].items():
-            nets.setdefault(n, []).append([c['ref'], pn])
+    parts = {}
+    for sh in sheets.values():
+        for s in sh.symbols:
+            if not sh.is_power(s):
+                parts[s['ref']] = s['lib'].split(':')[-1]
+    pins, names = joined(sheets)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('design', os.path.join(repo, 'tools', 'design.py'))
+    design = importlib.util.module_from_spec(spec); spec.loader.exec_module(design)
+    from_design = design_names(design, pins, parts)
+    netname, members = {}, {}
+    for r, ps in pins.items():
+        if names[r]:
+            n = '/'.join(sorted(names[r], key=natkey))
+        elif r in from_design:
+            n = from_design[r]
+        else:
+            ref, pn = min(ps, key=lambda p: (natkey(p[0]), natkey(p[1])))
+            n = 'Net-(%s-Pad%s)' % (ref, pn)
+        for p in ps:
+            netname[p] = n
+        members[n] = ps
 
     total = 0
-    for sheet, fname in SHEETS.items():
-        bx = boxes(os.path.join(proj, fname))
-        svg = open(os.path.join(here, 'img', sheet + '.svg')).read(4000)
-        vb = re.search(r'viewBox="([\d.\s]+)"', svg).group(1).split()
-        mine = {r: c for (r, sh), c in comp.items() if sh == sheet}
-        comps = []
-        for r, c in sorted(mine.items(), key=lambda kv: natkey(kv[0])):
-            comps.append({
-                'ref': r, 'value': c['value'], 'fp': c['fp'].split(':')[-1],
-                'kind': kind(r, c.get('sym', '')), 'note': NOTES.get(r, ''),
-                'box': bx.get(r, {}).get('box'),
-                # pin order is incidental in design.py (D8 lists anode first); the
-                # panel reads as a pinout, so emit it numbered
-                'pins': {k: c['pins'][k] for k in sorted(c['pins'], key=natkey)},
-            })
-        onsheet = {(c['ref'], pn) for c in mine.values() for pn in c['pins']}
-        used = sorted({n for c in mine.values() for n in c['pins'].values()})
+    for slug, sh in sheets.items():
+        w, h = paper(sh)
+        comps = {}
+        for s in sh.symbols:
+            if sh.is_power(s):
+                continue
+            pts = [place(px, py, s['X'], s['Y'], s['rot'], s['mirror']) for _, _, px, py in sh.pins(s)]
+            xs = [p[0] for p in pts] + [s['X']]; ys = [p[1] for p in pts] + [s['Y']]
+            pad = 1.6
+            b = [min(xs) - pad, min(ys) - pad, max(xs) - min(xs) + 2 * pad, max(ys) - min(ys) + 2 * pad]
+            c = comps.get(s['ref'])
+            if c:                               # multi-unit part: union the boxes
+                o = c['box']
+                x0, y0 = min(o[0], b[0]), min(o[1], b[1])
+                x1, y1 = max(o[0] + o[2], b[0] + b[2]), max(o[1] + o[3], b[1] + b[3])
+                c['box'] = [round(v, 2) for v in (x0, y0, x1 - x0, y1 - y0)]
+            else:
+                c = comps[s['ref']] = {'ref': s['ref'], 'value': s['value'],
+                                       'fp': s['fp'].split(':')[-1],
+                                       'kind': kind(s['ref'], s['lib'].split(':')[-1]),
+                                       # the panel parts are drawn here but marked
+                                       # "not on board": they are on the front board
+                                       'note': ' '.join(x for x in (NOTES.get(s['ref'], ''),
+                                                OFF_BOARD if off_board(s) else '') if x),
+                                       'box': [round(v, 2) for v in b], 'pins': {}}
+            # each sheet sees only the pins drawn on it: an NE5532 has unit A on one sheet,
+            # unit B on another and its supply pins on a third
+            for _, pn, _, _ in sh.pins(s):
+                if (s['ref'], pn) in netname:
+                    c['pins'][pn] = netname[(s['ref'], pn)]
+        comps = [comps[r] for r in sorted(comps, key=natkey)]
+        for c in comps:
+            c['pins'] = {k: c['pins'][k] for k in sorted(c['pins'], key=natkey)}
+        onsheet = {(c['ref'], pn) for c in comps for pn in c['pins']}
+        used = sorted({n for c in comps for n in c['pins'].values()}, key=natkey)
         netlist = []
         for n in used:
-            here_pins = sorted((p for p in nets[n] if tuple(p) in onsheet),
-                               key=lambda p: (natkey(p[0]), natkey(p[1])))
+            here_pins = sorted(([r, p] for r, p in members[n] if (r, p) in onsheet),
+                               key=lambda q: (natkey(q[0]), natkey(q[1])))
             netlist.append({'name': n, 'cls': net_class(n), 'pins': here_pins,
-                            'offsheet': len(nets[n]) - len(here_pins)})
-        data = {'sheet': sheet, 'w': float(vb[2]), 'h': float(vb[3]),
+                            'offsheet': len(members[n]) - len(here_pins)})
+        data = {'sheet': slug, 'w': w, 'h': h,
                 'components': comps, 'nets': netlist}
-        out = os.path.join(here, 'data', sheet + '.json')
+        out = os.path.join(here, 'data', slug + '.json')
         open(out, 'w').write(json.dumps(data, separators=(',', ':')))
-        missing = [c['ref'] for c in comps if not c['box']]
         total += len(comps)
-        print('%-10s %3d parts %3d nets %6.1f KB%s'
-              % (sheet, len(comps), len(netlist), os.path.getsize(out)/1024,
-                 '   NO BOX: ' + ','.join(missing) if missing else ''))
-    print('total %d components' % total)
+        print('%-10s %3d parts %3d nets %6.1f KB' % (slug, len(comps), len(netlist), os.path.getsize(out) / 1024))
+    named = sum(1 for r in pins if not names[r] and r in from_design)
+    print('total %d components, %d nets (%d unnamed on the sheets, named from design.py)'
+          % (total, len(pins), named))
 
 
 if __name__ == '__main__':
