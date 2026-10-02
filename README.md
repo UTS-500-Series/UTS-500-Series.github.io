@@ -14,7 +14,7 @@ also render correctly if this is ever demoted to an ordinary project site.
 
 | Module | Status | Source |
 |---|---|---|
-| Compressor | **Designed** — schematic complete and verified, main and front boards routed, not built | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
+| Compressor | **Designed** — schematic complete, verified and simulated, main and front boards routed, parts list from Altronics, not built | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
 | Preamp | **In progress** — schematic drawn and board routed, no component values yet | [`UTS-500-Series/Pre-Amp`](https://github.com/UTS-500-Series/Pre-Amp) |
 | Equaliser | **In progress** — two parametric bands drawn with values on one sheet; filters and gain on their own sheets; not wired to the card edge | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
 
@@ -132,7 +132,12 @@ script. A board with no outline or no parts is listed on the page but not render
 The compressor exports both of its boards, the main board and the front board. The front
 board's pots need Alps' RK09K 3D model, which is not committed: run
 `sh tools/get_3d_models.sh` in the Compressor checkout before exporting, or the pots render
-as bare footprints.
+as bare footprints. The renders exported on 2 October 2026 were made where Alps' site is
+blocked, so they show a plain block-and-shaft stand-in for the pots.
+
+`build_site.py` also copies the compressor's simulation plots (`kicad/sim/results/*.png`) and
+its parts list (`bom/altronics.csv`) in from the checkout when it is present; the copies are
+committed, and the parts page is built from `site/compressor/parts/altronics.csv`.
 
 ## Adding a module
 

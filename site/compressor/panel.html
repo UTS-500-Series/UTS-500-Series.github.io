@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html" class="on"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="using.html"><i>11</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>12</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html" class="on"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="simulation.html"><i>11</i><span>The simulation</span></a><a href="parts.html"><i>12</i><span>Parts list</span></a><a href="using.html"><i>13</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>14</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -52,7 +52,7 @@ it. There is no arrangement where everything is comfortable; every layout below 
 thing for another.</p>
 
 <h2>The controls</h2>
-<div class="tw"><table><thead><tr><th class="">Control</th><th class="r">Ref</th><th class="">What it does</th><th class="">More</th></tr></thead><tbody><tr><td class="">THRESHOLD</td><td class="r">RV3</td><td class="">How loud before compression starts</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">RATIO</td><td class="r">RV4</td><td class="">How much gain reduction per dB over threshold</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">ATTACK</td><td class="r">RV5</td><td class="">How fast it clamps down, 2.7&ndash;50 ms</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">RELEASE</td><td class="r">RV6</td><td class="">How fast it lets go, 47 ms&ndash;2.2 s</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">MAKEUP</td><td class="r">RV2</td><td class="">Level put back after compression, 0 to +21 dB</td><td class=""><a href="output.html">Output</a></td></tr><tr><td class="">BYPASS</td><td class="r">SW1</td><td class="">Hard bypass &mdash; rack straight through</td><td class=""><a href="output.html">Output</a></td></tr><tr><td class="">HPF</td><td class="r">SW3</td><td class="">Defeats the 72 Hz sidechain filter</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">KEY</td><td class="r">SW2</td><td class="">Detector listens here, or to the aux input</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">LINK</td><td class="r">SW4</td><td class="">Ties this detector to the module beside it</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="">Control</th><th class="r">Ref</th><th class="">What it does</th><th class="">More</th></tr></thead><tbody><tr><td class="">THRESHOLD</td><td class="r">RV3</td><td class="">How loud before compression starts</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">RATIO</td><td class="r">RV4</td><td class="">How much gain reduction per dB over threshold</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">ATTACK</td><td class="r">RV5</td><td class="">How fast it clamps down, 2&ndash;71 ms</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">RELEASE</td><td class="r">RV6</td><td class="">How fast it lets go, 49 ms&ndash;3.5 s</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">MAKEUP</td><td class="r">RV2</td><td class="">Level put back after compression, 0 to +21 dB</td><td class=""><a href="output.html">Output</a></td></tr><tr><td class="">BYPASS</td><td class="r">SW1</td><td class="">Hard bypass &mdash; rack straight through</td><td class=""><a href="output.html">Output</a></td></tr><tr><td class="">HPF</td><td class="r">SW3</td><td class="">Defeats the sidechain high-pass filter</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">KEY</td><td class="r">SW2</td><td class="">Detector listens here, or to the aux input</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">LINK</td><td class="r">SW4</td><td class="">Ties this detector to the module beside it</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr></tbody></table></div>
 
 <h2>Reading the meters</h2>
 <p>Two seven-segment bargraphs sit at the top, in a recessed window so they read against the
@@ -67,8 +67,8 @@ panel.</p>
 <div class="note">
   <h4>The meters have a circuit now</h4>
   <p>The fourteen LEDs are driven by <a href="meters.html">sheet 7</a>: two LM391x display
-  drivers in dot mode, fed by a peak detector and a level shifter. They add about 29 mA to the
-  +16 V rail, taking the module to roughly 90 mA of the 130 mA the rack allows.</p>
+  drivers in dot mode, fed by a peak detector and a level shifter. With two LEDs lit the
+  module draws about 81 mA of the 130 mA the rack allows on +16 V.</p>
 </div>
 
 <h2>Three layouts</h2>
@@ -128,13 +128,15 @@ the repository, alongside the DXF.</p>
 
 <div class="note warn">
   <h4>Before you have one made</h4>
-  <p>The holes are &Oslash;7.2 for the Alps RK09K pots, &Oslash;5.2 for the Jaycar
-  sub-miniature toggles and &Oslash;2.2 for the 2 mm LEDs. Check them against the parts you
-  actually buy &mdash; half a millimetre is the difference between a push fit and a rattle.</p>
-  <p>The toggles' bushing is only 4.06 mm long, which leaves under 1 mm of thread for the nut
-  through a standard 3.18 mm panel. Either counterbore the back of the panel to about 2 mm
-  round those four holes, or use a 1.6 to 2 mm panel. Depth is covered on
-  <a href="boards.html">the boards</a> page.</p>
+  <p>The holes are &Oslash;7.2 for the 9 mm pots, &Oslash;6.5 for the Salecom S1315 and
+  S1350 mini toggles and &Oslash;2.2 for the 2 mm LEDs. Altronics has no 2 mm LEDs: if you fit
+  its 3 mm flangeless ones instead, open the meter holes to &Oslash;3.1. Check every hole
+  against the parts you actually buy &mdash; half a millimetre is the difference between a push
+  fit and a rattle.</p>
+  <p>The toggles' 8.9 mm bushing leaves about 5.5 mm of thread through a standard 3.18 mm panel,
+  plenty for the nut. The pots' 5 mm bushing leaves under 2 mm, so either counterbore the back
+  of the panel to about 2 mm round the five pot holes, or use a 1.6 to 2 mm panel. Depth is
+  covered on <a href="boards.html">the boards</a> page.</p>
 </div>
 
 <div class="next"><a href="meters.html">&larr; The LED meters</a><a href="boards.html">The boards &rarr;</a></div>

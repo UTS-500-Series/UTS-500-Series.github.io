@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="using.html" class="on"><i>11</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>12</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="simulation.html"><i>11</i><span>The simulation</span></a><a href="parts.html"><i>12</i><span>Parts list</span></a><a href="using.html" class="on"><i>13</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>14</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -37,7 +37,7 @@ try {
 wrong.</p>
 
 <h2>The controls</h2>
-<div class="tw"><table><thead><tr><th class="">Control</th><th class="r">Ref</th><th class="">What it does</th></tr></thead><tbody><tr><td class="">Threshold</td><td class="r">RV3</td><td class="">How loud the signal must be before compression starts. Clockwise = lower threshold = more compression.</td></tr><tr><td class="">Ratio</td><td class="r">RV4</td><td class="">How much gain reduction per dB over threshold. Clockwise = harder.</td></tr><tr><td class="">Attack</td><td class="r">RV5</td><td class="">How fast it clamps down. 2.7&ndash;50 ms.</td></tr><tr><td class="">Release</td><td class="r">RV6</td><td class="">How fast it lets go. 47 ms&ndash;2.2 s.</td></tr><tr><td class="">Makeup</td><td class="r">RV2</td><td class="">Level put back after compression. 0 to +21 dB.</td></tr><tr><td class="">Unity trim</td><td class="r">RV1</td><td class="">Set once at bring-up. Not a performance control.</td></tr><tr><td class="">Bypass</td><td class="r">SW1</td><td class="">Hard bypass &mdash; audio goes straight through the rack.</td></tr><tr><td class="">Key int/ext</td><td class="r">SW2</td><td class="">Detector listens to this channel, or to the aux input.</td></tr><tr><td class="">HPF defeat</td><td class="r">SW3</td><td class="">Shorts out the 72 Hz detector filter.</td></tr><tr><td class="">Link</td><td class="r">SW4</td><td class="">Ties this detector to the other module on pin 6.</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="">Control</th><th class="r">Ref</th><th class="">What it does</th></tr></thead><tbody><tr><td class="">Threshold</td><td class="r">RV3</td><td class="">How loud the signal must be before compression starts. Clockwise = lower threshold = more compression.</td></tr><tr><td class="">Ratio</td><td class="r">RV4</td><td class="">How much gain reduction per dB over threshold. Clockwise = harder.</td></tr><tr><td class="">Attack</td><td class="r">RV5</td><td class="">How fast it clamps down. 2&ndash;71 ms, simulated.</td></tr><tr><td class="">Release</td><td class="r">RV6</td><td class="">How fast it lets go. 49 ms&ndash;3.5 s, simulated.</td></tr><tr><td class="">Makeup</td><td class="r">RV2</td><td class="">Level put back after compression. 0 to +21 dB.</td></tr><tr><td class="">Unity trim</td><td class="r">RV1</td><td class="">Set once at bring-up. Not a performance control.</td></tr><tr><td class="">Bypass</td><td class="r">SW1</td><td class="">Hard bypass &mdash; audio goes straight through the rack.</td></tr><tr><td class="">Key int/ext</td><td class="r">SW2</td><td class="">Detector listens to this channel, or to the aux input.</td></tr><tr><td class="">HPF defeat</td><td class="r">SW3</td><td class="">Shorts out the detector's high-pass filter.</td></tr><tr><td class="">Link</td><td class="r">SW4</td><td class="">Ties this detector to the other module on pin 6.</td></tr></tbody></table></div>
 
 <div class="note">
   <h4>Threshold and ratio interact &mdash; this is normal</h4>
@@ -55,8 +55,8 @@ ever goes near a rack.</p>
       backplane <em>before</em> inserting. Check the drop across <code>R50</code> and
       <code>R51</code> &mdash; more than 1 V (100 mA) with no signal means something is wrong.</li>
   <li><strong>References.</strong> <code>VBIAS</code> = 2.23 V &plusmn;0.05.
-      <code>&minus;5V1</code> = &minus;5.1 V &plusmn;0.15. <code>VREF5</code> = 5.49 V,
-      <code>VREFA</code> = 5.19 V.</li>
+      <code>&minus;5V1</code> = &minus;5.1 V &plusmn;0.15. <code>VREF5</code> &asymp; 5.75 V,
+      <code>VREFA</code> &asymp; 5.44 V (simulated).</li>
   <li><strong>Tail current.</strong> Measure across <code>R18</code>: about 4.45 V, i.e. ~3 mA.
       Anywhere from 2.7 to 3.2 mA is fine &mdash; gain is set by the steering ratio, not by this
       current.</li>
@@ -82,7 +82,8 @@ ever goes near a rack.</p>
 <h2>Project files</h2>
 <ul>
   <li><code>kicad/</code> &mdash; the hierarchical schematic these pages document, seven sheets,
-      KiCad 9.</li>
+      KiCad 10. It simulates in KiCad's own simulator.</li>
+  <li><code>kicad/sim/</code> &mdash; the simulation's models, results and write-up.</li>
   <li><code>kicad_withpcb/compressor_with_pcb/</code> &mdash; the single-sheet schematic and the
       main board, KiCad 10.</li>
   <li><code>kicad_withpcb/compressor_front/</code> &mdash; the front board. Run
@@ -90,12 +91,14 @@ ever goes near a rack.</p>
   <li><code>tools/design.py</code> &mdash; the authoritative netlist as data.
       The schematic is generated and verified against it.</li>
   <li><code>panel/</code> &mdash; the faceplate generator: mockups, a 1:1 drawing and DXF.</li>
+  <li><code>bom/altronics.csv</code> &mdash; the <a href="parts.html">parts list</a>, built by
+      <code>tools/bom_altronics.py</code>.</li>
   <li>This site lives in its own repository,
       <a href="https://github.com/UTS-500-Series/UTS-500-Series.github.io">UTS-500-Series.github.io</a>,
       and its README explains how to regenerate these pages.</li>
 </ul>
 
-<div class="next"><a href="boards.html">&larr; The boards</a><a href="files.html">Design files &rarr;</a></div>
+<div class="next"><a href="parts.html">&larr; Parts list</a><a href="files.html">Design files &rarr;</a></div>
 <footer>
   UTS Mini Mixing Desk &mdash; Compressor &middot; documentation generated from the KiCad project<br>
   <a href="../index.html">All modules</a>

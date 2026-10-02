@@ -2,6 +2,7 @@
 
 Moved verbatim out of the old single-module _build.py. Every figure and number in here was
 checked against tools/design.py in the compressor repository; do not edit values loosely.
+Figures marked as simulated come from kicad/sim/ in that repository (results/results.json).
 """
 from shell import fig, pic, table
 
@@ -24,8 +25,10 @@ NAV = [
                  ("meters.html", "08", "The LED meters")]),
     ("Practical", [("panel.html", "09", "The front panel"),
                    ("boards.html", "10", "The boards"),
-                   ("using.html", "11", "Setting up &amp; using it"),
-                   ("files.html", "12", "Design files")]),
+                   ("simulation.html", "11", "The simulation"),
+                   ("parts.html", "12", "Parts list"),
+                   ("using.html", "13", "Setting up &amp; using it"),
+                   ("files.html", "14", "Design files")]),
 ]
 
 PAGES = {}
@@ -50,7 +53,9 @@ schematic: what it does, how it does it, and why it was built that way.</p>
 <dl class="spec">
   <div><dt>Format</dt><dd>500 series</dd></div>
   <div><dt>Supply</dt><dd>&plusmn;16 V</dd></div>
-  <div><dt>Gain reduction</dt><dd>~40 dB max</dd></div>
+  <div><dt>Gain reduction</dt><dd>36 dB max</dd></div>
+  <div><dt>Attack</dt><dd>2&ndash;71 ms</dd></div>
+  <div><dt>Release</dt><dd>49 ms&ndash;3.5 s</dd></div>
   <div><dt>Components</dt><dd>166</dd></div>
   <div><dt>Nets</dt><dd>110</dd></div>
   <div><dt>Boards</dt><dd>2, routed</dd></div>
@@ -100,15 +105,18 @@ is far more forgiving of component tolerance. Most classic bus compressors work 
   <a class="card" href="power.html"><b>Power &amp; references</b><span>Rails, the &minus;5.1 V reference, and the bias voltages everything else depends on.</span></a>
   <a class="card" href="panel.html"><b>The front panel</b><span>Nine functions in 38 mm, three ways to arrange them, and why each one is a compromise.</span></a>
   <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both laid out and routed.</span></a>
+  <a class="card" href="simulation.html"><b>The simulation</b><span>What ngspice found when the schematic was simulated, and the fourteen values that changed because of it.</span></a>
+  <a class="card" href="parts.html"><b>Parts list</b><span>Every part, ordered from Altronics where they stock it, with the rest from element14.</span></a>
 </div>
 
 <div class="note warn">
   <h4>Read this before building</h4>
-  <p>Both boards are laid out and routed, but nothing has been ordered, built or simulated.
-  Every performance figure on this site is
-  <strong>calculated from the design</strong>, not measured. The netlist has been verified
-  against the schematic automatically, and ERC passes with no errors, but that only proves the
-  drawing is self-consistent &mdash; not that the circuit behaves as predicted.</p>
+  <p>Both boards are laid out and routed and the circuit has been
+  <a href="simulation.html">simulated</a>, but nothing has been ordered or built. Every
+  performance figure on this site is <strong>calculated or simulated from the design</strong>,
+  not measured. The netlist has been verified against the schematic automatically, ERC passes
+  with no errors, and ngspice runs the schematic as drawn, but a simulation is only as good as
+  its models &mdash; measure the real module before trusting any of it.</p>
 </div>
 """)
 
@@ -231,8 +239,9 @@ hissier; make it smaller and it gets quieter but grittier.</p>
     [["Input receiver U1A", "0 dB", "Difference amplifier, unity by design"],
      ["Pad (R7 + RV1 / R8)", "&minus;42 dB", "Shrink the signal to suit the transistors"],
      ["Gain cell (max)", "+26 dB", "4k7 collector load &divide; 237 &Omega; emitter resistance"],
-     ["Recovery amp U1B", "+16.5 dB", "22 k &divide; 3k3"],
-     ["<strong>Through gain</strong>", "<strong>~0 dB</strong>", "The pad is chosen to cancel the two gain stages"]],
+     ["Recovery amp U1B", "+10.2 dB", "22 k &divide; 6k8"],
+     ["Balanced output", "+6 dB", "Hot and cold legs each carry the full signal"],
+     ["<strong>Through gain</strong>", "<strong>~0 dB</strong>", "The pad is chosen to cancel the gain stages; &minus;0.1 dB simulated"]],
     ["", "n", ""]) + """
 <p><code>RV1</code> is the trimmer that lets you land exactly on unity, absorbing the tolerance
 of everything upstream and downstream of it. It is the only audio trim in the module.</p>
@@ -243,12 +252,25 @@ and the module passes signal at unity. Working it through:</p>
 <ul>
   <li>Gain cell at full gain: 4k7 collector load &divide; 237 &Omega; emitter resistance =
       <strong>19.8&times;</strong></li>
-  <li>Recovery amp <code>U1B</code>: 22 k &divide; 3k3 = <strong>6.67&times;</strong></li>
-  <li>Together: <strong>132&times;</strong>, so the pad must divide by 132</li>
+  <li>Recovery amp <code>U1B</code>: 22 k &divide; 6k8 = <strong>3.24&times;</strong></li>
+  <li>Balanced output: the hot and cold legs each carry the full signal, so the level between
+      them is <strong>2&times;</strong></li>
+  <li>Together: <strong>128&times;</strong>, so the pad must divide by about 128</li>
 </ul>
 <p>The divider ratio is <code>(R7 + RV1 + R8) / R8</code>. With <code>R7</code> = 8k2 and
 <code>RV1</code> spanning 0&ndash;2k, that needs <code>R8</code> &asymp; 75 &Omega;, giving a
-ratio of 110&ndash;137&times; &mdash; which puts unity comfortably inside the trimmer's range.</p>
+ratio of 110&ndash;137&times; &mdash; which puts unity comfortably inside the trimmer's range.
+Simulated, <code>RV1</code> trims the module from +0.9 to &minus;1.0 dB.</p>
+
+<div class="note warn">
+  <h4>R21 and R22 were 3k3 until 2 October</h4>
+  <p>The first version of this sum left out the balanced output's 2&times;. With the recovery
+  amp at 22 k &divide; 3k3 the module came out 6 dB hot, so <code>BYPASS</code> dropped the
+  level by 6 dB and <code>RV1</code> could only trim between +4.9 and +6.8 dB. The
+  <a href="simulation.html">simulation</a> caught it; <code>R21</code> and <code>R22</code> went
+  to 6k8, and <code>C9</code>/<code>C10</code> to 4.7 &micro;F so the bass corner fell from
+  22 Hz to 5.6 Hz rather than rising.</p>
+</div>
 
 <div class="note warn">
   <h4>If you are working from an early copy of this design</h4>
@@ -352,7 +374,7 @@ and <code>R17</code>, giving a <strong>differential</strong> signal &mdash; the 
 the difference between the two collectors.</p>
 <p><code>Q4</code> and <code>Q5</code> are emitter followers that buffer those collectors so the
 next stage does not load them, and <code>U1B</code> is a difference amplifier with a gain of
-6.67&times; that converts the difference back into a normal single-ended signal.</p>
+3.24&times; that converts the difference back into a normal single-ended signal.</p>
 <p>Taking the output differentially is what makes gain changes inaudible. When the cell changes
 gain, the DC level at <em>both</em> collectors moves together. That common movement is exactly
 what a difference amplifier rejects &mdash; so the "thump" you would otherwise hear on a fast
@@ -465,21 +487,30 @@ external key input. <code>U6B</code> buffers whichever you picked so the followi
 not load the source.</p>
 
 <h3>2. The sidechain high-pass filter</h3>
-<p><code>C14</code> (220 nF) with <code>R38</code> (10 k&Omega;) makes a high-pass filter at
-about <strong>72 Hz</strong>, which <code>SW3</code> can short out.</p>
+<p><code>C14</code> (2.2 &micro;F) with <code>R38</code> (1 k&Omega;) makes a high-pass filter
+at about <strong>72 Hz</strong> on paper, which <code>SW3</code> can short out. The threshold
+network after it loads the filter a little, so in simulation the corner sits between 80 and
+160 Hz depending on where THRESHOLD is set.</p>
+<p>These were 220 nF and 10 k&Omega; until the threshold was rescaled. The much smaller
+<code>R35</code> that gives the threshold its range loaded the old filter heavily enough to push
+its corner to 400 Hz at the lowest threshold; dropping <code>R38</code> to 1 k&Omega; makes that
+load minor, and the larger <code>C14</code> brings the corner back down.</p>
 <p>This exists because bass carries most of the energy in music. Without it, every kick drum
 hit pulls the whole mix down and the compressor "pumps" to the beat. Rolling the bass out of
 the <em>detector only</em> &mdash; the audio path is untouched &mdash; makes the compressor
 respond to the overall balance instead of to the low end.</p>
 
 <h3>3. Threshold</h3>
-<p><code>RV3</code> (1 M&Omega;) is wired as a <strong>rheostat</strong>: a variable resistor
-feeding <code>U3A</code>, whose gain is <code>R36 / (R35 + RV3)</code>. Turning it up increases
-the detector's gain, so a quieter signal is enough to start compression &mdash; which is what
-lowering a threshold means.</p>
-<p>Wiring it this way is deliberate. Because gain is inversely proportional to resistance, a
-plain <em>linear</em> pot produces a roughly <em>logarithmic</em> sweep in dB, which is what
-feels natural on the knob. The usable range is about &minus;20 dBu to +14 dBu.</p>
+<p><code>RV3</code> (100 k&Omega;, audio taper) is wired as a <strong>rheostat</strong>: a
+variable resistor feeding <code>U3A</code>, whose gain is <code>R36 / (R35 + RV3)</code>
+(82 k&Omega; over 1 k&Omega; plus the pot). Turning it down increases the detector's gain, so a
+quieter signal is enough to start compression &mdash; which is what lowering a threshold
+means.</p>
+<p>Because gain is inversely proportional to resistance, the sweep in dB bunches up at the low
+end of the pot. The original 1 M&Omega; linear pot did nearly all its work in the first quarter
+of its travel. An audio-taper pot (10% of its resistance at half travel) spreads it evenly: in
+simulation the threshold lands at &minus;21, &minus;10, 0, +10 and +19 dBu at each quarter
+turn.</p>
 
 <h3>4. The precision rectifier</h3>
 <p>To measure loudness you need the size of the signal regardless of sign &mdash; its absolute
@@ -502,12 +533,18 @@ many dB of gain reduction you get per dB over threshold. That is what "ratio" me
 <p>This is where the compressor gets its <em>timing</em>. <code>C15</code> (10 &micro;F) is the
 timing capacitor, and its voltage <em>is</em> the control signal.</p>
 """ + table(
-    ["Control", "Path", "Time constant"],
-    [["Attack", "<code>RV5</code> 4k7 + <code>R46</code> 47 &Omega; + <code>R45</code> 220 &Omega;, through <code>D7</code> into C15",
-      "2.7 ms &ndash; 50 ms"],
-     ["Release", "<code>RV6</code> 220 k&Omega; + <code>R47</code> 4k7 discharging C15 to ground",
-      "47 ms &ndash; 2.2 s"]],
-    ["", "", "n"]) + """
+    ["Control", "Path", "Simulated", "Target"],
+    [["Attack", "<code>RV5</code> 10 k + <code>R46</code> 47 &Omega; + <code>R45</code> 220 &Omega;, through <code>D7</code> into C15",
+      "2 ms &ndash; 71 ms", "2.7 ms &ndash; 50 ms"],
+     ["Release", "<code>RV6</code> 1 M&Omega; + <code>R47</code> 15 k discharging C15 to ground",
+      "49 ms &ndash; 3.5 s", "47 ms &ndash; 2.2 s"]],
+    ["", "", "n", "n"]) + """
+<p>The simulated times are how long the gain takes to make 63% of its change for a burst
+about 20 dB over the threshold, so harder hits are faster. Both ranges cover their targets and
+run past them at the slow end: <code>RV5</code> and <code>RV6</code> are the 10 k&Omega; and
+1 M&Omega; pots Altronics stocks, where 4.7 k&Omega; and 500 k&Omega; parts from elsewhere would
+stop at 34 ms and 1.8 s. <code>R47</code> went from 4k7 to 15 k so the release pot loads the
+detector less at its fastest setting.</p>
 <p><code>D7</code> is what separates the two. Charging current can only flow into the capacitor
 through the diode, so the <em>attack</em> path is the diode plus the attack resistor. Discharge
 cannot flow back through the diode, so it has to go through the release resistor instead. One
@@ -518,14 +555,16 @@ is smoother but can leave the signal held down after a loud passage.</p>
 
 <h3>7. Control buffer</h3>
 <p><code>U4B</code> buffers the timing capacitor. Its job is to read the capacitor's voltage
-without discharging it. <code>R74</code> (220 k&Omega;) in the feedback path is chosen to match
-the release network's resistance, so the op amp's small input bias current produces an equal
-error on both inputs and cancels rather than shifting the resting point.</p>
+without discharging it. <code>R74</code> (220 k&Omega;) in the feedback path was chosen to match
+the old 220 k&Omega; release pot, so an op amp's input bias current produces an equal error on
+both inputs and cancels. With <code>RV6</code> now 1 M&Omega; they only match part of the way
+round the knob, which is one more reason <code>U4</code> is a FET-input part.</p>
 
 <div class="note warn">
   <h4>The one place worth deviating from NE5532</h4>
-  <p>An NE5532's inputs draw around 200 nA. On a 220 k&Omega; timing node that can leave enough
-  offset to hold the compressor in about a decibel of gain reduction at idle. So the
+  <p>An NE5532's inputs draw around 200 nA. On a timing node that now sees up to 1 M&Omega;
+  through RELEASE, that can leave enough offset to hold the compressor in gain reduction at
+  idle. So the
   schematic specifies a <strong>TL072 for U4 only</strong> (an OPA2134 is also pin-compatible),
   which removes the problem entirely, because FET inputs draw essentially no current.</p>
 </div>
@@ -581,12 +620,15 @@ voltage across it to behave like a current source. Raising the whole cell by 2.2
 point.</p>
 """ + table(
     ["Net", "Voltage", "Set by", "What it does"],
-    [["<code>VREF5</code>", "5.49 V", "R60 / (R61+R62)", "Top of the reference chain"],
-     ["<code>VREFA</code>", "5.19 V", "R60+R61 / R62", "Buffered by U6A to become <code>STA</code>"],
-     ["<code>STA</code>", "5.19 V", "U6A follower", "Fixed reference for the dump transistors"],
-     ["<code>STB</code>", "5.34 V at rest", "R68 / R69 from VREF5 and the control voltage",
+    [["<code>VREF5</code>", "5.75 V", "R60 / (R61+R62)", "Top of the reference chain"],
+     ["<code>VREFA</code>", "5.44 V", "R60+R61 / R62", "Buffered by U6A to become <code>STA</code>"],
+     ["<code>STA</code>", "5.44 V", "U6A follower", "Fixed reference for the dump transistors"],
+     ["<code>STB</code>", "5.59 V at rest", "R68 / R69 from VREF5 and the control voltage",
       "The controlled side &mdash; moves with compression"]],
     ["r", "n", "r", ""]) + """
+<p>The voltages are simulated at rest. <code>R60</code> is 24 k&Omega;: at the original
+47 k&Omega;, <code>R68</code> and <code>R69</code> loaded <code>VREF5</code> down to 3.60 V and
+the resting steer fell to 94 mV.</p>
 <p>At rest <code>STB</code> sits about <strong>150 mV above</strong> <code>STA</code>, which
 holds the cell fully on. As the control voltage goes negative, <code>R68</code>/<code>R69</code>
 drag <code>STB</code> down; when it passes about 120 mV <em>below</em> <code>STA</code> the cell
@@ -594,11 +636,16 @@ is at roughly 40 dB of gain reduction.</p>
 <p>That resting offset is set by <code>R61</code> (1k33) and <code>R62</code> (23k2), which is
 why both are 0.1% parts. If <code>VREFA</code> comes out too high, <code>STB</code> starts below
 <code>STA</code> and the module sits in permanent gain reduction.</p>
+<p><code>C22</code> filters this reference for <code>STA</code>'s side only. At its original
+47 &micro;F, <code>STA</code> lagged <code>STB</code> by about 60 ms whenever the control
+voltage pulled on the shared reference, and the simulation showed the gain overshooting by up
+to 20 dB on a fast attack. At 4.7 &micro;F the overshoot is about 1 dB.</p>
 
 <h2>Gain-reduction meter</h2>
 <p><code>R77</code> (3k9) and <code>LED1</code> hang off the control voltage. At rest the
-control line is at 0 V and the LED is dark; at full compression it is near &minus;10 V and the
-LED draws about 2 mA. Brightness tracks gain reduction directly &mdash; crude, but it costs two
+control line is at 0 V and the LED is dark; at full compression it is near &minus;8 V
+(simulated) and the LED draws about 2 mA. Brightness tracks gain reduction directly &mdash;
+crude, but it costs two
 components and tells you instantly whether the compressor is working.</p>
 <p><strong>This is now superseded.</strong> <a href="meters.html">Sheet 7</a> carries a proper
 seven-segment gain-reduction meter, and the panel has no hole for <code>LED1</code>. It is left
@@ -622,8 +669,9 @@ optional garnish, it is what stops one stage from talking to another through the
 
 <div class="note">
   <h4>Current budget</h4>
-  <p>About <strong>90 mA on +16 V and 70 mA on &minus;16 V</strong> typical, against the
-  130 mA per rail the 500-series specification allows. The asymmetry is the
+  <p>Simulated at rest: <strong>72 mA on +16 V and 62 mA on &minus;16 V</strong>, plus about
+  9 mA for the two lit meter LEDs, against the 130 mA per rail the 500-series specification
+  allows. The asymmetry is the
   <a href="meters.html">meter sheet</a>, whose display drivers and LEDs hang off the positive
   rail only. Worst-case NE5532s with a hard-driven output land near 140 mA on +16 V, which is
   over &mdash; that is a peak, not a steady state, but it is the number to watch. Building a
@@ -679,8 +727,9 @@ segments match without sorting parts. <code>RHI</code> ties to <code>REFOUT</cod
 <code>RLO</code> to ground, so each ladder spans 0 V to 5.05 V.</p>
 
 <h2>Gain reduction &mdash; U9</h2>
-<p>The control voltage <code>CTRL-B</code> rests at 0 V and swings to about &minus;10 V at full
-compression, so it needs inverting before a meter can read it. That much is easy. The problem is
+<p>The control voltage <code>CTRL-B</code> rests at 0 V and swings negative as the module
+compresses: about &minus;10 V by the design, &minus;8 V at the most reduction in simulation. It
+needs inverting before a meter can read it. That much is easy. The problem is
 what happens next.</p>
 <p><code>Q6</code> and <code>Q7</code> in the gain cell are an <strong>undegenerated</strong>
 differential pair, so gain follows control voltage as a sigmoid, not a line. Feed that to a
@@ -733,7 +782,7 @@ signal generator and a voltmeter.</p>
   produce a known amount of gain reduction, measured as the difference in output level with the
   threshold backed off and applied. Adjust <code>RV7</code> until the segment you want lights.
   Setting it at 19 dB on <code>D26</code> puts the rest of the scale where the table above
-  says.</li>
+  says. Set it against a measured <code>CTRL-B</code>, not the design's &minus;10 V.</li>
 </ul>
 
 <h2>What this costs the supply</h2>
@@ -743,10 +792,10 @@ signal generator and a voltmeter.</p>
      ["<code>U9</code> + <code>U10</code> quiescent", "~12 mA", "&mdash;"],
      ["Two lit LEDs at 4.6 mA", "9 mA", "&mdash;"],
      ["<strong>Added by this sheet</strong>", "<strong>~29 mA</strong>", "<strong>8 mA</strong>"],
-     ["<strong>Module total</strong>", "<strong>~90 mA</strong>", "<strong>~70 mA</strong>"]],
+     ["<strong>Module total</strong>, simulated at rest plus two lit LEDs", "<strong>~81 mA</strong>", "<strong>~62 mA</strong>"]],
     ["r", "n", "n"]) + """
-<p>Against the 130 mA per rail the 500-series specification allows, that still fits &mdash; but
-the +16 V margin is now about 40 mA rather than 70 mA. The driver quiescent figures are
+<p>Against the 130 mA per rail the 500-series specification allows, that still fits, with
+about 50 mA to spare on +16 V. The driver quiescent figures are
 datasheet typicals; this is the one number in the project worth measuring on the bench rather
 than trusting.</p>
 
@@ -757,6 +806,9 @@ than trusting.</p>
   every other dot/bar display driver they list. All thirteen, TI and Rohm alike, in every
   package. The dedicated analogue bargraph driver is an extinct product category, not a part
   that happens to be out of stock, so there is no drop-in replacement to name.</p>
+  <p>Altronics still lists the LM3914 (Z2670, low stock, held at its Cannington store when
+  checked on 3 October 2026) but not the LM3915, which isn't at Jaycar or element14 either.
+  Rochester Electronics, an authorised seller of obsolete TI parts, is the place to look.</p>
   <p>That leaves two routes. Source the LM391x from a distributor that still holds it and
   accept an end-of-life part in a new design; or rework this sheet around a comparator
   ladder &mdash; four LM339 quads cover fourteen thresholds and are stocked from about
@@ -773,8 +825,9 @@ than trusting.</p>
 
 <div class="note warn">
   <h4>Still open</h4>
-  <p>Nothing here has been built or simulated. The gain-reduction scale in particular comes from
-  a model of the steering pair, not from measurement &mdash; the shape is right, but expect to
+  <p>Nothing here has been built, and the simulation models the drivers only as their
+  reference and input, so the LEDs never light in it. The gain-reduction scale in particular
+  comes from a model of the steering pair, not from measurement &mdash; the shape is right, but expect to
   move <code>RV7</code> and to redraw the panel legend once a real one exists. <code>LED1</code>
   on sheet 6 is now superseded by this sheet and has no hole in the panel.</p>
 </div>
@@ -805,11 +858,11 @@ thing for another.</p>
     ["Control", "Ref", "What it does", "More"],
     [["THRESHOLD", "RV3", "How loud before compression starts", '<a href="sidechain.html">Sidechain</a>'],
      ["RATIO", "RV4", "How much gain reduction per dB over threshold", '<a href="sidechain.html">Sidechain</a>'],
-     ["ATTACK", "RV5", "How fast it clamps down, 2.7&ndash;50 ms", '<a href="sidechain.html">Sidechain</a>'],
-     ["RELEASE", "RV6", "How fast it lets go, 47 ms&ndash;2.2 s", '<a href="sidechain.html">Sidechain</a>'],
+     ["ATTACK", "RV5", "How fast it clamps down, 2&ndash;71 ms", '<a href="sidechain.html">Sidechain</a>'],
+     ["RELEASE", "RV6", "How fast it lets go, 49 ms&ndash;3.5 s", '<a href="sidechain.html">Sidechain</a>'],
      ["MAKEUP", "RV2", "Level put back after compression, 0 to +21 dB", '<a href="output.html">Output</a>'],
      ["BYPASS", "SW1", "Hard bypass &mdash; rack straight through", '<a href="output.html">Output</a>'],
-     ["HPF", "SW3", "Defeats the 72 Hz sidechain filter", '<a href="sidechain.html">Sidechain</a>'],
+     ["HPF", "SW3", "Defeats the sidechain high-pass filter", '<a href="sidechain.html">Sidechain</a>'],
      ["KEY", "SW2", "Detector listens here, or to the aux input", '<a href="sidechain.html">Sidechain</a>'],
      ["LINK", "SW4", "Ties this detector to the module beside it", '<a href="sidechain.html">Sidechain</a>']],
     ["", "r", "", ""]) + """
@@ -827,8 +880,8 @@ panel.</p>
 <div class="note">
   <h4>The meters have a circuit now</h4>
   <p>The fourteen LEDs are driven by <a href="meters.html">sheet 7</a>: two LM391x display
-  drivers in dot mode, fed by a peak detector and a level shifter. They add about 29 mA to the
-  +16 V rail, taking the module to roughly 90 mA of the 130 mA the rack allows.</p>
+  drivers in dot mode, fed by a peak detector and a level shifter. With two LEDs lit the
+  module draws about 81 mA of the 130 mA the rack allows on +16 V.</p>
 </div>
 
 <h2>Three layouts</h2>
@@ -890,13 +943,15 @@ the repository, alongside the DXF.</p>
 
 <div class="note warn">
   <h4>Before you have one made</h4>
-  <p>The holes are &Oslash;7.2 for the Alps RK09K pots, &Oslash;5.2 for the Jaycar
-  sub-miniature toggles and &Oslash;2.2 for the 2 mm LEDs. Check them against the parts you
-  actually buy &mdash; half a millimetre is the difference between a push fit and a rattle.</p>
-  <p>The toggles' bushing is only 4.06 mm long, which leaves under 1 mm of thread for the nut
-  through a standard 3.18 mm panel. Either counterbore the back of the panel to about 2 mm
-  round those four holes, or use a 1.6 to 2 mm panel. Depth is covered on
-  <a href="boards.html">the boards</a> page.</p>
+  <p>The holes are &Oslash;7.2 for the 9 mm pots, &Oslash;6.5 for the Salecom S1315 and
+  S1350 mini toggles and &Oslash;2.2 for the 2 mm LEDs. Altronics has no 2 mm LEDs: if you fit
+  its 3 mm flangeless ones instead, open the meter holes to &Oslash;3.1. Check every hole
+  against the parts you actually buy &mdash; half a millimetre is the difference between a push
+  fit and a rattle.</p>
+  <p>The toggles' 8.9 mm bushing leaves about 5.5 mm of thread through a standard 3.18 mm panel,
+  plenty for the nut. The pots' 5 mm bushing leaves under 2 mm, so either counterbore the back
+  of the panel to about 2 mm round the five pot holes, or use a 1.6 to 2 mm panel. Depth is
+  covered on <a href="boards.html">the boards</a> page.</p>
 </div>
 """)
 
@@ -956,6 +1011,12 @@ the same net names, in the front board's own schematic.</p>
       chip a swap rather than a desoldering job.</li>
   <li><strong>The trimmers</strong> <code>RV1</code>, <code>RV7</code> and <code>RV8</code>
       stay on the main board. They are set once at bring-up.</li>
+  <li><strong>The film capacitors</strong> have footprints for real parts. <code>C5</code>,
+      <code>C8</code>, <code>C15</code> (10 &micro;F) and <code>C9</code>, <code>C10</code>
+      (4.7 &micro;F) are TDK B32562 boxes on a 15 mm pitch; <code>C14</code> and
+      <code>C35</code> (2.2 &micro;F) are KEMET MMK5 on 5 mm. Nothing that size fits the
+      original 5 mm outlines, so the board was re-placed and re-routed around them on
+      2 October.</li>
 </ul>
 <p>The front edge of the board is set back 24 mm from the panel to clear the front board, its
 header and the ribbon plug.</p>
@@ -967,27 +1028,32 @@ reference netlist, <code>tools/design.py</code>. That comparison caught a wire j
 
 <h2>The front board</h2>
 <ul>
-  <li><strong>Pots:</strong> Alps RK09K, vertical, for THRESHOLD, RATIO, ATTACK, RELEASE and
-      MAKEUP.</li>
-  <li><strong>Toggles:</strong> Jaycar ST0300 sub-miniature SPDT for HPF, KEY and LINK, and the
-      ST0310 DPDT for BYPASS.</li>
+  <li><strong>Pots:</strong> 9 mm vertical, on the Alps RK09K footprint, for THRESHOLD, RATIO,
+      ATTACK, RELEASE and MAKEUP. Altronics' 9 mm pots (R1946 and family) share its pins and
+      lugs, and the <a href="parts.html">parts list</a> uses them: 100 k&Omega; log for
+      THRESHOLD, 100 k&Omega; for RATIO, 10 k&Omega; for ATTACK and MAKEUP and 1 M&Omega; for
+      RELEASE. The RK09K itself stops at 100 k&Omega;.</li>
+  <li><strong>Toggles:</strong> Altronics' Salecom mini toggles, the S1315 SPDT for HPF, KEY and
+      LINK and the S1350 DPDT for BYPASS. The S1332 centre-off fits the SPDT footprint if you
+      want one.</li>
   <li><strong>Meters:</strong> the fourteen LEDs in two columns, with the LM3914 and LM3915
       (<code>U9</code>, <code>U10</code>) either side. The driver chips are soldered rather than
       socketed, because a socket would overlap the LEDs.</li>
   <li><strong>On the back:</strong> the ribbon header <code>J1</code> and <code>C38</code>,
       which is too tall for the panel side.</li>
 </ul>
-<p>The toggle bodies are 8.64 mm deep and rest on the board, so the board sits <strong>about
-8.7 mm behind the panel</strong>. That sets two things: the LEDs need spacers of about 6 mm to
-reach their holes, and the pots probably stand a little short of the panel, which a nut behind
-the panel can make up.</p>
+<p>The pot bodies stand 10.6 mm off the board and the toggles 10.4 mm, so the board sits
+<strong>about 10.6 mm behind the panel</strong>, with the pots resting against it. The LEDs
+need spacers of about 8 mm to reach their holes.</p>
 
 <h2>Joining and fixing them</h2>
 <ul>
   <li><strong>Ribbon.</strong> 30-way, 2.54 mm pitch, with an IDC socket crimped on each end. It
       carries 24 signals with ground between the audio pairs. The main board's <code>J2</code>
       is a shrouded header but the front board's <code>J1</code> is a plain one, so it is not
-      keyed: put the red stripe on pin 1 at both ends (pin 1 is marked on the silkscreen).</li>
+      keyed: put the red stripe on pin 1 at both ends (pin 1 is marked on the silkscreen).
+      Altronics' P1023, a 150 mm 30-way socket-to-socket strip, does the same job with no
+      crimping.</li>
   <li><strong>Ribbon length.</strong> About 150 mm, folded once. It depends on where the board
       sits in your rack, so lay the boards out before crimping.</li>
   <li><strong>Front board to panel:</strong> just the nine bushing nuts.</li>
@@ -1004,26 +1070,249 @@ module.</p>
 <p>Every part has a 3D model, so KiCad's 3D viewer and a STEP export for the Fusion 360
 assembly show both boards complete. The pots use Alps' own RK09K model, which is not kept in
 the repository: run <code>sh tools/get_3d_models.sh</code> once to download it. The toggles use
-simple models built to the Jaycar datasheet.</p>
+simple models of the Salecom parts. The renders on this site stand a plain block and shaft in
+for the pots, because Alps' download is out of reach where they are made.</p>
 
 <div class="note warn">
   <h4>Check before ordering boards</h4>
   <ul>
-    <li><strong>Some tracks need tidying by hand.</strong> The routing passes DRC but has not
-        been reviewed: a few autorouted runs want straightening, including the input and output
-        pairs, bottom-layer runs that split the ground pour, and the timing node at
-        <code>C15</code> and <code>U4</code>.</li>
-    <li><strong>The ST0310's lug rows are unmeasured.</strong> Jaycar publishes no drawing for
-        it, so its footprint assumes the ST0300's 2.54 mm pitch with rows 4.7 mm apart. Measure
-        one first.</li>
-    <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the toggles under 1 mm of
-        thread: counterbore those holes or use a thinner panel
+    <li><strong>The main board needs tidying by hand.</strong> It was re-placed and re-routed
+        by script for the film capacitors. It passes DRC with nothing unconnected, but the
+        <code>TIMING</code> node and <code>Q3</code>'s emitter run longer than they need to,
+        and no one has reviewed the routing yet.</li>
+    <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the pots under 2 mm of
+        thread: counterbore the pot holes or use a thinner panel
         (<a href="panel.html">front panel</a>).</li>
-    <li><strong>Pot height and ribbon length</strong> are estimates until the parts are in hand
-        and the boards are in a rack.</li>
+    <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, THRESHOLD and RATIO turn
+        the opposite way to the panel legend (see <a href="simulation.html">the
+        simulation</a>).</li>
+    <li><strong>Ribbon length</strong> is an estimate until the boards are in a rack.</li>
   </ul>
 </div>
 """)
+
+# ============================================================ 11 SIMULATION
+SIM = 'https://github.com/UTS-500-Series/Compressor/blob/main/kicad/sim/README.md'
+PAGES['simulation.html'] = ("The simulation", """
+<p class="eyebrow">Practical</p>
+<h1>The simulation</h1>
+<p class="lede">Before any boards were ordered, the schematic was run in ngspice, the simulator
+inside KiCad. It works as a compressor, but it showed several of the values as first drawn
+were wrong. Fourteen parts changed, and the whole module was simulated again once the boards had
+been re-laid out for them.</p>
+
+""" + pic("sim-compression.png", "Output against input at five THRESHOLD settings, RATIO at the hard end") + """
+
+<h2>How it was simulated</h2>
+<p>Straight from the seven-sheet schematic these pages document, so what was tested is what is
+drawn. KiCad 10's <code>kicad-cli</code> exports the netlist and ngspice 42 runs it, the same
+engine as KiCad's own <em>Inspect &rarr; Simulator</em>.</p>
+<ul>
+  <li><strong>Models.</strong> Philips' model for the BC549C, vendor models for the diodes, and a
+      behavioural NE5532 with the real part's gain, bandwidth, slew rate, swing and current
+      limit. TI's own NE5532 macromodel stalls the solver once the meter's peak detector swings.
+      The LM3914 and LM3915 are stand-ins for their reference and input only.</li>
+  <li><strong>Test bench.</strong> A text block on the root sheet supplies &plusmn;16 V, a
+      balanced 1 kHz source and a 10 k&Omega; load on each output leg. Every knob and switch is a
+      <code>.param</code> from 0 to 1, so settings change without editing parts.</li>
+  <li><strong>Tests.</strong> The DC operating point, an AC sweep, slow input ramps for the
+      compression curves, a tone burst for attack and release, and distortion from an FFT.</li>
+  <li><strong>Limits.</strong> The op amp model has no noise and no distortion of its own below
+      clipping, so noise was not simulated and the distortion figures are the gain cell's. The
+      meter LEDs never light.</li>
+</ul>
+<p>Levels are balanced dBu at 1 kHz, with makeup at 0 and attack and release at half travel
+unless it says otherwise.</p>
+
+<h2>Against the targets</h2>
+""" + table(
+    ["", "As first drawn", "Now", "Target"],
+    [["Gain at 1 kHz, balanced in to out", "+5.8 dB", "&minus;0.1 dB", "0 dB"],
+     ["<code>RV1</code> trim range", "+4.9 to +6.8 dB", "+0.9 to &minus;1.0 dB", "Covers 0 dB"],
+     ["&minus;3 dB points", "22 Hz, 60 kHz", "5.6 Hz, 60 kHz", "20 Hz to 20 kHz"],
+     ["Threshold, 1 dB of reduction", "&minus;9 to above +20 dBu", "&minus;21 to +19 dBu", "&minus;20 to +14 dBu"],
+     ["Threshold per quarter turn of <code>RV3</code>", "&minus;9, +14, then above +20", "&minus;21, &minus;10, 0, +10, +19", "Evenly spread"],
+     ["Most reduction, +22 dBu in", "22 dB", "36 dB", "About 40 dB"],
+     ["Attack, fastest to slowest", "1 to 14 ms", "2 to 71 ms", "2.7 to 50 ms"],
+     ["Release, fastest to slowest", "20 ms to 0.44 s", "49 ms to 3.5 s", "47 ms to 2.2 s"],
+     ["Resting steer, <code>VREF5</code>", "94 mV, 3.60 V", "150 mV, 5.75 V", "150 mV, 5.49 V"],
+     ["<code>CTRL-B</code> at most reduction", "&minus;4.5 V", "&minus;8.0 V", "&minus;10 V"],
+     ["Supply at rest, +16 / &minus;16 V", "72 / 61 mA", "72 / 62 mA", "About 60 mA"]],
+    ["", "n", "n", "n"]) + """
+
+<h2>What changed</h2>
+<p>Every miss traced to a component value, not to the circuit. No connections moved. The same
+values are on the sheets, both boards and <code>tools/design.py</code>.</p>
+""" + table(
+    ["Part", "Was", "Now", "Why"],
+    [["<code>R21</code>, <code>R22</code>", "3k3", "6k8", "Halves the recovery amp's gain: the module is unity and BYPASS matches (<a href=\"input.html#errata\">the sum</a>)"],
+     ["<code>C9</code>, <code>C10</code>", "2u2", "4u7", "With the larger R21/R22, the bass corner falls from 22 Hz to 5.6 Hz"],
+     ["<code>R36</code>", "100k", "82k", "With R35 and RV3, sets the detector's gain range"],
+     ["<code>RV3</code>", "1M linear", "100k audio", "Spreads the threshold evenly over the knob"],
+     ["<code>R35</code>", "20k", "1k", "Sets the lowest threshold at about &minus;20 dBu"],
+     ["<code>R38</code>, <code>C14</code>", "10k, 220n", "1k, 2u2", "Keeps the sidechain high-pass at 80&ndash;160 Hz; the small R35 had pushed it to 400 Hz"],
+     ["<code>R60</code>", "47k", "24k", "Restores the 150 mV resting steer"],
+     ["<code>C22</code>", "47u", "4u7", "Stops the gain overshooting by up to 20 dB on a fast attack"],
+     ["<code>R47</code>", "4k7", "15k", "Fastest release near 47 ms; the release pot loads the detector less"],
+     ["<code>RV5</code>", "4k7", "10k", "The 9 mm pots Altronics stocks come in 10k, 100k and 1M"],
+     ["<code>RV6</code>", "220k", "1M", "The same; slows the slowest release past 2.2 s"]],
+    ["r", "n", "n", ""]) + """
+
+<h3>Two things nobody expected</h3>
+<p><strong><code>C22</code>.</strong> It filters the steering reference for one side of the pair
+only. When the control voltage pulled the shared reference down, that side lagged by about
+60 ms, so the gain kept falling after the control voltage had settled: up to 20 dB of overshoot
+on a fast attack. The static curves looked fine; only the burst test showed it. At 4.7 &micro;F
+the overshoot is about 1 dB.</p>
+<p><strong><code>R38</code> and <code>C14</code>.</strong> The small <code>R35</code> that gives
+the threshold its range also loads the sidechain high-pass filter, which pushed its corner from
+80 Hz to 400 Hz at the lowest threshold. A 1 k&Omega; <code>R38</code> makes that load minor at
+every knob position, and a 2.2 &micro;F <code>C14</code> brings the corner back down.</p>
+
+""" + pic("sim-attack_release.png", "Attack and release: gain against time for a burst about 20 dB over the threshold") + """
+
+<h2>Distortion</h2>
+<p>The point of a current-steering cell is that distortion stays flat as it compresses, and it
+does:</p>
+""" + table(
+    ["Condition", "Out", "Gain reduction", "THD"],
+    [["+4 dBu in, not compressing", "+3.9 dBu", "0", "0.008%"],
+     ["+4 dBu in, makeup at full", "+24.7 dBu", "0", "0.010%"],
+     ["+8 dBu in, threshold at &frac14;", "&minus;5.9 dBu", "13.8 dB", "0.013%"],
+     ["+8 dBu in, threshold lowest", "&minus;15.5 dBu", "23.3 dB", "0.026%"],
+     ["+16 dBu in, threshold lowest", "&minus;14.7 dBu", "30.5 dB", "0.031%"],
+     ["+16 / +20 / +22 dBu in, not compressing", "", "0", "0.033 / 0.057 / 0.079%"],
+     ["+24 dBu in, not compressing", "", "0", "6.2%, the input stage clipping"]],
+    ["", "n", "n", "n"]) + """
+
+""" + pic("sim-frequency.png", "Frequency response, balanced in to out") + """
+
+<h2>What still misses</h2>
+<ul>
+  <li><strong>36 dB of reduction, not 40.</strong> The input stage clips at about +23 dBu on
+      &plusmn;16 V, so 40 dB would need a threshold near &minus;30 dBu. The target is better
+      restated as 36 dB of usable reduction.</li>
+  <li><strong>The slow ends of ATTACK and RELEASE run long</strong>, 71 ms and 3.5 s against
+      50 ms and 2.2 s, because the pots are the values Altronics stocks. A 4.7 k&Omega; and a
+      500 k&Omega; from elsewhere give 34 ms and 1.8 s.</li>
+  <li><strong>Times depend on level.</strong> They are the time to 63% of the change in gain for
+      a burst 20 dB over the threshold. Harder hits are faster.</li>
+  <li><strong>The ratio rises with level.</strong> With RATIO at the hard end the knee is soft:
+      about 4:1 just above the threshold, 6:1 to 11:1 by 20 dB over. That is normal for a
+      feedback design.</li>
+  <li><strong><code>CTRL-B</code> reaches &minus;8 V, not &minus;10 V.</strong> Set the
+      gain-reduction meter's <code>RV7</code> against a measured <code>CTRL-B</code>.</li>
+  <li><strong>Supply is about 72 / 62 mA at rest</strong>, a little over the 60 mA in the
+      brief, and the lit meter LEDs add about 9 mA on +16 V. Still well inside the rack's
+      130 mA.</li>
+</ul>
+
+<div class="note warn">
+  <h4>Check by hand before ordering</h4>
+  <p>On the usual convention pin 3 is the clockwise end of a pot. If that holds for these pots,
+  THRESHOLD and RATIO turn the opposite way to the panel legend. Swapping their outer pins fixes
+  it, and <code>RV3</code> then needs a reverse-log (C) taper. MAKEUP, ATTACK and RELEASE turn
+  the expected way.</p>
+</div>
+
+<h2>Running it yourself</h2>
+<p>Open <code>kicad/UTS Mini Mixing Desk - Compressor.kicad_pro</code> in KiCad 10, then
+<em>Inspect &rarr; Simulator</em>. A transient run of <code>.tran 10u 0.6 0 20u</code> or an AC
+sweep from 10 Hz to 100 kHz both work; probe <code>OUT_DIFF</code> for the output and
+<code>CTRL-B</code> for the control voltage. The knobs are the <code>.param</code> lines at the
+bottom of the root sheet. <code>tools/sim/run_all.py</code> reproduces everything on this page
+from the command line, in about an hour.</p>
+<p>The full write-up, with every number and how it was measured, is
+<a href=\"""" + SIM + """\">kicad/sim/README.md</a> in the compressor repository.</p>
+""")
+
+# ============================================================ 12 PARTS
+import csv, html, os
+_BOM = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'site', 'compressor',
+                    'parts', 'altronics.csv')
+
+
+def _bom_rows():
+    rows = list(csv.reader(open(_BOM, newline='')))
+    head, body = rows[0], [r for r in rows[1:] if r and r[0]]
+    total = next(r for r in rows[1:] if r and not r[0] and 'total' in ' '.join(r))
+    return head, body, total
+
+
+def _bom_table(body, board):
+    e = lambda s: html.escape(s, quote=False)
+    out = []
+    for r in body:
+        if r[0] != board:
+            continue
+        refs, value, qty, code, desc, _, packs, _, line, stock, notes, alt = r[1:13]
+        if code == 'NOT STOCKED':
+            part = '<em>not stocked</em>'
+            notes = ' '.join(x for x in (notes, alt and 'Instead: ' + alt) if x)
+        else:
+            # the pack count, or "see C36" where another line already orders this part
+            part = '<code>%s</code> &times;&nbsp;%s' % (e(code), e(packs)) if packs[:1].isdigit() \
+                else '<code>%s</code>, %s' % (e(code), e(packs))
+            if board == 'hardware':
+                notes = ' '.join(x for x in (desc + '.', notes) if x)
+        out.append([e(refs.replace(' ', ', ')) or e(desc), e(value), part,
+                    line and '$' + line, e(notes)])
+    return table(["Parts", "Value", "Altronics &times; packs", "Line", "Notes"], out,
+                 ["", "", "", "n", ""])
+
+
+def _parts_page():
+    head, body, total = _bom_rows()
+    stock_date = head[10].rsplit(' on ', 1)[-1]
+    alt = sum(float(r[9]) for r in body if r[9])
+    return ("Parts list", """
+<p class="eyebrow">Practical</p>
+<h1>Parts list</h1>
+<p class="lede">Every part for both boards, chosen from what Altronics had in stock where it
+could be. What Altronics doesn't sell comes from element14.</p>
+
+<dl class="spec">
+  <div><dt>Altronics</dt><dd>$%.2f</dd></div>
+  <div><dt>element14 film caps</dt><dd>~$64.63</dd></div>
+  <div><dt>Prices</dt><dd>inc GST, no postage</dd></div>
+  <div><dt>Stock checked</dt><dd>%s</dd></div>
+</dl>
+
+<p>The Altronics column gives the catalogue code and how many packs to order, so parts sold
+in tens are already covered. The whole list is
+also a spreadsheet: <a href="parts/altronics.csv">altronics.csv</a>, built from the board files by
+<code>tools/bom_altronics.py</code> in the compressor repository.</p>
+
+<div class="note warn">
+  <h4>Not from Altronics</h4>
+  <ul>
+    <li><strong>Film capacitors.</strong> Altronics' film range stops at 1 &micro;F on a 5 mm
+        pitch. <code>C5</code>, <code>C8</code>, <code>C15</code>, <code>C9</code>,
+        <code>C10</code>, <code>C14</code> and <code>C35</code> are drawn for the TDK and KEMET
+        parts named below, about $64.63 from element14. <code>C15</code> must be film: an
+        electrolytic leaks and shortens the release.</li>
+    <li><strong><code>R61</code> and <code>R62</code></strong> are 0.1%% parts in values
+        Altronics doesn't stock.</li>
+    <li><strong>The LM3915</strong> isn't stocked anywhere mainstream; see
+        <a href="meters.html">the meters</a>. The LM3914 is low stock.</li>
+    <li><strong>The 2 mm meter LEDs.</strong> Altronics has 3 mm flangeless ones, which fit the
+        footprint but need the panel's meter holes opened to &Oslash;3.1.</li>
+  </ul>
+</div>
+
+<h2>Main board</h2>
+%s
+
+<h2>Front board</h2>
+%s
+
+<h2>Hardware</h2>
+%s
+""" % (alt, stock_date, _bom_table(body, 'main'), _bom_table(body, 'front'),
+       _bom_table(body, 'hardware')))
+
+
+PAGES['parts.html'] = _parts_page()
 
 # ============================================================ 09 USING
 PAGES['using.html'] = ("Setting up &amp; using it", """
@@ -1037,13 +1326,13 @@ wrong.</p>
     ["Control", "Ref", "What it does"],
     [["Threshold", "RV3", "How loud the signal must be before compression starts. Clockwise = lower threshold = more compression."],
      ["Ratio", "RV4", "How much gain reduction per dB over threshold. Clockwise = harder."],
-     ["Attack", "RV5", "How fast it clamps down. 2.7&ndash;50 ms."],
-     ["Release", "RV6", "How fast it lets go. 47 ms&ndash;2.2 s."],
+     ["Attack", "RV5", "How fast it clamps down. 2&ndash;71 ms, simulated."],
+     ["Release", "RV6", "How fast it lets go. 49 ms&ndash;3.5 s, simulated."],
      ["Makeup", "RV2", "Level put back after compression. 0 to +21 dB."],
      ["Unity trim", "RV1", "Set once at bring-up. Not a performance control."],
      ["Bypass", "SW1", "Hard bypass &mdash; audio goes straight through the rack."],
      ["Key int/ext", "SW2", "Detector listens to this channel, or to the aux input."],
-     ["HPF defeat", "SW3", "Shorts out the 72 Hz detector filter."],
+     ["HPF defeat", "SW3", "Shorts out the detector's high-pass filter."],
      ["Link", "SW4", "Ties this detector to the other module on pin 6."]],
     ["", "r", ""]) + """
 
@@ -1063,8 +1352,8 @@ ever goes near a rack.</p>
       backplane <em>before</em> inserting. Check the drop across <code>R50</code> and
       <code>R51</code> &mdash; more than 1 V (100 mA) with no signal means something is wrong.</li>
   <li><strong>References.</strong> <code>VBIAS</code> = 2.23 V &plusmn;0.05.
-      <code>&minus;5V1</code> = &minus;5.1 V &plusmn;0.15. <code>VREF5</code> = 5.49 V,
-      <code>VREFA</code> = 5.19 V.</li>
+      <code>&minus;5V1</code> = &minus;5.1 V &plusmn;0.15. <code>VREF5</code> &asymp; 5.75 V,
+      <code>VREFA</code> &asymp; 5.44 V (simulated).</li>
   <li><strong>Tail current.</strong> Measure across <code>R18</code>: about 4.45 V, i.e. ~3 mA.
       Anywhere from 2.7 to 3.2 mA is fine &mdash; gain is set by the steering ratio, not by this
       current.</li>
@@ -1100,7 +1389,8 @@ ever goes near a rack.</p>
 <h2>Project files</h2>
 <ul>
   <li><code>kicad/</code> &mdash; the hierarchical schematic these pages document, seven sheets,
-      KiCad 9.</li>
+      KiCad 10. It simulates in KiCad's own simulator.</li>
+  <li><code>kicad/sim/</code> &mdash; the simulation's models, results and write-up.</li>
   <li><code>kicad_withpcb/compressor_with_pcb/</code> &mdash; the single-sheet schematic and the
       main board, KiCad 10.</li>
   <li><code>kicad_withpcb/compressor_front/</code> &mdash; the front board. Run
@@ -1108,6 +1398,8 @@ ever goes near a rack.</p>
   <li><code>tools/design.py</code> &mdash; the authoritative netlist as data.
       The schematic is generated and verified against it.</li>
   <li><code>panel/</code> &mdash; the faceplate generator: mockups, a 1:1 drawing and DXF.</li>
+  <li><code>bom/altronics.csv</code> &mdash; the <a href="parts.html">parts list</a>, built by
+      <code>tools/bom_altronics.py</code>.</li>
   <li>This site lives in its own repository,
       <a href="https://github.com/UTS-500-Series/UTS-500-Series.github.io">UTS-500-Series.github.io</a>,
       and its README explains how to regenerate these pages.</li>
@@ -1116,4 +1408,4 @@ ever goes near a rack.</p>
 
 
 import content_files
-PAGES['files.html'] = content_files.page('compressor', '12')
+PAGES['files.html'] = content_files.page('compressor', '14')

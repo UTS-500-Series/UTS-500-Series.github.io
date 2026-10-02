@@ -36,9 +36,9 @@ try {
 <p class="lede">Three ways to get a pot shaft through the panel, and when each one makes
 sense.</p>
 <div class="tw"><table><thead><tr><th class="r">Approach</th><th class="">How it works</th><th class="">Good for</th><th class="">Watch out for</th></tr></thead><tbody><tr><td class="r"><strong>Front board</strong> (use)</td><td class="">A small board parallel to the panel carries vertical pots, PCB-mount toggles and LEDs. Pot nuts clamp it to the panel. A connector or ribbon cable joins it to the main board.</td><td class="">Several columns of controls, meters, anything dense. Hole positions come straight from the KiCad layout.</td><td class="">Two boards to design and order. The joint between them needs planning.</td></tr><tr><td class="r"><strong>Right-angle parts on the main board</strong></td><td class="">Pots and switches with bent legs (KiCad's <em>Horizontal</em> footprints) sit along the main board's front edge, shafts pointing forward through the panel. An L-bracket joins board and panel.</td><td class="">One column of controls on a single line. Simple modules like a preamp.</td><td class="">Every shaft sits at the same distance from the board, so all controls end up in one column. Shaft height has to match the board offset.</td></tr><tr><td class="r"><strong>Panel-mounted, wired</strong> (prototype)</td><td class="">Controls bolt to the panel and wires run to headers on the main board.</td><td class="">A first prototype, or when parts arrive before the boards.</td><td class="">Lots of hand wiring, easy to cross two wires, and long wires on audio-path pots can pick up hum.</td></tr></tbody></table></div>
-<p>The compressor's pot footprints (Alps RK09K <em>Vertical</em>) are already the right type
-for a front board. Its switches currently land on header sockets, which suits the wired
-approach but works as the board-to-board connector too.</p>
+<p>The compressor's pot footprints (Alps RK09K <em>Vertical</em>) are the right type for a
+front board, and Altronics' 9 mm pots share them. Its toggles are PCB-mount Salecom mini
+toggles on the same front board.</p>
 
 <div class="next"><a href="index.html">&larr; How a module fits</a><a href="positions.html">Get the positions right &rarr;</a></div>
 <footer>

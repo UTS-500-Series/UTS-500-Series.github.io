@@ -35,7 +35,7 @@ class Module:
 MODULES = [
     Module('compressor', 'Compressor',
            'Feedback compressor built round a discrete current-steering gain cell. '
-           'Both boards laid out and routed.',
+           'Both boards laid out and routed, simulated, and a parts list from Altronics.',
            'designed',
            'How the UTS Mini Mixing Desk compressor module works, section by section.',
            'documentation generated from the KiCad project',
