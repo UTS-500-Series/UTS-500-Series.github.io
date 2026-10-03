@@ -237,7 +237,7 @@ copper is what makes that worthwhile.</p>
             ["r", "", ""]) + """
 <div class="note">
   <h4>Meter current</h4>
-  <p>The LM3914 and LM3915 drivers switch up to 14 LEDs on and off, which draws pulses of
+  <p>The two LM3914 drivers switch up to 20 LEDs on and off, which draws pulses of
   current. Give U9, U10, the LEDs and C38 their own ground track back towards the power entry,
   and join it to the main pour there. If those pulses flow through the pour under the audio
   stages, they can be heard as a faint buzz that follows the meters.</p>

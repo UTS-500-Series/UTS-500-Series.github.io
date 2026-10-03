@@ -174,7 +174,7 @@ PAGES['front-board.html'] = ("Design the front board", """
   <li><strong>Size the outline</strong> to about 34 &times; 110 mm. It must clear the panel edges
   (the panel is 37.8 mm wide once trimmed) and stay about 10 mm clear of each mounting hole, so
   the countersunk screw heads and rack rails don't hit it.</li>
-  <li><strong>Move the meters onto it.</strong> The two LED bargraphs need 14 LED lines between
+  <li><strong>Move the meters onto it.</strong> The two LED bargraphs need 20 LED lines between
   them. With U9, U10 and their resistors on the front board, only the two meter signals, power
   and ground cross between the boards. The same applies to anything that exists only to drive
   the panel.</li>
@@ -305,7 +305,7 @@ description.</p>
   <li><strong>Layout:</strong> the <code>toggle</code> layout, five single RK09K pots with four
   toggles beside them. The dual-concentric and pull-switch layouts were dropped.</li>
   <li><strong>Front board:</strong> 35 &times; 110 mm, carrying the pots, the Salecom S1315 and
-  S1350 toggles, both meters and their LM3914/LM3915 drivers. It sits about 10.6 mm behind the
+  S1350 toggles, both meters and their two LM3914 drivers. It sits about 10.6 mm behind the
   panel with the pot bodies resting on it, held only by the bushing nuts.</li>
   <li><strong>Master:</strong> the panel and its holes are drawn on the front board's
   User.Drawings layer with the origin on the panel's top-left corner, and

@@ -38,7 +38,7 @@ copper is what makes that worthwhile.</p>
 <div class="tw"><table><thead><tr><th class="r">Net</th><th class="">Comes from</th><th class="">How to lay it out</th></tr></thead><tbody><tr><td class="r"><code>AGND</code></td><td class="">J1 pin 5</td><td class="">The audio reference. Make it a copper pour covering most of the bottom layer, so every part has a short, low-impedance path to it.</td></tr><tr><td class="r"><code>PGND</code></td><td class="">J1 pin 13</td><td class="">The rack's power return. It joins AGND at one point only, through R48 (0 &Omega;). Place R48 near the power entry and route PGND as a single track from pin 13 to it, with no pour.</td></tr><tr><td class="r"><code>CHASSIS</code></td><td class="">J1 pin 1</td><td class="">The metalwork. It joins AGND through R52 (100 &Omega;) and C18 (10 nF). Keep both next to pin 1. Chassis also reaches the faceplate through pot bushings and the bracket.</td></tr></tbody></table></div>
 <div class="note">
   <h4>Meter current</h4>
-  <p>The LM3914 and LM3915 drivers switch up to 14 LEDs on and off, which draws pulses of
+  <p>The two LM3914 drivers switch up to 20 LEDs on and off, which draws pulses of
   current. Give U9, U10, the LEDs and C38 their own ground track back towards the power entry,
   and join it to the main pour there. If those pulses flow through the pour under the audio
   stages, they can be heard as a faint buzz that follows the meters.</p>
