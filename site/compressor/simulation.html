@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The simulation &middot; UTS Mini Mixing Desk &mdash; Compressor</title>
+<meta name="description" content="How the UTS Mini Mixing Desk compressor module works, section by section.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="simulation.html" class="on"><i>11</i><span>The simulation</span></a><a href="parts.html"><i>12</i><span>Parts list</span></a><a href="using.html"><i>13</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>14</i><span>Design files</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Practical</p>
+<h1>The simulation</h1>
+<p class="lede">Before any boards were ordered, the schematic was run in ngspice, the simulator
+inside KiCad. It works as a compressor, but it showed several of the values as first drawn
+were wrong. Fourteen parts changed, and the whole module was simulated again once the boards had
+been re-laid out for them.</p>
+
+<figure>
+  <div class="pane tall"><img src="img/sim-compression.png" alt="Output against input at five THRESHOLD settings, RATIO at the hard end" loading="lazy"></div>
+  <figcaption><span>Output against input at five THRESHOLD settings, RATIO at the hard end</span><a href="img/sim-compression.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<h2>How it was simulated</h2>
+<p>Straight from the seven-sheet schematic these pages document, so what was tested is what is
+drawn. KiCad 10's <code>kicad-cli</code> exports the netlist and ngspice 42 runs it, the same
+engine as KiCad's own <em>Inspect &rarr; Simulator</em>.</p>
+<ul>
+  <li><strong>Models.</strong> Philips' model for the BC549C, vendor models for the diodes, and a
+      behavioural NE5532 with the real part's gain, bandwidth, slew rate, swing and current
+      limit. TI's own NE5532 macromodel stalls the solver once the meter's peak detector swings.
+      The LM3914 and LM3915 are stand-ins for their reference and input only.</li>
+  <li><strong>Test bench.</strong> A text block on the root sheet supplies &plusmn;16 V, a
+      balanced 1 kHz source and a 10 k&Omega; load on each output leg. Every knob and switch is a
+      <code>.param</code> from 0 to 1, so settings change without editing parts.</li>
+  <li><strong>Tests.</strong> The DC operating point, an AC sweep, slow input ramps for the
+      compression curves, a tone burst for attack and release, and distortion from an FFT.</li>
+  <li><strong>Limits.</strong> The op amp model has no noise and no distortion of its own below
+      clipping, so noise was not simulated and the distortion figures are the gain cell's. The
+      meter LEDs never light.</li>
+</ul>
+<p>Levels are balanced dBu at 1 kHz, with makeup at 0 and attack and release at half travel
+unless it says otherwise.</p>
+
+<h2>Against the targets</h2>
+<div class="tw"><table><thead><tr><th class=""></th><th class="n">As first drawn</th><th class="n">Now</th><th class="n">Target</th></tr></thead><tbody><tr><td class="">Gain at 1 kHz, balanced in to out</td><td class="n">+5.8 dB</td><td class="n">&minus;0.1 dB</td><td class="n">0 dB</td></tr><tr><td class=""><code>RV1</code> trim range</td><td class="n">+4.9 to +6.8 dB</td><td class="n">+0.9 to &minus;1.0 dB</td><td class="n">Covers 0 dB</td></tr><tr><td class="">&minus;3 dB points</td><td class="n">22 Hz, 60 kHz</td><td class="n">5.6 Hz, 60 kHz</td><td class="n">20 Hz to 20 kHz</td></tr><tr><td class="">Threshold, 1 dB of reduction</td><td class="n">&minus;9 to above +20 dBu</td><td class="n">&minus;21 to +19 dBu</td><td class="n">&minus;20 to +14 dBu</td></tr><tr><td class="">Threshold per quarter turn of <code>RV3</code></td><td class="n">&minus;9, +14, then above +20</td><td class="n">&minus;21, &minus;10, 0, +10, +19</td><td class="n">Evenly spread</td></tr><tr><td class="">Most reduction, +22 dBu in</td><td class="n">22 dB</td><td class="n">36 dB</td><td class="n">About 40 dB</td></tr><tr><td class="">Attack, fastest to slowest</td><td class="n">1 to 14 ms</td><td class="n">2 to 71 ms</td><td class="n">2.7 to 50 ms</td></tr><tr><td class="">Release, fastest to slowest</td><td class="n">20 ms to 0.44 s</td><td class="n">49 ms to 3.5 s</td><td class="n">47 ms to 2.2 s</td></tr><tr><td class="">Resting steer, <code>VREF5</code></td><td class="n">94 mV, 3.60 V</td><td class="n">150 mV, 5.75 V</td><td class="n">150 mV, 5.49 V</td></tr><tr><td class=""><code>CTRL-B</code> at most reduction</td><td class="n">&minus;4.5 V</td><td class="n">&minus;8.0 V</td><td class="n">&minus;10 V</td></tr><tr><td class="">Supply at rest, +16 / &minus;16 V</td><td class="n">72 / 61 mA</td><td class="n">72 / 62 mA</td><td class="n">About 60 mA</td></tr></tbody></table></div>
+
+<h2>What changed</h2>
+<p>Every miss traced to a component value, not to the circuit. No connections moved. The same
+values are on the sheets, both boards and <code>tools/design.py</code>.</p>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="n">Was</th><th class="n">Now</th><th class="">Why</th></tr></thead><tbody><tr><td class="r"><code>R21</code>, <code>R22</code></td><td class="n">3k3</td><td class="n">6k8</td><td class="">Halves the recovery amp's gain: the module is unity and BYPASS matches (<a href="input.html#errata">the sum</a>)</td></tr><tr><td class="r"><code>C9</code>, <code>C10</code></td><td class="n">2u2</td><td class="n">4u7</td><td class="">With the larger R21/R22, the bass corner falls from 22 Hz to 5.6 Hz</td></tr><tr><td class="r"><code>R36</code></td><td class="n">100k</td><td class="n">82k</td><td class="">With R35 and RV3, sets the detector's gain range</td></tr><tr><td class="r"><code>RV3</code></td><td class="n">1M linear</td><td class="n">100k audio</td><td class="">Spreads the threshold evenly over the knob</td></tr><tr><td class="r"><code>R35</code></td><td class="n">20k</td><td class="n">1k</td><td class="">Sets the lowest threshold at about &minus;20 dBu</td></tr><tr><td class="r"><code>R38</code>, <code>C14</code></td><td class="n">10k, 220n</td><td class="n">1k, 2u2</td><td class="">Keeps the sidechain high-pass at 80&ndash;160 Hz; the small R35 had pushed it to 400 Hz</td></tr><tr><td class="r"><code>R60</code></td><td class="n">47k</td><td class="n">24k</td><td class="">Restores the 150 mV resting steer</td></tr><tr><td class="r"><code>C22</code></td><td class="n">47u</td><td class="n">4u7</td><td class="">Stops the gain overshooting by up to 20 dB on a fast attack</td></tr><tr><td class="r"><code>R47</code></td><td class="n">4k7</td><td class="n">15k</td><td class="">Fastest release near 47 ms; the release pot loads the detector less</td></tr><tr><td class="r"><code>RV5</code></td><td class="n">4k7</td><td class="n">10k</td><td class="">The 9 mm pots Altronics stocks come in 10k, 100k and 1M</td></tr><tr><td class="r"><code>RV6</code></td><td class="n">220k</td><td class="n">1M</td><td class="">The same; slows the slowest release past 2.2 s</td></tr></tbody></table></div>
+
+<h3>Two things nobody expected</h3>
+<p><strong><code>C22</code>.</strong> It filters the steering reference for one side of the pair
+only. When the control voltage pulled the shared reference down, that side lagged by about
+60 ms, so the gain kept falling after the control voltage had settled: up to 20 dB of overshoot
+on a fast attack. The static curves looked fine; only the burst test showed it. At 4.7 &micro;F
+the overshoot is about 1 dB.</p>
+<p><strong><code>R38</code> and <code>C14</code>.</strong> The small <code>R35</code> that gives
+the threshold its range also loads the sidechain high-pass filter, which pushed its corner from
+80 Hz to 400 Hz at the lowest threshold. A 1 k&Omega; <code>R38</code> makes that load minor at
+every knob position, and a 2.2 &micro;F <code>C14</code> brings the corner back down.</p>
+
+<figure>
+  <div class="pane tall"><img src="img/sim-attack_release.png" alt="Attack and release: gain against time for a burst about 20 dB over the threshold" loading="lazy"></div>
+  <figcaption><span>Attack and release: gain against time for a burst about 20 dB over the threshold</span><a href="img/sim-attack_release.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<h2>Distortion</h2>
+<p>The point of a current-steering cell is that distortion stays flat as it compresses, and it
+does:</p>
+<div class="tw"><table><thead><tr><th class="">Condition</th><th class="n">Out</th><th class="n">Gain reduction</th><th class="n">THD</th></tr></thead><tbody><tr><td class="">+4 dBu in, not compressing</td><td class="n">+3.9 dBu</td><td class="n">0</td><td class="n">0.008%</td></tr><tr><td class="">+4 dBu in, makeup at full</td><td class="n">+24.7 dBu</td><td class="n">0</td><td class="n">0.010%</td></tr><tr><td class="">+8 dBu in, threshold at &frac14;</td><td class="n">&minus;5.9 dBu</td><td class="n">13.8 dB</td><td class="n">0.013%</td></tr><tr><td class="">+8 dBu in, threshold lowest</td><td class="n">&minus;15.5 dBu</td><td class="n">23.3 dB</td><td class="n">0.026%</td></tr><tr><td class="">+16 dBu in, threshold lowest</td><td class="n">&minus;14.7 dBu</td><td class="n">30.5 dB</td><td class="n">0.031%</td></tr><tr><td class="">+16 / +20 / +22 dBu in, not compressing</td><td class="n"></td><td class="n">0</td><td class="n">0.033 / 0.057 / 0.079%</td></tr><tr><td class="">+24 dBu in, not compressing</td><td class="n"></td><td class="n">0</td><td class="n">6.2%, the input stage clipping</td></tr></tbody></table></div>
+
+<figure>
+  <div class="pane tall"><img src="img/sim-frequency.png" alt="Frequency response, balanced in to out" loading="lazy"></div>
+  <figcaption><span>Frequency response, balanced in to out</span><a href="img/sim-frequency.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<h2>What still misses</h2>
+<ul>
+  <li><strong>36 dB of reduction, not 40.</strong> The input stage clips at about +23 dBu on
+      &plusmn;16 V, so 40 dB would need a threshold near &minus;30 dBu. The target is better
+      restated as 36 dB of usable reduction.</li>
+  <li><strong>The slow ends of ATTACK and RELEASE run long</strong>, 71 ms and 3.5 s against
+      50 ms and 2.2 s, because the pots are the values Altronics stocks. A 4.7 k&Omega; and a
+      500 k&Omega; from elsewhere give 34 ms and 1.8 s.</li>
+  <li><strong>Times depend on level.</strong> They are the time to 63% of the change in gain for
+      a burst 20 dB over the threshold. Harder hits are faster.</li>
+  <li><strong>The ratio rises with level.</strong> With RATIO at the hard end the knee is soft:
+      about 4:1 just above the threshold, 6:1 to 11:1 by 20 dB over. That is normal for a
+      feedback design.</li>
+  <li><strong><code>CTRL-B</code> reaches &minus;8 V, not &minus;10 V.</strong> Set the
+      gain-reduction meter's <code>RV7</code> against a measured <code>CTRL-B</code>.</li>
+  <li><strong>Supply is about 72 / 62 mA at rest</strong>, a little over the 60 mA in the
+      brief, and the lit meter LEDs add about 9 mA on +16 V. Still well inside the rack's
+      130 mA.</li>
+</ul>
+
+<div class="note warn">
+  <h4>Check by hand before ordering</h4>
+  <p>On the usual convention pin 3 is the clockwise end of a pot. If that holds for these pots,
+  THRESHOLD and RATIO turn the opposite way to the panel legend. Swapping their outer pins fixes
+  it, and <code>RV3</code> then needs a reverse-log (C) taper. MAKEUP, ATTACK and RELEASE turn
+  the expected way.</p>
+</div>
+
+<h2>Running it yourself</h2>
+<p>Open <code>kicad/UTS Mini Mixing Desk - Compressor.kicad_pro</code> in KiCad 10, then
+<em>Inspect &rarr; Simulator</em>. A transient run of <code>.tran 10u 0.6 0 20u</code> or an AC
+sweep from 10 Hz to 100 kHz both work; probe <code>OUT_DIFF</code> for the output and
+<code>CTRL-B</code> for the control voltage. The knobs are the <code>.param</code> lines at the
+bottom of the root sheet. <code>tools/sim/run_all.py</code> reproduces everything on this page
+from the command line, in about an hour.</p>
+<p>The full write-up, with every number and how it was measured, is
+<a href="https://github.com/UTS-500-Series/Compressor/blob/main/kicad/sim/README.md">kicad/sim/README.md</a> in the compressor repository.</p>
+
+<div class="next"><a href="boards.html">&larr; The boards</a><a href="parts.html">Parts list &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Compressor &middot; documentation generated from the KiCad project<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

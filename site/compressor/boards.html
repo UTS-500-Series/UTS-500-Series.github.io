@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html" class="on"><i>10</i><span>The boards</span></a><a href="using.html"><i>11</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>12</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html" class="on"><i>10</i><span>The boards</span></a><a href="simulation.html"><i>11</i><span>The simulation</span></a><a href="parts.html"><i>12</i><span>Parts list</span></a><a href="using.html"><i>13</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>14</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -83,6 +83,12 @@ the same net names, in the front board's own schematic.</p>
       chip a swap rather than a desoldering job.</li>
   <li><strong>The trimmers</strong> <code>RV1</code>, <code>RV7</code> and <code>RV8</code>
       stay on the main board. They are set once at bring-up.</li>
+  <li><strong>The film capacitors</strong> have footprints for real parts. <code>C5</code>,
+      <code>C8</code>, <code>C15</code> (10 &micro;F) and <code>C9</code>, <code>C10</code>
+      (4.7 &micro;F) are TDK B32562 boxes on a 15 mm pitch; <code>C14</code> and
+      <code>C35</code> (2.2 &micro;F) are KEMET MMK5 on 5 mm. Nothing that size fits the
+      original 5 mm outlines, so the board was re-placed and re-routed around them on
+      2 October.</li>
 </ul>
 <p>The front edge of the board is set back 24 mm from the panel to clear the front board, its
 header and the ribbon plug.</p>
@@ -94,27 +100,32 @@ reference netlist, <code>tools/design.py</code>. That comparison caught a wire j
 
 <h2>The front board</h2>
 <ul>
-  <li><strong>Pots:</strong> Alps RK09K, vertical, for THRESHOLD, RATIO, ATTACK, RELEASE and
-      MAKEUP.</li>
-  <li><strong>Toggles:</strong> Jaycar ST0300 sub-miniature SPDT for HPF, KEY and LINK, and the
-      ST0310 DPDT for BYPASS.</li>
+  <li><strong>Pots:</strong> 9 mm vertical, on the Alps RK09K footprint, for THRESHOLD, RATIO,
+      ATTACK, RELEASE and MAKEUP. Altronics' 9 mm pots (R1946 and family) share its pins and
+      lugs, and the <a href="parts.html">parts list</a> uses them: 100 k&Omega; log for
+      THRESHOLD, 100 k&Omega; for RATIO, 10 k&Omega; for ATTACK and MAKEUP and 1 M&Omega; for
+      RELEASE. The RK09K itself stops at 100 k&Omega;.</li>
+  <li><strong>Toggles:</strong> Altronics' Salecom mini toggles, the S1315 SPDT for HPF, KEY and
+      LINK and the S1350 DPDT for BYPASS. The S1332 centre-off fits the SPDT footprint if you
+      want one.</li>
   <li><strong>Meters:</strong> the fourteen LEDs in two columns, with the LM3914 and LM3915
       (<code>U9</code>, <code>U10</code>) either side. The driver chips are soldered rather than
       socketed, because a socket would overlap the LEDs.</li>
   <li><strong>On the back:</strong> the ribbon header <code>J1</code> and <code>C38</code>,
       which is too tall for the panel side.</li>
 </ul>
-<p>The toggle bodies are 8.64 mm deep and rest on the board, so the board sits <strong>about
-8.7 mm behind the panel</strong>. That sets two things: the LEDs need spacers of about 6 mm to
-reach their holes, and the pots probably stand a little short of the panel, which a nut behind
-the panel can make up.</p>
+<p>The pot bodies stand 10.6 mm off the board and the toggles 10.4 mm, so the board sits
+<strong>about 10.6 mm behind the panel</strong>, with the pots resting against it. The LEDs
+need spacers of about 8 mm to reach their holes.</p>
 
 <h2>Joining and fixing them</h2>
 <ul>
   <li><strong>Ribbon.</strong> 30-way, 2.54 mm pitch, with an IDC socket crimped on each end. It
       carries 24 signals with ground between the audio pairs. The main board's <code>J2</code>
       is a shrouded header but the front board's <code>J1</code> is a plain one, so it is not
-      keyed: put the red stripe on pin 1 at both ends (pin 1 is marked on the silkscreen).</li>
+      keyed: put the red stripe on pin 1 at both ends (pin 1 is marked on the silkscreen).
+      Altronics' P1023, a 150 mm 30-way socket-to-socket strip, does the same job with no
+      crimping.</li>
   <li><strong>Ribbon length.</strong> About 150 mm, folded once. It depends on where the board
       sits in your rack, so lay the boards out before crimping.</li>
   <li><strong>Front board to panel:</strong> just the nine bushing nuts.</li>
@@ -131,27 +142,27 @@ module.</p>
 <p>Every part has a 3D model, so KiCad's 3D viewer and a STEP export for the Fusion 360
 assembly show both boards complete. The pots use Alps' own RK09K model, which is not kept in
 the repository: run <code>sh tools/get_3d_models.sh</code> once to download it. The toggles use
-simple models built to the Jaycar datasheet.</p>
+simple models of the Salecom parts. The renders on this site stand a plain block and shaft in
+for the pots, because Alps' download is out of reach where they are made.</p>
 
 <div class="note warn">
   <h4>Check before ordering boards</h4>
   <ul>
-    <li><strong>Some tracks need tidying by hand.</strong> The routing passes DRC but has not
-        been reviewed: a few autorouted runs want straightening, including the input and output
-        pairs, bottom-layer runs that split the ground pour, and the timing node at
-        <code>C15</code> and <code>U4</code>.</li>
-    <li><strong>The ST0310's lug rows are unmeasured.</strong> Jaycar publishes no drawing for
-        it, so its footprint assumes the ST0300's 2.54 mm pitch with rows 4.7 mm apart. Measure
-        one first.</li>
-    <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the toggles under 1 mm of
-        thread: counterbore those holes or use a thinner panel
+    <li><strong>The main board needs tidying by hand.</strong> It was re-placed and re-routed
+        by script for the film capacitors. It passes DRC with nothing unconnected, but the
+        <code>TIMING</code> node and <code>Q3</code>'s emitter run longer than they need to,
+        and no one has reviewed the routing yet.</li>
+    <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the pots under 2 mm of
+        thread: counterbore the pot holes or use a thinner panel
         (<a href="panel.html">front panel</a>).</li>
-    <li><strong>Pot height and ribbon length</strong> are estimates until the parts are in hand
-        and the boards are in a rack.</li>
+    <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, THRESHOLD and RATIO turn
+        the opposite way to the panel legend (see <a href="simulation.html">the
+        simulation</a>).</li>
+    <li><strong>Ribbon length</strong> is an estimate until the boards are in a rack.</li>
   </ul>
 </div>
 
-<div class="next"><a href="panel.html">&larr; The front panel</a><a href="using.html">Setting up &amp; using it &rarr;</a></div>
+<div class="next"><a href="panel.html">&larr; The front panel</a><a href="simulation.html">The simulation &rarr;</a></div>
 <footer>
   UTS Mini Mixing Desk &mdash; Compressor &middot; documentation generated from the KiCad project<br>
   <a href="../index.html">All modules</a>

@@ -29,15 +29,20 @@ def copy_module_assets(mod):
     buildable and publishable with no sibling checkouts present."""
     if not mod.repo:
         return
-    panel = os.path.join(ROOT, '..', mod.repo, 'panel')
-    img = os.path.join(SITE, mod.slug, 'img')
-    for src, dst in [('faceplate-mockup.svg', 'panel-mockup.svg'),
-                     ('faceplate-mockup-bone.svg', 'panel-bone.svg'),
-                     ('faceplate-drawing.svg', 'panel-drawing.svg')]:
-        s = os.path.join(panel, src)
+    repo = os.path.join(ROOT, '..', mod.repo)
+    for src, dst in [('panel/faceplate-mockup.svg', 'img/panel-mockup.svg'),
+                     ('panel/faceplate-mockup-bone.svg', 'img/panel-bone.svg'),
+                     ('panel/faceplate-drawing.svg', 'img/panel-drawing.svg'),
+                     # the simulation's plots and the parts list, where a module has them
+                     ('kicad/sim/results/compression.png', 'img/sim-compression.png'),
+                     ('kicad/sim/results/attack_release.png', 'img/sim-attack_release.png'),
+                     ('kicad/sim/results/frequency.png', 'img/sim-frequency.png'),
+                     ('bom/altronics.csv', 'parts/altronics.csv')]:
+        s = os.path.join(repo, src)
         if os.path.exists(s):
-            os.makedirs(img, exist_ok=True)
-            shutil.copyfile(s, os.path.join(img, dst))
+            d = os.path.join(SITE, mod.slug, dst)
+            os.makedirs(os.path.dirname(d), exist_ok=True)
+            shutil.copyfile(s, d)
             print('    copied %s' % dst)
 
 
@@ -45,9 +50,9 @@ def build_module(mod):
     out = os.path.join(SITE, mod.slug)
     os.makedirs(out, exist_ok=True)
     shell.DATA_DIR = os.path.join(out, 'data')       # fig() inlines from here at import time
+    copy_module_assets(mod)                          # before the import: pages read the copies
     content = importlib.import_module(mod.content)
     mod.bind(content.NAV, content.PAGES)
-    copy_module_assets(mod)
     for fname in mod.order:
         title, body = mod.pages[fname]
         open(os.path.join(out, fname), 'w').write(shell.shell(mod, fname, title, body))
@@ -93,8 +98,9 @@ built that way.</p>
 
 <h2>How far along each module is</h2>
 <p>The compressor has been designed and both of its boards are laid out and routed: a main
-card and a front board behind the faceplate, joined by a ribbon. Nothing has been ordered or
-built yet. Its pages are generated from a netlist that the KiCad schematic is verified
+card and a front board behind the faceplate, joined by a ribbon. The whole circuit has been
+simulated in ngspice and its values corrected from that, and it has a parts list drawn from
+Altronics' stock. Nothing has been ordered or built yet. Its pages are generated from a netlist that the KiCad schematic is verified
 against, pin by pin, so the figures in it come from the design rather than from memory.</p>
 <p>The equaliser is <strong>in progress</strong>: its two parametric bands are drawn with
 values on one sheet, and their response is worked out from that sheet and matches the team's
@@ -118,7 +124,7 @@ work together.</p>
 
 <footer>
   {shell.SUITE} &middot; documentation site &middot; one section per module<br>
-  Performance figures are calculated from the designs, not measured on hardware.
+  Performance figures are calculated or simulated from the designs, not measured on hardware.
 </footer>
 </div></main>
 </div></body></html>

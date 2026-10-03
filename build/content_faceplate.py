@@ -120,9 +120,9 @@ sense.</p>
               "Lots of hand wiring, easy to cross two wires, and long wires on audio-path pots "
               "can pick up hum."]],
             ["r", "", "", ""]) + """
-<p>The compressor's pot footprints (Alps RK09K <em>Vertical</em>) are already the right type
-for a front board. Its switches currently land on header sockets, which suits the wired
-approach but works as the board-to-board connector too.</p>
+<p>The compressor's pot footprints (Alps RK09K <em>Vertical</em>) are the right type for a
+front board, and Altronics' 9 mm pots share them. Its toggles are PCB-mount Salecom mini
+toggles on the same front board.</p>
 """)
 
 PAGES['positions.html'] = ("Get the positions right", f"""
@@ -235,12 +235,12 @@ typical values to start from.</p>
               "From the 500-series spec, countersunk on the front."]],
             ["r", "", "", ""]) + """
 <div class="note warn">
-  <h4>Sub-miniature toggles have short bushings</h4>
-  <p>The compressor uses Jaycar's ST0300 and ST0310 sub-miniature toggles, which need a
-  &Oslash;5.2 hole for their 10-48 bushing rather than the mini toggle's &Oslash;6.5. Their
-  bushing is only 4.06 mm long, so a 3.18 mm panel leaves under 1 mm of thread for the nut:
-  counterbore those holes from the back or use a thinner panel. Confirm every size against the
-  actual parts before cutting.</p>
+  <h4>Check the bushing length against the panel</h4>
+  <p>The compressor's Salecom S1315 and S1350 mini toggles take a &Oslash;6.5 hole, and their
+  8.9 mm bushing leaves plenty of thread through a 3.18 mm panel. Its 9 mm pots are the tight
+  one: a 5 mm bushing leaves under 2 mm, so counterbore the pot holes from the back or use a
+  thinner panel. Sub-miniature toggles are worse still, with bushings around 4 mm. Confirm every
+  size against the actual parts before cutting.</p>
 </div>
 """)
 
@@ -298,15 +298,15 @@ PAGES['compressor.html'] = ("Compressor notes", f"""
 <p class="eyebrow">Finish</p>
 <h1>Compressor notes</h1>
 <p class="lede">How the <a href="{ORG}/Compressor">compressor</a> followed this guide, as of
-1 October 2026. Its <a href="../compressor/boards.html">boards page</a> has the full
+2 October 2026. Its <a href="../compressor/boards.html">boards page</a> has the full
 description.</p>
 
 <ul>
   <li><strong>Layout:</strong> the <code>toggle</code> layout, five single RK09K pots with four
   toggles beside them. The dual-concentric and pull-switch layouts were dropped.</li>
-  <li><strong>Front board:</strong> 35 &times; 110 mm, carrying the pots, the Jaycar ST0300 and
-  ST0310 toggles, both meters and their LM3914/LM3915 drivers. It sits about 8.7 mm behind the
-  panel with the toggle bodies resting on it, held only by the bushing nuts.</li>
+  <li><strong>Front board:</strong> 35 &times; 110 mm, carrying the pots, the Salecom S1315 and
+  S1350 toggles, both meters and their LM3914/LM3915 drivers. It sits about 10.6 mm behind the
+  panel with the pot bodies resting on it, held only by the bushing nuts.</li>
   <li><strong>Master:</strong> the panel and its holes are drawn on the front board's
   User.Drawings layer with the origin on the panel's top-left corner, and
   <code>panel/make_panel.py</code> takes its positions from there. The meter columns ended up
@@ -316,9 +316,8 @@ description.</p>
   put the stripe on pin 1 at both ends.</li>
   <li><strong>Main board:</strong> front edge set back 24 mm, fixed to the panel with an L-bracket
   on two M3 holes. One of them is plated to CHASSIS, which grounds the panel.</li>
-  <li><strong>Still open:</strong> the panel thickness for the short toggle bushings, the
-  ST0310's unmeasured lug rows, the pot height at an 8.7 mm gap, and the ribbon length in a real
-  rack.</li>
+  <li><strong>Still open:</strong> the panel thickness for the pots' short bushings and the
+  ribbon length in a real rack.</li>
 </ul>
 """)
 

@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html" class="on"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="using.html"><i>11</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>12</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html" class="on"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="boards.html"><i>10</i><span>The boards</span></a><a href="simulation.html"><i>11</i><span>The simulation</span></a><a href="parts.html"><i>12</i><span>Parts list</span></a><a href="using.html"><i>13</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>14</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -98,7 +98,7 @@ where that negotiation happens.</strong> Make it bigger and the module gets clea
 hissier; make it smaller and it gets quieter but grittier.</p>
 
 <h3>Where the numbers come from</h3>
-<div class="tw"><table><thead><tr><th class="">Stage</th><th class="n">Gain</th><th class="">Reason</th></tr></thead><tbody><tr><td class="">Input receiver U1A</td><td class="n">0 dB</td><td class="">Difference amplifier, unity by design</td></tr><tr><td class="">Pad (R7 + RV1 / R8)</td><td class="n">&minus;42 dB</td><td class="">Shrink the signal to suit the transistors</td></tr><tr><td class="">Gain cell (max)</td><td class="n">+26 dB</td><td class="">4k7 collector load &divide; 237 &Omega; emitter resistance</td></tr><tr><td class="">Recovery amp U1B</td><td class="n">+16.5 dB</td><td class="">22 k &divide; 3k3</td></tr><tr><td class=""><strong>Through gain</strong></td><td class="n"><strong>~0 dB</strong></td><td class="">The pad is chosen to cancel the two gain stages</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="">Stage</th><th class="n">Gain</th><th class="">Reason</th></tr></thead><tbody><tr><td class="">Input receiver U1A</td><td class="n">0 dB</td><td class="">Difference amplifier, unity by design</td></tr><tr><td class="">Pad (R7 + RV1 / R8)</td><td class="n">&minus;42 dB</td><td class="">Shrink the signal to suit the transistors</td></tr><tr><td class="">Gain cell (max)</td><td class="n">+26 dB</td><td class="">4k7 collector load &divide; 237 &Omega; emitter resistance</td></tr><tr><td class="">Recovery amp U1B</td><td class="n">+10.2 dB</td><td class="">22 k &divide; 6k8</td></tr><tr><td class="">Balanced output</td><td class="n">+6 dB</td><td class="">Hot and cold legs each carry the full signal</td></tr><tr><td class=""><strong>Through gain</strong></td><td class="n"><strong>~0 dB</strong></td><td class="">The pad is chosen to cancel the gain stages; &minus;0.1 dB simulated</td></tr></tbody></table></div>
 <p><code>RV1</code> is the trimmer that lets you land exactly on unity, absorbing the tolerance
 of everything upstream and downstream of it. It is the only audio trim in the module.</p>
 
@@ -108,12 +108,25 @@ and the module passes signal at unity. Working it through:</p>
 <ul>
   <li>Gain cell at full gain: 4k7 collector load &divide; 237 &Omega; emitter resistance =
       <strong>19.8&times;</strong></li>
-  <li>Recovery amp <code>U1B</code>: 22 k &divide; 3k3 = <strong>6.67&times;</strong></li>
-  <li>Together: <strong>132&times;</strong>, so the pad must divide by 132</li>
+  <li>Recovery amp <code>U1B</code>: 22 k &divide; 6k8 = <strong>3.24&times;</strong></li>
+  <li>Balanced output: the hot and cold legs each carry the full signal, so the level between
+      them is <strong>2&times;</strong></li>
+  <li>Together: <strong>128&times;</strong>, so the pad must divide by about 128</li>
 </ul>
 <p>The divider ratio is <code>(R7 + RV1 + R8) / R8</code>. With <code>R7</code> = 8k2 and
 <code>RV1</code> spanning 0&ndash;2k, that needs <code>R8</code> &asymp; 75 &Omega;, giving a
-ratio of 110&ndash;137&times; &mdash; which puts unity comfortably inside the trimmer's range.</p>
+ratio of 110&ndash;137&times; &mdash; which puts unity comfortably inside the trimmer's range.
+Simulated, <code>RV1</code> trims the module from +0.9 to &minus;1.0 dB.</p>
+
+<div class="note warn">
+  <h4>R21 and R22 were 3k3 until 2 October</h4>
+  <p>The first version of this sum left out the balanced output's 2&times;. With the recovery
+  amp at 22 k &divide; 3k3 the module came out 6 dB hot, so <code>BYPASS</code> dropped the
+  level by 6 dB and <code>RV1</code> could only trim between +4.9 and +6.8 dB. The
+  <a href="simulation.html">simulation</a> caught it; <code>R21</code> and <code>R22</code> went
+  to 6k8, and <code>C9</code>/<code>C10</code> to 4.7 &micro;F so the bass corner fell from
+  22 Hz to 5.6 Hz rather than rising.</p>
+</div>
 
 <div class="note warn">
   <h4>If you are working from an early copy of this design</h4>
