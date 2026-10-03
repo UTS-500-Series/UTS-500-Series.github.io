@@ -47,7 +47,7 @@ Almost every decision on this panel is a consequence of that.</p>
 puts them 3.96 mm from each end. They are countersunk, so a screw head occupies a 5.72 mm
 circle in the middle of the panel top and bottom.</p>
 <p>That leaves a usable strip roughly 34 mm wide and 120 mm tall, interrupted at both ends.
-Into it go five knobs, four switch functions, fourteen meter LEDs and the legends for all of
+Into it go five knobs, four switch functions, twenty meter LEDs and the legends for all of
 it. There is no arrangement where everything is comfortable; every layout below trades one
 thing for another.</p>
 
@@ -55,7 +55,7 @@ thing for another.</p>
 <div class="tw"><table><thead><tr><th class="">Control</th><th class="r">Ref</th><th class="">What it does</th><th class="">More</th></tr></thead><tbody><tr><td class="">THRESHOLD</td><td class="r">RV3</td><td class="">How loud before compression starts</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">RATIO</td><td class="r">RV4</td><td class="">How much gain reduction per dB over threshold</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">ATTACK</td><td class="r">RV5</td><td class="">How fast it clamps down, 2&ndash;71 ms</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">RELEASE</td><td class="r">RV6</td><td class="">How fast it lets go, 49 ms&ndash;3.5 s</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">MAKEUP</td><td class="r">RV2</td><td class="">Level put back after compression, 0 to +21 dB</td><td class=""><a href="output.html">Output</a></td></tr><tr><td class="">BYPASS</td><td class="r">SW1</td><td class="">Hard bypass &mdash; rack straight through</td><td class=""><a href="output.html">Output</a></td></tr><tr><td class="">HPF</td><td class="r">SW3</td><td class="">Defeats the sidechain high-pass filter</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">KEY</td><td class="r">SW2</td><td class="">Detector listens here, or to the aux input</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr><tr><td class="">LINK</td><td class="r">SW4</td><td class="">Ties this detector to the module beside it</td><td class=""><a href="sidechain.html">Sidechain</a></td></tr></tbody></table></div>
 
 <h2>Reading the meters</h2>
-<p>Two seven-segment bargraphs sit at the top, in a recessed window so they read against the
+<p>Two ten-segment bargraphs sit at the top, in a recessed window so they read against the
 panel.</p>
 <ul>
   <li><strong>GR</strong> fills <em>downward</em> from the top as the compressor clamps. More
@@ -66,15 +66,15 @@ panel.</p>
 </ul>
 <div class="note">
   <h4>The meters have a circuit now</h4>
-  <p>The fourteen LEDs are driven by <a href="meters.html">sheet 7</a>: two LM391x display
-  drivers in dot mode, fed by a peak detector and a level shifter. With two LEDs lit the
-  module draws about 81 mA of the 130 mA the rack allows on +16 V.</p>
+  <p>The twenty LEDs are driven by <a href="meters.html">sheet 7</a>: two LM3914 display
+  drivers in dot mode, fed by a peak detector and a level shifter. With one LED lit in each
+  meter the module draws about 94 mA of the 130 mA the rack allows on +16 V.</p>
 </div>
 
 <h2>Three layouts</h2>
 <p>The same nine functions, arranged three ways. The generator builds any of them from one
 definition, so choosing is a command-line flag rather than a redraw.</p>
-<div class="tw"><table><thead><tr><th class="r">Layout</th><th class="">Switches</th><th class="n">Holes</th><th class="">The trade</th></tr></thead><tbody><tr><td class="r"><code>pull</code></td><td class="">None &mdash; every switch is a pull on a pot; LINK is an internal jumper</td><td class="n">21</td><td class="">Fewest parts and cheapest to build. Bypass is slow and uncertain, and you cannot bypass without touching the makeup knob.</td></tr><tr><td class="r"><code>toggle</code></td><td class="">Four toggles flanking THRESHOLD and RATIO</td><td class="n">25</td><td class="">Every function is one positive movement, nothing hidden, bypass instant. Most parts of the three.</td></tr><tr><td class="r"><code>concentric</code></td><td class="">Lit BYPASS button and two toggles; LINK on a pull</td><td class="n">22</td><td class="">Dual-concentric knobs free the space, but they are dearer, harder to source, and their inner shafts cannot carry a printed scale.</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="r">Layout</th><th class="">Switches</th><th class="n">Holes</th><th class="">The trade</th></tr></thead><tbody><tr><td class="r"><code>pull</code></td><td class="">None &mdash; every switch is a pull on a pot; LINK is an internal jumper</td><td class="n">27</td><td class="">Fewest parts and cheapest to build. Bypass is slow and uncertain, and you cannot bypass without touching the makeup knob.</td></tr><tr><td class="r"><code>toggle</code></td><td class="">Four toggles flanking THRESHOLD and RATIO</td><td class="n">31</td><td class="">Every function is one positive movement, nothing hidden, bypass instant. Most parts of the three.</td></tr><tr><td class="r"><code>concentric</code></td><td class="">Lit BYPASS button and two toggles; LINK on a pull</td><td class="n">28</td><td class="">Dual-concentric knobs free the space, but they are dearer, harder to source, and their inner shafts cannot carry a printed scale.</td></tr></tbody></table></div>
 
 <h3>Why the switches sit where they do</h3>
 <p>On the <code>toggle</code> layout they flank the knob they belong to: <strong>HPF</strong>
@@ -129,8 +129,8 @@ the repository, alongside the DXF.</p>
 <div class="note warn">
   <h4>Before you have one made</h4>
   <p>The holes are &Oslash;7.2 for the 9 mm pots, &Oslash;6.5 for the Salecom S1315 and
-  S1350 mini toggles and &Oslash;2.2 for the 2 mm LEDs. Altronics has no 2 mm LEDs: if you fit
-  its 3 mm flangeless ones instead, open the meter holes to &Oslash;3.1. Check every hole
+  S1350 mini toggles and &Oslash;2.2 for the 2 mm LEDs, ten per meter on a 3.0 mm pitch, which
+  leaves 0.8 mm of metal between meter holes. 3 mm LEDs won't fit that pitch. Check every hole
   against the parts you actually buy &mdash; half a millimetre is the difference between a push
   fit and a rattle.</p>
   <p>The toggles' 8.9 mm bushing leaves about 5.5 mm of thread through a standard 3.18 mm panel,

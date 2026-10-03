@@ -49,7 +49,7 @@ def natkey(s):
     return [(1, int(t)) if t.isdigit() else (0, t) for t in re.findall(r'\d+|\D+', str(s))]
 
 KIND = {'R':'res','C':'cap','D':'dio','Q':'tr','U':'ic','RV':'pot','SW':'sw','J':'conn','LED':'led'}
-# The refdes prefix is a poor classifier: the meter LEDs are D20-D36 and would draw as plain
+# The refdes prefix is a poor classifier: the meter LEDs are D20-D39 and would draw as plain
 # diodes, and an 18-pin display driver would draw as an op-amp triangle. The library symbol
 # says what the part actually is, so prefer it and keep the prefix only as a fallback.
 SYMKIND = {'R':'res', 'C':'cap', 'C_Polarized':'cap', 'D':'dio', 'D_Zener':'zen', 'LED':'led',
@@ -97,7 +97,7 @@ NOTES = {
  'U3':'A: sidechain amp. B: rectifier first half.',
  'U4':'TL072. A: rectifier summer. B: control buffer - low bias current, so the timing cap holds.',
  'U7':'A: level-meter peak detector. B: gain-reduction meter driver.',
- 'U9':'LM3914: gain-reduction meter, linear steps.','U10':'LM3915: output-level meter, 3 dB steps.',
+ 'U9':'LM3914: gain-reduction meter, linear steps.','U10':'LM3914: output-level meter, linear steps.',
  'U5':'A: aux key receiver. B: aux output buffer.',
  'U6':'A: STA reference buffer. B: sidechain input buffer.',
  'RV2':'MAKEUP - 0 to +21 dB.','RV3':'THRESHOLD - wired as a rheostat.',

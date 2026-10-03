@@ -1,6 +1,6 @@
 {
  "repo": "https://github.com/UTS-500-Series/Compressor",
- "commit": "b6e6605",
+ "commit": "43ee4af",
  "date": "2026-10-03",
  "kicad": "10.0.6",
  "schematics": [
@@ -65,9 +65,9 @@
    "source": "kicad_withpcb/compressor_front/compressor_front.kicad_pcb",
    "label": "Front board: sits behind the faceplate, joined to the main board by a ribbon",
    "stats": {
-    "footprints": 33,
-    "segments": 373,
-    "vias": 19,
+    "footprints": 39,
+    "segments": 407,
+    "vias": 18,
     "zones": 1,
     "outline": 4
    },

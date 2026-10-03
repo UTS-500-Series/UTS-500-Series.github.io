@@ -648,7 +648,7 @@ control line is at 0 V and the LED is dark; at full compression it is near &minu
 crude, but it costs two
 components and tells you instantly whether the compressor is working.</p>
 <p><strong>This is now superseded.</strong> <a href="meters.html">Sheet 7</a> carries a proper
-seven-segment gain-reduction meter, and the panel has no hole for <code>LED1</code>. It is left
+ten-segment gain-reduction meter, and the panel has no hole for <code>LED1</code>. It is left
 on the sheet as a build-time sanity check &mdash; it lights before any of the meter circuitry is
 populated &mdash; but it can be omitted.</p>
 
@@ -670,7 +670,7 @@ optional garnish, it is what stops one stage from talking to another through the
 <div class="note">
   <h4>Current budget</h4>
   <p>Simulated at rest: <strong>72 mA on +16 V and 62 mA on &minus;16 V</strong>, plus about
-  9 mA for the two lit meter LEDs, against the 130 mA per rail the 500-series specification
+  22 mA for one lit LED in each meter, against the 130 mA per rail the 500-series specification
   allows. The asymmetry is the
   <a href="meters.html">meter sheet</a>, whose display drivers and LEDs hang off the positive
   rail only. Worst-case NE5532s with a hard-driven output land near 140 mA on +16 V, which is
@@ -684,47 +684,52 @@ optional garnish, it is what stops one stage from talking to another through the
 PAGES['meters.html'] = ("The LED meters", """
 <p class="eyebrow">Sheet 7</p>
 <h1>The LED meters</h1>
-<p class="lede">Two seven-segment bargraphs &mdash; gain reduction and output level &mdash;
-driven by one NE5532 and a pair of display drivers. Both light exactly one LED at a time, which
-is the only reason they fit the power budget at all.</p>
+<p class="lede">Two ten-segment meters &mdash; gain reduction and output level &mdash;
+driven by one NE5532 and a pair of LM3914 display drivers. Both light exactly one LED at a
+time, which is the only reason they fit the power budget at all.</p>
 
 """ + fig("meters", "Sheet 7 &mdash; detectors, display drivers and the two LED columns") + """
 
 <h2>Why this sheet uses a driver IC</h2>
-<p>A seven-segment bargraph needs seven comparators, and there are two of them. Building
-fourteen comparators out of NE5532s means seven more packages and roughly <strong>56 mA</strong>
-&mdash; on rails that only have about 70 mA of headroom left. It does not fit.</p>
+<p>A ten-segment meter needs ten comparators, and there are two of them. Building twenty
+comparators out of NE5532s means ten more packages and roughly <strong>80 mA</strong>
+&mdash; on rails that only have about 60 mA of headroom left. It does not fit.</p>
 <p>So this is the one place the module steps outside its NE5532-and-BC549 palette.
-<code>U9</code> and <code>U10</code> are LM391x display drivers: ten comparators, a reference and
-the LED current sinks in one 18-pin package.</p>
-<p>They are pin-identical but follow different laws, which is the whole reason there are two
-different part numbers. <code>U9</code> is an <strong>LM3914</strong>, whose ten steps are
-evenly spaced in volts. <code>U10</code> is an <strong>LM3915</strong>, whose steps are 3 dB
-apart. Gain reduction is read off a control voltage; output level is read in dB. Fitting them
-the wrong way round gives two meters that both read badly.</p>
+<code>U9</code> and <code>U10</code> are LM3914 display drivers: ten comparators, a reference
+and the LED current sinks in one 18-pin package. The LM3914's ten steps are evenly spaced in
+volts.</p>
+<p>The level meter was first drawn with an LM3915, the same chip with 3 dB steps. Nobody
+stocks it any more, so both meters now use the LM3914. The gain-reduction meter suits it
+anyway, and the level meter's scale is set out below.</p>
 
 <div class="note">
   <h4>Dot mode, not bar mode</h4>
   <p>Pin 9 (<code>MODE</code>) is left open on both drivers, which selects dot mode: one LED lit
   at a time instead of a filled bar. That is a power decision before it is an aesthetic one. In
-  bar mode, seven lit LEDs per meter at 4.6 mA is about <strong>64 mA</strong> of extra draw and
-  the module no longer fits the 130 mA the rack allows. In dot mode the same meters cost
-  <strong>9.2 mA</strong>.</p>
+  bar mode, ten lit LEDs per meter at about 10 mA would be <strong>200 mA</strong> and the module
+  would be far over the 130 mA the rack allows. In dot mode the two meters cost about
+  <strong>22 mA</strong>.</p>
 </div>
 
 <h2>The reference and the LED current</h2>
-<p>Each driver sets its own full-scale voltage and its own LED current from two resistors, and
-both meters use the same pair.</p>
+<p>Each driver sets its own full-scale voltage and its own LED current from two resistors.</p>
 """ + table(
     ["Set by", "Value", "Result", "What it fixes"],
-    [["<code>R89</code> / <code>R91</code>", "2k7", "4.6 mA",
-      "LED current, <em>12.5&nbsp;/&nbsp;R</em> &mdash; every segment the same brightness"],
-     ["<code>R90</code> / <code>R92</code>", "8k2", "5.05 V",
-      "Full scale, <em>1.25&nbsp;&times;&nbsp;(1&nbsp;+&nbsp;R90/R89)</em>"]],
+    [["<code>R89</code> / <code>R91</code>", "2k7", "about 10&ndash;12 mA",
+      "LED current: ten times what is drawn from <code>REFOUT</code>, so every segment matches"],
+     ["<code>R90</code>", "8k2", "5.05 V",
+      "GR full scale, <em>1.25&nbsp;&times;&nbsp;(1&nbsp;+&nbsp;R90/R89)</em>"],
+     ["<code>R92</code>", "4k7", "3.43 V",
+      "Level full scale, <em>1.25&nbsp;&times;&nbsp;(1&nbsp;+&nbsp;R92/R91)</em>"]],
     ["r", "n", "n", ""]) + """
-<p>The LED current is set by the driver, not by a series resistor per LED, so all fourteen
+<p>The LED current is set by the driver, not by a series resistor per LED, so all twenty
 segments match without sorting parts. <code>RHI</code> ties to <code>REFOUT</code> and
-<code>RLO</code> to ground, so each ladder spans 0 V to 5.05 V.</p>
+<code>RLO</code> to ground, so each ladder runs from 0 V to its full scale in ten equal
+steps.</p>
+<p><code>R92</code> was 8k2 like <code>R90</code>. With ten LEDs the level meter's top LED is
+the full-scale voltage itself, and at 5.05 V even <code>RV8</code> turned fully up could not
+bring it below +19.3 dBu. At 4k7 the top LED sits at +18 dBu with <code>RV8</code> about a
+fifth of the way round.</p>
 
 <h2>Gain reduction &mdash; U9</h2>
 <p>The control voltage <code>CTRL-B</code> rests at 0 V and swings negative as the module
@@ -732,23 +737,23 @@ compresses: about &minus;10 V by the design, &minus;8 V at the most reduction in
 needs inverting before a meter can read it. That much is easy. The problem is
 what happens next.</p>
 <p><code>Q6</code> and <code>Q7</code> in the gain cell are an <strong>undegenerated</strong>
-differential pair, so gain follows control voltage as a sigmoid, not a line. Feed that to a
-meter that steps evenly in volts and the scale bunches horribly:</p>
-""" + table(
-    ["Segment", "Even steps in volts", "With the R93 offset"],
-    [["<code>D20</code>", "0.1 dB", "1 dB"], ["<code>D21</code>", "0.5 dB", "2 dB"],
-     ["<code>D22</code>", "2.0 dB", "3 dB"],  ["<code>D23</code>", "6.6 dB", "6 dB"],
-     ["<code>D24</code>", "15.7 dB", "9 dB"], ["<code>D25</code>", "27.5 dB", "14 dB"],
-     ["<code>D26</code>", "40.2 dB", "19 dB"]],
-    ["r", "n", "n"]) + """
-<p>Three of seven segments inside the first 2 dB, then a jump from 6 dB to 40 dB across the last
-three. No trim setting fixes it, because the spacing is wrong, not the span.</p>
+differential pair, so gain follows control voltage as a sigmoid, not a line. Feed that
+straight to a meter that steps evenly in volts and the first few segments all land inside the
+first couple of dB, while the last ones need more reduction than the module can give.</p>
 <p><code>R93</code> (18 k&Omega;) solves it by making <code>U7B</code> a <em>summing</em>
 inverting stage: it subtracts a fixed offset taken from <code>U9</code>'s own reference before
-the signal reaches the driver. The seven even voltage steps then land on the useful middle of
-the sigmoid, and the scale comes out close to the classic 1/2/3/6/9/14/19 dB progression.</p>
-<p>The cost is that <code>U7B</code> now sits at about <strong>&minus;2.1 V</strong> with no
-compression happening. <code>R94</code> and <code>D12</code> clamp the driver input at
+the signal reaches the driver. The even voltage steps then land on the useful part of the
+sigmoid. With <code>RV7</code> set for a top LED at 30 dB, the simulated scale is:</p>
+""" + table(
+    ["Segment", "Lights at"],
+    [["<code>D20</code>", "1.8 dB"], ["<code>D21</code>", "3.1 dB"], ["<code>D22</code>", "4.7 dB"],
+     ["<code>D23</code>", "6.8 dB"], ["<code>D24</code>", "9.6 dB"], ["<code>D25</code>", "12.9 dB"],
+     ["<code>D26</code>", "16.7 dB"], ["<code>D27</code>", "21.1 dB"], ["<code>D28</code>", "25.7 dB"],
+     ["<code>D29</code>", "30.4 dB"]],
+    ["r", "n"]) + """
+<p>Fine steps where a light touch of compression lives, coarser ones where it is clamping
+hard. The cost of the offset is that <code>U7B</code> sits at about <strong>&minus;2.1 V</strong>
+with no compression happening. <code>R94</code> and <code>D12</code> clamp the driver input at
 &minus;0.7 V so that idle offset never reaches <code>U9</code>. <code>RV7</code> trims the
 slope, which moves the whole scale together.</p>
 
@@ -766,23 +771,39 @@ accurate down to a few millivolts &mdash; a bare diode and capacitor would read 
     [["<code>R87</code> &times; <code>C35</code>", "1k &times; 2&micro;2", "2.2 ms attack &mdash; fast enough to catch peaks"],
      ["<code>R88</code> &times; <code>C35</code>", "100k &times; 2&micro;2", "220 ms decay &mdash; slow enough to read"]],
     ["r", "n", ""]) + """
-<p>From there <code>U10</code>'s 3 dB steps give a seven-segment scale spanning
-<strong>18 dB</strong>. Outputs 4&ndash;10 drive the LEDs, so the top segment is full scale and
-the bottom is 18 dB below it; outputs 1&ndash;3 are unused.</p>
+<p>The LM3914's steps are even in volts, so in dB they close up towards the top. With the top
+LED at +18 dBu, segment <em>k</em> lights at 18&nbsp;+&nbsp;20&nbsp;log(<em>k</em>/10) dBu,
+which the simulation confirms:</p>
+""" + table(
+    ["Segment", "Lights at"],
+    [["<code>D30</code>", "&minus;1.8 dBu"], ["<code>D31</code>", "+4.1 dBu"], ["<code>D32</code>", "+7.5 dBu"],
+     ["<code>D33</code>", "+10.1 dBu"], ["<code>D34</code>", "+12.0 dBu"], ["<code>D35</code>", "+13.6 dBu"],
+     ["<code>D36</code>", "+14.8 dBu"], ["<code>D37</code>", "+16.0 dBu"], ["<code>D38</code>", "+17.1 dBu"],
+     ["<code>D39</code>", "+18.0 dBu"]],
+    ["r", "n"]) + """
+<p>A 20 dB span, finest near clipping, where a level meter matters most. The LM3915 would have
+given 27 dB in even 3 dB steps.</p>
+
+<h2>Simulated</h2>
+""" + pic("sim-meters.png", "The LED lit against output level and against gain reduction, and both meters through a +20 dBu burst") + """
+<p>The simulation's LM3914 model has the reference, the divider, all ten comparators, dot mode
+and the LED current sinks, so every LED's current is a result rather than an assumption. On a
++20 dBu burst the level meter touches its top LED for the first 15 ms or so, until the attack
+catches up, and the gain-reduction meter climbs to <code>D26</code> and steps back down over
+the release. The <a href="simulation.html">simulation page</a> has the method.</p>
 
 <h2>Setting the two trimmers</h2>
-<p>Neither meter is calibrated by calculation &mdash; both have a trimmer, and both want a
-signal generator and a voltmeter.</p>
+<p>Both meters have a trimmer, and both want a signal generator and a voltmeter.</p>
 <ul>
   <li><strong><code>RV8</code>, level.</strong> Feed the module a steady tone at whatever level
-  you want the top LED to mean &mdash; +18 dBu is the usual choice, leaving about 2 dB before
-  <code>U2A</code> clips. Adjust <code>RV8</code> until <code>D36</code> just lights. The scale
-  below it then reads +15, +12, +9, +6, +3 and 0 dBu.</li>
+  you want the top LED to mean &mdash; +18 dBu is the usual choice, leaving a few dB before the
+  output clips. Adjust <code>RV8</code> until <code>D39</code> just lights. The rest of the
+  scale then follows the table above.</li>
   <li><strong><code>RV7</code>, gain reduction.</strong> Drive the compressor hard enough to
   produce a known amount of gain reduction, measured as the difference in output level with the
-  threshold backed off and applied. Adjust <code>RV7</code> until the segment you want lights.
-  Setting it at 19 dB on <code>D26</code> puts the rest of the scale where the table above
-  says. Set it against a measured <code>CTRL-B</code>, not the design's &minus;10 V.</li>
+  threshold backed off and applied. Adjust <code>RV7</code> until the segment you want lights:
+  <code>D29</code> at 30 dB puts the rest where the table above says. Set it against a measured
+  <code>CTRL-B</code>, not the design's &minus;10 V.</li>
 </ul>
 
 <h2>What this costs the supply</h2>
@@ -790,46 +811,36 @@ signal generator and a voltmeter.</p>
     ["Draw", "+16 V", "&minus;16 V"],
     [["<code>U7</code> NE5532", "8 mA", "8 mA"],
      ["<code>U9</code> + <code>U10</code> quiescent", "~12 mA", "&mdash;"],
-     ["Two lit LEDs at 4.6 mA", "9 mA", "&mdash;"],
-     ["<strong>Added by this sheet</strong>", "<strong>~29 mA</strong>", "<strong>8 mA</strong>"],
-     ["<strong>Module total</strong>, simulated at rest plus two lit LEDs", "<strong>~81 mA</strong>", "<strong>~62 mA</strong>"]],
+     ["One lit LED per meter", "~22 mA", "&mdash;"],
+     ["<strong>Module total</strong>, simulated at rest plus one LED per meter", "<strong>~94 mA</strong>", "<strong>~62 mA</strong>"]],
     ["r", "n", "n"]) + """
 <p>Against the 130 mA per rail the 500-series specification allows, that still fits, with
-about 50 mA to spare on +16 V. The driver quiescent figures are
-datasheet typicals; this is the one number in the project worth measuring on the bench rather
-than trusting.</p>
+about 35 mA to spare on +16 V. The LED current in the model counts the driver's internal
+divider as well as <code>R89</code>/<code>R91</code>, so if anything it reads a little high;
+this is still the one number in the project worth measuring on the bench.</p>
 
 <div class="note warn">
-  <h4>Both drivers are obsolete</h4>
+  <h4>The LM3914 is end of life</h4>
   <p>Checked at DigiKey on 2 September 2026: <code>LM3914N-1/NOPB</code> and
   <code>LM3915N-1/NOPB</code> are <strong>obsolete with no stock</strong> &mdash; and so is
-  every other dot/bar display driver they list. All thirteen, TI and Rohm alike, in every
-  package. The dedicated analogue bargraph driver is an extinct product category, not a part
-  that happens to be out of stock, so there is no drop-in replacement to name.</p>
+  every other dot/bar display driver they list. The dedicated analogue bargraph driver is an
+  extinct product category, not a part that happens to be out of stock.</p>
   <p>Altronics still lists the LM3914 (Z2670, low stock, held at its Cannington store when
-  checked on 3 October 2026) but not the LM3915, which isn't at Jaycar or element14 either.
-  Rochester Electronics, an authorised seller of obsolete TI parts, is the place to look.</p>
-  <p>That leaves two routes. Source the LM391x from a distributor that still holds it and
-  accept an end-of-life part in a new design; or rework this sheet around a comparator
-  ladder &mdash; four LM339 quads cover fourteen thresholds and are stocked from about
-  $0.13 each.</p>
-  <p>The comparator route is more viable than the argument at the top of this page implies.
-  That argument compared against seven <em>NE5532s</em>, which is the wrong part: a real
-  comparator draws roughly a milliamp per package rather than eight. What the LM391x
-  actually buys is its dot-mode logic and its programmable constant-current sinks &mdash;
-  a comparator ladder needs a resistor per LED, a divider chain to set the thresholds
-  (two different ones, since the meters follow different laws) and extra steering if dot
-  mode is to be kept.</p>
-  <p>Only this sheet is affected. Sheets 1&ndash;6 use nothing that is at risk.</p>
+  checked on 3 October 2026), and both meters now use it, so order the two early. Rochester
+  Electronics, an authorised seller of obsolete TI parts, is the place to look if it runs
+  out.</p>
+  <p>If it does, a comparator ladder is the fallback: five LM339 quads cover twenty thresholds
+  and are stocked for cents each. What the LM3914 actually buys is its dot-mode logic and its
+  constant-current sinks &mdash; a ladder needs a resistor per LED, a divider chain to set the
+  thresholds and extra steering if dot mode is to be kept. Only this sheet is affected.</p>
 </div>
 
 <div class="note warn">
   <h4>Still open</h4>
-  <p>Nothing here has been built, and the simulation models the drivers only as their
-  reference and input, so the LEDs never light in it. The gain-reduction scale in particular
-  comes from a model of the steering pair, not from measurement &mdash; the shape is right, but expect to
-  move <code>RV7</code> and to redraw the panel legend once a real one exists. <code>LED1</code>
-  on sheet 6 is now superseded by this sheet and has no hole in the panel.</p>
+  <p>Nothing here has been built. The gain-reduction scale comes from a model of the steering
+  pair, not from measurement &mdash; the shape is right, but expect to move <code>RV7</code> and
+  to redraw the panel legend once a real one exists. <code>LED1</code> on sheet 6 is superseded
+  by this sheet and has no hole in the panel.</p>
 </div>
 """)
 
@@ -849,7 +860,7 @@ Almost every decision on this panel is a consequence of that.</p>
 puts them 3.96 mm from each end. They are countersunk, so a screw head occupies a 5.72 mm
 circle in the middle of the panel top and bottom.</p>
 <p>That leaves a usable strip roughly 34 mm wide and 120 mm tall, interrupted at both ends.
-Into it go five knobs, four switch functions, fourteen meter LEDs and the legends for all of
+Into it go five knobs, four switch functions, twenty meter LEDs and the legends for all of
 it. There is no arrangement where everything is comfortable; every layout below trades one
 thing for another.</p>
 
@@ -868,7 +879,7 @@ thing for another.</p>
     ["", "r", "", ""]) + """
 
 <h2>Reading the meters</h2>
-<p>Two seven-segment bargraphs sit at the top, in a recessed window so they read against the
+<p>Two ten-segment bargraphs sit at the top, in a recessed window so they read against the
 panel.</p>
 <ul>
   <li><strong>GR</strong> fills <em>downward</em> from the top as the compressor clamps. More
@@ -879,9 +890,9 @@ panel.</p>
 </ul>
 <div class="note">
   <h4>The meters have a circuit now</h4>
-  <p>The fourteen LEDs are driven by <a href="meters.html">sheet 7</a>: two LM391x display
-  drivers in dot mode, fed by a peak detector and a level shifter. With two LEDs lit the
-  module draws about 81 mA of the 130 mA the rack allows on +16 V.</p>
+  <p>The twenty LEDs are driven by <a href="meters.html">sheet 7</a>: two LM3914 display
+  drivers in dot mode, fed by a peak detector and a level shifter. With one LED lit in each
+  meter the module draws about 94 mA of the 130 mA the rack allows on +16 V.</p>
 </div>
 
 <h2>Three layouts</h2>
@@ -890,11 +901,11 @@ definition, so choosing is a command-line flag rather than a redraw.</p>
 """ + table(
     ["Layout", "Switches", "Holes", "The trade"],
     [["<code>pull</code>", "None &mdash; every switch is a pull on a pot; LINK is an internal jumper",
-      "21", "Fewest parts and cheapest to build. Bypass is slow and uncertain, and you cannot bypass without touching the makeup knob."],
+      "27", "Fewest parts and cheapest to build. Bypass is slow and uncertain, and you cannot bypass without touching the makeup knob."],
      ["<code>toggle</code>", "Four toggles flanking THRESHOLD and RATIO",
-      "25", "Every function is one positive movement, nothing hidden, bypass instant. Most parts of the three."],
+      "31", "Every function is one positive movement, nothing hidden, bypass instant. Most parts of the three."],
      ["<code>concentric</code>", "Lit BYPASS button and two toggles; LINK on a pull",
-      "22", "Dual-concentric knobs free the space, but they are dearer, harder to source, and their inner shafts cannot carry a printed scale."]],
+      "28", "Dual-concentric knobs free the space, but they are dearer, harder to source, and their inner shafts cannot carry a printed scale."]],
     ["r", "", "n", ""]) + """
 
 <h3>Why the switches sit where they do</h3>
@@ -944,8 +955,8 @@ the repository, alongside the DXF.</p>
 <div class="note warn">
   <h4>Before you have one made</h4>
   <p>The holes are &Oslash;7.2 for the 9 mm pots, &Oslash;6.5 for the Salecom S1315 and
-  S1350 mini toggles and &Oslash;2.2 for the 2 mm LEDs. Altronics has no 2 mm LEDs: if you fit
-  its 3 mm flangeless ones instead, open the meter holes to &Oslash;3.1. Check every hole
+  S1350 mini toggles and &Oslash;2.2 for the 2 mm LEDs, ten per meter on a 3.0 mm pitch, which
+  leaves 0.8 mm of metal between meter holes. 3 mm LEDs won't fit that pitch. Check every hole
   against the parts you actually buy &mdash; half a millimetre is the difference between a push
   fit and a rattle.</p>
   <p>The toggles' 8.9 mm bushing leaves about 5.5 mm of thread through a standard 3.18 mm panel,
@@ -1036,8 +1047,8 @@ reference netlist, <code>tools/design.py</code>. That comparison caught a wire j
   <li><strong>Toggles:</strong> Altronics' Salecom mini toggles, the S1315 SPDT for HPF, KEY and
       LINK and the S1350 DPDT for BYPASS. The S1332 centre-off fits the SPDT footprint if you
       want one.</li>
-  <li><strong>Meters:</strong> the fourteen LEDs in two columns, with the LM3914 and LM3915
-      (<code>U9</code>, <code>U10</code>) either side. The driver chips are soldered rather than
+  <li><strong>Meters:</strong> twenty 2 mm LEDs in two columns of ten on a 3.0 mm pitch, with
+      the two LM3914s (<code>U9</code>, <code>U10</code>) either side. The driver chips are soldered rather than
       socketed, because a socket would overlap the LEDs.</li>
   <li><strong>On the back:</strong> the ribbon header <code>J1</code> and <code>C38</code>,
       which is too tall for the panel side.</li>
@@ -1111,15 +1122,17 @@ engine as KiCad's own <em>Inspect &rarr; Simulator</em>.</p>
   <li><strong>Models.</strong> Philips' model for the BC549C, vendor models for the diodes, and a
       behavioural NE5532 with the real part's gain, bandwidth, slew rate, swing and current
       limit. TI's own NE5532 macromodel stalls the solver once the meter's peak detector swings.
-      The LM3914 and LM3915 are stand-ins for their reference and input only.</li>
+      The LM3914 model, written for this design, has its reference, divider, ten comparators,
+      dot mode and LED current sinks.</li>
   <li><strong>Test bench.</strong> A text block on the root sheet supplies &plusmn;16 V, a
       balanced 1 kHz source and a 10 k&Omega; load on each output leg. Every knob and switch is a
       <code>.param</code> from 0 to 1, so settings change without editing parts.</li>
   <li><strong>Tests.</strong> The DC operating point, an AC sweep, slow input ramps for the
-      compression curves, a tone burst for attack and release, and distortion from an FFT.</li>
+      compression curves, a tone burst for attack and release, and distortion from an FFT.
+      A second script ramps the output level and the gain reduction to find where each meter
+      LED lights.</li>
   <li><strong>Limits.</strong> The op amp model has no noise and no distortion of its own below
-      clipping, so noise was not simulated and the distortion figures are the gain cell's. The
-      meter LEDs never light.</li>
+      clipping, so noise was not simulated and the distortion figures are the gain cell's.</li>
 </ul>
 <p>Levels are balanced dBu at 1 kHz, with makeup at 0 and attack and release at half travel
 unless it says otherwise.</p>
@@ -1203,9 +1216,16 @@ does:</p>
   <li><strong><code>CTRL-B</code> reaches &minus;8 V, not &minus;10 V.</strong> Set the
       gain-reduction meter's <code>RV7</code> against a measured <code>CTRL-B</code>.</li>
   <li><strong>Supply is about 72 / 62 mA at rest</strong>, a little over the 60 mA in the
-      brief, and the lit meter LEDs add about 9 mA on +16 V. Still well inside the rack's
-      130 mA.</li>
+      brief, and one lit LED in each meter adds about 22 mA on +16 V, about 94 mA in all.
+      Still inside the rack's 130 mA.</li>
 </ul>
+
+<h2>The meters</h2>
+""" + pic("sim-meters.png", "The LED lit against output level and against gain reduction, and both meters through a +20 dBu burst") + """
+<p>With <code>RV8</code> set for a top LED at +18 dBu, the level meter's ten LEDs light from
+&minus;1.8 to +18 dBu, closing up towards the top. With <code>RV7</code> set for 30 dB, the
+gain-reduction meter's light at 1.8, 3.1, 4.7, 6.8, 9.6, 12.9, 16.7, 21.1, 25.7 and 30.4 dB.
+<a href="meters.html">The meters page</a> has both scales LED by LED.</p>
 
 <div class="note warn">
   <h4>Check by hand before ordering</h4>
@@ -1293,10 +1313,11 @@ also a spreadsheet: <a href="parts/altronics.csv">altronics.csv</a>, built from 
         electrolytic leaks and shortens the release.</li>
     <li><strong><code>R61</code> and <code>R62</code></strong> are 0.1%% parts in values
         Altronics doesn't stock.</li>
-    <li><strong>The LM3915</strong> isn't stocked anywhere mainstream; see
-        <a href="meters.html">the meters</a>. The LM3914 is low stock.</li>
-    <li><strong>The 2 mm meter LEDs.</strong> Altronics has 3 mm flangeless ones, which fit the
-        footprint but need the panel's meter holes opened to &Oslash;3.1.</li>
+    <li><strong>The twenty 2 mm meter LEDs.</strong> Altronics has no 2 mm LEDs, and its 3 mm
+        flangeless ones don't fit the meters' 3.0 mm pitch. Buy 2 mm round flat-tops from
+        element14 or DigiKey.</li>
+    <li><strong>The LM3914</strong> is at Altronics but low stock, and both meters use it now
+        that the LM3915 can't be had; see <a href="meters.html">the meters</a>.</li>
   </ul>
 </div>
 

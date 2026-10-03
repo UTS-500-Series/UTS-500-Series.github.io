@@ -51,15 +51,17 @@ engine as KiCad's own <em>Inspect &rarr; Simulator</em>.</p>
   <li><strong>Models.</strong> Philips' model for the BC549C, vendor models for the diodes, and a
       behavioural NE5532 with the real part's gain, bandwidth, slew rate, swing and current
       limit. TI's own NE5532 macromodel stalls the solver once the meter's peak detector swings.
-      The LM3914 and LM3915 are stand-ins for their reference and input only.</li>
+      The LM3914 model, written for this design, has its reference, divider, ten comparators,
+      dot mode and LED current sinks.</li>
   <li><strong>Test bench.</strong> A text block on the root sheet supplies &plusmn;16 V, a
       balanced 1 kHz source and a 10 k&Omega; load on each output leg. Every knob and switch is a
       <code>.param</code> from 0 to 1, so settings change without editing parts.</li>
   <li><strong>Tests.</strong> The DC operating point, an AC sweep, slow input ramps for the
-      compression curves, a tone burst for attack and release, and distortion from an FFT.</li>
+      compression curves, a tone burst for attack and release, and distortion from an FFT.
+      A second script ramps the output level and the gain reduction to find where each meter
+      LED lights.</li>
   <li><strong>Limits.</strong> The op amp model has no noise and no distortion of its own below
-      clipping, so noise was not simulated and the distortion figures are the gain cell's. The
-      meter LEDs never light.</li>
+      clipping, so noise was not simulated and the distortion figures are the gain cell's.</li>
 </ul>
 <p>Levels are balanced dBu at 1 kHz, with makeup at 0 and attack and release at half travel
 unless it says otherwise.</p>
@@ -114,9 +116,19 @@ does:</p>
   <li><strong><code>CTRL-B</code> reaches &minus;8 V, not &minus;10 V.</strong> Set the
       gain-reduction meter's <code>RV7</code> against a measured <code>CTRL-B</code>.</li>
   <li><strong>Supply is about 72 / 62 mA at rest</strong>, a little over the 60 mA in the
-      brief, and the lit meter LEDs add about 9 mA on +16 V. Still well inside the rack's
-      130 mA.</li>
+      brief, and one lit LED in each meter adds about 22 mA on +16 V, about 94 mA in all.
+      Still inside the rack's 130 mA.</li>
 </ul>
+
+<h2>The meters</h2>
+<figure>
+  <div class="pane tall"><img src="img/sim-meters.png" alt="The LED lit against output level and against gain reduction, and both meters through a +20 dBu burst" loading="lazy"></div>
+  <figcaption><span>The LED lit against output level and against gain reduction, and both meters through a +20 dBu burst</span><a href="img/sim-meters.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+<p>With <code>RV8</code> set for a top LED at +18 dBu, the level meter's ten LEDs light from
+&minus;1.8 to +18 dBu, closing up towards the top. With <code>RV7</code> set for 30 dB, the
+gain-reduction meter's light at 1.8, 3.1, 4.7, 6.8, 9.6, 12.9, 16.7, 21.1, 25.7 and 30.4 dB.
+<a href="meters.html">The meters page</a> has both scales LED by LED.</p>
 
 <div class="note warn">
   <h4>Check by hand before ordering</h4>

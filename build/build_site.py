@@ -37,6 +37,7 @@ def copy_module_assets(mod):
                      ('kicad/sim/results/compression.png', 'img/sim-compression.png'),
                      ('kicad/sim/results/attack_release.png', 'img/sim-attack_release.png'),
                      ('kicad/sim/results/frequency.png', 'img/sim-frequency.png'),
+                     ('kicad/sim/results/meters.png', 'img/sim-meters.png'),
                      ('bom/altronics.csv', 'parts/altronics.csv')]:
         s = os.path.join(repo, src)
         if os.path.exists(s):
