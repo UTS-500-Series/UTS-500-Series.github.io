@@ -37,7 +37,7 @@ try {
 wrong.</p>
 
 <h2>The controls</h2>
-<div class="tw"><table><thead><tr><th class="">Control</th><th class="r">Ref</th><th class="">What it does</th></tr></thead><tbody><tr><td class="">Threshold</td><td class="r">RV3</td><td class="">How loud the signal must be before compression starts. Clockwise = lower threshold = more compression.</td></tr><tr><td class="">Ratio</td><td class="r">RV4</td><td class="">How much gain reduction per dB over threshold. Clockwise = harder.</td></tr><tr><td class="">Attack</td><td class="r">RV5</td><td class="">How fast it clamps down. 2&ndash;71 ms, simulated.</td></tr><tr><td class="">Release</td><td class="r">RV6</td><td class="">How fast it lets go. 49 ms&ndash;3.5 s, simulated.</td></tr><tr><td class="">Makeup</td><td class="r">RV2</td><td class="">Level put back after compression. 0 to +21 dB.</td></tr><tr><td class="">Unity trim</td><td class="r">RV1</td><td class="">Set once at bring-up. Not a performance control.</td></tr><tr><td class="">Bypass</td><td class="r">SW1</td><td class="">Hard bypass &mdash; audio goes straight through the rack.</td></tr><tr><td class="">Key int/ext</td><td class="r">SW2</td><td class="">Detector listens to this channel, or to the aux input.</td></tr><tr><td class="">HPF defeat</td><td class="r">SW3</td><td class="">Shorts out the detector's high-pass filter.</td></tr><tr><td class="">Link</td><td class="r">SW4</td><td class="">Ties this detector to the other module on pin 6.</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="">Control</th><th class="r">Ref</th><th class="">What it does</th></tr></thead><tbody><tr><td class="">Threshold</td><td class="r">RV3</td><td class="">How loud the signal must be before compression starts. Clockwise = higher threshold = less compression.</td></tr><tr><td class="">Ratio</td><td class="r">RV4</td><td class="">How much gain reduction per dB over threshold. Clockwise = harder.</td></tr><tr><td class="">Attack</td><td class="r">RV5</td><td class="">How fast it clamps down. 2&ndash;71 ms, simulated.</td></tr><tr><td class="">Release</td><td class="r">RV6</td><td class="">How fast it lets go. 49 ms&ndash;3.5 s, simulated.</td></tr><tr><td class="">Makeup</td><td class="r">RV2</td><td class="">Level put back after compression. 0 to +21 dB.</td></tr><tr><td class="">Unity trim</td><td class="r">RV1</td><td class="">Set once at bring-up. Not a performance control.</td></tr><tr><td class="">Bypass</td><td class="r">SW1</td><td class="">Hard bypass &mdash; audio goes straight through the rack.</td></tr><tr><td class="">Key int/ext</td><td class="r">SW2</td><td class="">Detector listens to this channel, or to the aux input.</td></tr><tr><td class="">HPF defeat</td><td class="r">SW3</td><td class="">Shorts out the detector's high-pass filter.</td></tr><tr><td class="">Link</td><td class="r">SW4</td><td class="">Ties this detector to the other module on pin 6.</td></tr></tbody></table></div>
 
 <div class="note">
   <h4>Threshold and ratio interact &mdash; this is normal</h4>
@@ -67,9 +67,9 @@ ever goes near a rack.</p>
       150 mV <em>above</em> <code>STA</code>. If it sits below, the module is compressing at
       idle &mdash; check <code>R61</code>.</li>
   <li><strong>Unity trim.</strong> Feed +4 dBu at 1 kHz, makeup fully down, threshold fully
-      anticlockwise so nothing is compressing. Adjust <code>RV1</code> for +4 dBu out.</li>
-  <li><strong>Threshold sweep.</strong> Still at +4 dBu, ratio at maximum, bring threshold up
-      until the LED just lights. Raise the input and the output should start to hold. Sweep
+      clockwise so nothing is compressing. Adjust <code>RV1</code> for +4 dBu out.</li>
+  <li><strong>Threshold sweep.</strong> Still at +4 dBu, ratio at maximum, turn threshold
+      anticlockwise until the LED just lights. Raise the input and the output should start to hold. Sweep
       attack and release and watch the LED's decay track.</li>
   <li><strong>Link check.</strong> With two modules and <code>SW4</code> closed on both,
       driving one channel only should pull <em>both</em> down by about half as much as that

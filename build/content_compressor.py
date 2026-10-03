@@ -1087,15 +1087,15 @@ for the pots, because Alps' download is out of reach where they are made.</p>
 <div class="note warn">
   <h4>Check before ordering boards</h4>
   <ul>
-    <li><strong>The main board needs tidying by hand.</strong> It was re-placed and re-routed
-        by script for the film capacitors. It passes DRC with nothing unconnected, but the
-        <code>TIMING</code> node and <code>Q3</code>'s emitter run longer than they need to,
-        and no one has reviewed the routing yet.</li>
+    <li><strong>The main board was routed by script.</strong> IN&plusmn; and OUT&plusmn; run as
+        pairs on the top layer and the ground pour on the bottom is one piece. It passes DRC
+        with nothing unconnected, but no one has reviewed the routing by eye yet.</li>
     <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the pots under 2 mm of
         thread: counterbore the pot holes or use a thinner panel
         (<a href="panel.html">front panel</a>).</li>
-    <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, THRESHOLD and RATIO turn
-        the opposite way to the panel legend (see <a href="simulation.html">the
+    <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, as is usual, RATIO
+        turns clockwise for a harder ratio (its outer pins are swapped for that) and THRESHOLD
+        turns clockwise for a higher threshold (see <a href="simulation.html">the
         simulation</a>).</li>
     <li><strong>Ribbon length</strong> is an estimate until the boards are in a rack.</li>
   </ul>
@@ -1230,9 +1230,9 @@ gain-reduction meter's light at 1.8, 3.1, 4.7, 6.8, 9.6, 12.9, 16.7, 21.1, 25.7 
 <div class="note warn">
   <h4>Check by hand before ordering</h4>
   <p>On the usual convention pin 3 is the clockwise end of a pot. If that holds for these pots,
-  THRESHOLD and RATIO turn the opposite way to the panel legend. Swapping their outer pins fixes
-  it, and <code>RV3</code> then needs a reverse-log (C) taper. MAKEUP, ATTACK and RELEASE turn
-  the expected way.</p>
+  every knob turns clockwise for &ldquo;more&rdquo;: a harder RATIO (<code>RV4</code>'s outer
+  pins are swapped for this), a higher THRESHOLD, slower ATTACK and RELEASE, and more MAKEUP.
+  A multimeter on one pot confirms which end is which.</p>
 </div>
 
 <h2>Running it yourself</h2>
@@ -1345,7 +1345,7 @@ wrong.</p>
 <h2>The controls</h2>
 """ + table(
     ["Control", "Ref", "What it does"],
-    [["Threshold", "RV3", "How loud the signal must be before compression starts. Clockwise = lower threshold = more compression."],
+    [["Threshold", "RV3", "How loud the signal must be before compression starts. Clockwise = higher threshold = less compression."],
      ["Ratio", "RV4", "How much gain reduction per dB over threshold. Clockwise = harder."],
      ["Attack", "RV5", "How fast it clamps down. 2&ndash;71 ms, simulated."],
      ["Release", "RV6", "How fast it lets go. 49 ms&ndash;3.5 s, simulated."],
@@ -1385,9 +1385,9 @@ ever goes near a rack.</p>
       150 mV <em>above</em> <code>STA</code>. If it sits below, the module is compressing at
       idle &mdash; check <code>R61</code>.</li>
   <li><strong>Unity trim.</strong> Feed +4 dBu at 1 kHz, makeup fully down, threshold fully
-      anticlockwise so nothing is compressing. Adjust <code>RV1</code> for +4 dBu out.</li>
-  <li><strong>Threshold sweep.</strong> Still at +4 dBu, ratio at maximum, bring threshold up
-      until the LED just lights. Raise the input and the output should start to hold. Sweep
+      clockwise so nothing is compressing. Adjust <code>RV1</code> for +4 dBu out.</li>
+  <li><strong>Threshold sweep.</strong> Still at +4 dBu, ratio at maximum, turn threshold
+      anticlockwise until the LED just lights. Raise the input and the output should start to hold. Sweep
       attack and release and watch the LED's decay track.</li>
   <li><strong>Link check.</strong> With two modules and <code>SW4</code> closed on both,
       driving one channel only should pull <em>both</em> down by about half as much as that

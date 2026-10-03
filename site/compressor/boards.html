@@ -148,15 +148,15 @@ for the pots, because Alps' download is out of reach where they are made.</p>
 <div class="note warn">
   <h4>Check before ordering boards</h4>
   <ul>
-    <li><strong>The main board needs tidying by hand.</strong> It was re-placed and re-routed
-        by script for the film capacitors. It passes DRC with nothing unconnected, but the
-        <code>TIMING</code> node and <code>Q3</code>'s emitter run longer than they need to,
-        and no one has reviewed the routing yet.</li>
+    <li><strong>The main board was routed by script.</strong> IN&plusmn; and OUT&plusmn; run as
+        pairs on the top layer and the ground pour on the bottom is one piece. It passes DRC
+        with nothing unconnected, but no one has reviewed the routing by eye yet.</li>
     <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the pots under 2 mm of
         thread: counterbore the pot holes or use a thinner panel
         (<a href="panel.html">front panel</a>).</li>
-    <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, THRESHOLD and RATIO turn
-        the opposite way to the panel legend (see <a href="simulation.html">the
+    <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, as is usual, RATIO
+        turns clockwise for a harder ratio (its outer pins are swapped for that) and THRESHOLD
+        turns clockwise for a higher threshold (see <a href="simulation.html">the
         simulation</a>).</li>
     <li><strong>Ribbon length</strong> is an estimate until the boards are in a rack.</li>
   </ul>
