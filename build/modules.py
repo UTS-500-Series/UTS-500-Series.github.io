@@ -35,7 +35,7 @@ class Module:
 MODULES = [
     Module('compressor', 'Compressor',
            'Feedback compressor built round a discrete current-steering gain cell. '
-           'Both boards laid out and routed, simulated, and a parts list from Altronics.',
+           'Simulated, boards ordered, parts from Altronics, and a faceplate you can 3D print.',
            'designed',
            'How the UTS Mini Mixing Desk compressor module works, section by section.',
            'documentation generated from the KiCad project',
@@ -50,11 +50,11 @@ MODULES = [
            content='content_preamp', repo='Pre-Amp'),
 
     Module('equaliser', 'Equaliser',
-           'Two state-variable parametric bands on OPA1644s, plus high-pass, low-pass and gain '
-           'stages. Bands drawn with values; card not wired yet.',
+           'Four bands: low and high shelves and two state-variable parametric mids, between a '
+           'balanced receiver and line driver. Schematic finished; board being laid out.',
            'progress',
            'How the UTS Mini Mixing Desk equaliser module works, and how far along it is.',
-           'written from the Equaliser repository at e2f6864',
+           'written from the Equaliser repository at 10142c5',
            content='content_equaliser', repo='Equaliser'),
 ]
 

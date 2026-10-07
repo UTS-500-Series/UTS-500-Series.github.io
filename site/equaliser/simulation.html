@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The main schematic</span></a><h4>The circuit</h4><a href="bands.html"><i>03</i><span>Parametric bands</span></a><a href="filters.html"><i>04</i><span>High- and low-pass filters</span></a><a href="gain.html"><i>05</i><span>Gain stage</span></a><h4>Practical</h4><a href="simulation.html" class="on"><i>06</i><span>Simulating it</span></a><a href="status.html"><i>07</i><span>What is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html" class="on"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -31,50 +31,61 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">Practical &mdash; 06</p>
+<p class="eyebrow">Practical &mdash; 07</p>
 <h1>Simulating it</h1>
-<p class="lede">The low-mid band&rsquo;s LTspice model now runs, and it agrees with the KiCad
-sheet. It still only runs on the machine it was drawn on.</p>
+<p class="lede">The site solves the whole sheet; the team&rsquo;s LTspice model of the low-mid
+band agrees with it.</p>
+
+<h2>How this site works out the response</h2>
+<p>LTspice is not available where this site is built, so every response on these pages is
+worked out from the KiCad sheet directly by <code>build/_eq_response.py</code>. It reads the
+netlist, splits each pot at its wiper into two resistors, treats each op amp as a gain of a
+million, and solves the circuit at 401 frequencies from 10&nbsp;Hz to 100&nbsp;kHz &mdash; the
+same nodal analysis SPICE does for an AC run. It starts at the INA137&rsquo;s output and ends at
+the DRV134&rsquo;s input; the receiver&rsquo;s &minus;6&nbsp;dB and the driver&rsquo;s +6&nbsp;dB
+cancel, so that is also the module&rsquo;s response from input to output.</p>
+<p>It solves the circuit as it should be powered: the two op amps with their supply pin on the
+wrong rail are treated as working (see <a href="io.html#power">power</a>).</p>
+<p>Ideal op amps are a fair assumption here. The OPA1644 has 11&nbsp;MHz of gain-bandwidth; at
+20&nbsp;kHz that still leaves it hundreds of times more gain than any stage asks for. What it
+cannot show is noise, headroom or the op amps&rsquo; own distortion &mdash; those need the real
+model, or a real board.</p>
+
+<figure>
+  <div style="background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 10px 6px"><svg viewBox="0 0 680 364" role="img" style="width:100%;height:auto;display:block" aria-label="The flat response with every knob centred">
+    <g stroke="var(--rule)" stroke-width="1"><line x1="48.0" y1="16" x2="48.0" y2="304"/><line x1="202.0" y1="16" x2="202.0" y2="304"/><line x1="356.0" y1="16" x2="356.0" y2="304"/><line x1="510.0" y1="16" x2="510.0" y2="304"/><line x1="664.0" y1="16" x2="664.0" y2="304"/><line x1="48" y1="304.0" x2="664" y2="304.0"/><line x1="48" y1="268.0" x2="664" y2="268.0"/><line x1="48" y1="232.0" x2="664" y2="232.0"/><line x1="48" y1="196.0" x2="664" y2="196.0"/><line x1="48" y1="160.0" x2="664" y2="160.0"/><line x1="48" y1="124.0" x2="664" y2="124.0"/><line x1="48" y1="88.0" x2="664" y2="88.0"/><line x1="48" y1="52.0" x2="664" y2="52.0"/><line x1="48" y1="16.0" x2="664" y2="16.0"/></g>
+    <line x1="48" y1="160.0" x2="664" y2="160.0" stroke="var(--ink-3)" stroke-width="1"/>
+    <path d="M48.0 167.8 L49.5 167.5 L51.1 167.1 L52.6 166.8 L54.2 166.6 L55.7 166.3 L57.2 166.0 L58.8 165.7 L60.3 165.5 L61.9 165.2 L63.4 165.0 L64.9 164.8 L66.5 164.5 L68.0 164.3 L69.6 164.2 L71.1 164.0 L72.6 163.8 L74.2 163.6 L75.7 163.5 L77.3 163.3 L78.8 163.2 L80.3 163.0 L81.9 162.9 L83.4 162.7 L85.0 162.7 L86.5 162.5 L88.0 162.4 L89.6 162.3 L91.1 162.2 L92.7 162.1 L94.2 162.0 L95.7 161.9 L97.3 161.9 L98.8 161.8 L100.4 161.7 L101.9 161.7 L103.4 161.6 L105.0 161.5 L106.5 161.4 L108.1 161.4 L109.6 161.3 L111.1 161.3 L112.7 161.2 L114.2 161.2 L115.8 161.1 L117.3 161.1 L118.8 161.0 L120.4 161.0 L121.9 160.9 L123.5 160.9 L125.0 160.9 L126.5 160.9 L128.1 160.8 L129.6 160.8 L131.2 160.8 L132.7 160.7 L134.2 160.7 L135.8 160.7 L137.3 160.6 L138.9 160.6 L140.4 160.6 L141.9 160.6 L143.5 160.6 L145.0 160.6 L146.6 160.6 L148.1 160.6 L149.6 160.6 L151.2 160.6 L152.7 160.6 L154.3 160.5 L155.8 160.5 L157.3 160.5 L158.9 160.5 L160.4 160.5 L162.0 160.5 L163.5 160.5 L165.0 160.5 L166.6 160.5 L168.1 160.5 L169.7 160.5 L171.2 160.5 L172.7 160.5 L174.3 160.5 L175.8 160.6 L177.4 160.6 L178.9 160.6 L180.4 160.6 L182.0 160.6 L183.5 160.6 L185.1 160.6 L186.6 160.6 L188.1 160.6 L189.7 160.6 L191.2 160.6 L192.8 160.6 L194.3 160.6 L195.8 160.7 L197.4 160.7 L198.9 160.7 L200.5 160.7 L202.0 160.8 L203.5 160.8 L205.1 160.8 L206.6 160.8 L208.2 160.8 L209.7 160.8 L211.2 160.9 L212.8 160.9 L214.3 160.9 L215.9 160.9 L217.4 160.9 L218.9 160.9 L220.5 160.9 L222.0 160.9 L223.6 160.9 L225.1 160.9 L226.6 160.9 L228.2 160.9 L229.7 160.9 L231.3 160.9 L232.8 160.9 L234.3 160.9 L235.9 160.9 L237.4 160.8 L239.0 160.8 L240.5 160.8 L242.0 160.8 L243.6 160.8 L245.1 160.7 L246.7 160.7 L248.2 160.7 L249.7 160.6 L251.3 160.6 L252.8 160.6 L254.4 160.6 L255.9 160.6 L257.4 160.6 L259.0 160.6 L260.5 160.6 L262.1 160.5 L263.6 160.5 L265.1 160.5 L266.7 160.4 L268.2 160.4 L269.8 160.4 L271.3 160.4 L272.8 160.4 L274.4 160.4 L275.9 160.4 L277.5 160.4 L279.0 160.4 L280.5 160.3 L282.1 160.3 L283.6 160.3 L285.2 160.3 L286.7 160.3 L288.2 160.3 L289.8 160.2 L291.3 160.2 L292.9 160.2 L294.4 160.2 L295.9 160.2 L297.5 160.2 L299.0 160.2 L300.6 160.2 L302.1 160.1 L303.6 160.1 L305.2 160.1 L306.7 160.1 L308.3 160.1 L309.8 160.1 L311.3 160.1 L312.9 160.1 L314.4 160.1 L316.0 160.1 L317.5 160.1 L319.0 160.1 L320.6 160.1 L322.1 160.1 L323.7 160.1 L325.2 160.1 L326.7 160.1 L328.3 160.1 L329.8 160.1 L331.4 160.1 L332.9 160.1 L334.4 160.1 L336.0 160.1 L337.5 160.1 L339.1 160.1 L340.6 160.1 L342.1 160.1 L343.7 160.1 L345.2 160.1 L346.8 160.1 L348.3 160.1 L349.8 160.1 L351.4 160.1 L352.9 160.1 L354.5 160.0 L356.0 160.0 L357.5 160.0 L359.1 160.0 L360.6 160.0 L362.2 160.0 L363.7 160.0 L365.2 160.0 L366.8 160.0 L368.3 160.0 L369.9 160.0 L371.4 160.0 L372.9 160.0 L374.5 160.0 L376.0 160.0 L377.6 160.0 L379.1 160.0 L380.6 159.9 L382.2 159.9 L383.7 159.9 L385.3 159.9 L386.8 159.9 L388.3 159.9 L389.9 159.9 L391.4 159.9 L393.0 159.9 L394.5 159.9 L396.0 159.9 L397.6 159.8 L399.1 159.8 L400.7 159.8 L402.2 159.7 L403.7 159.7 L405.3 159.7 L406.8 159.6 L408.4 159.6 L409.9 159.6 L411.4 159.5 L413.0 159.5 L414.5 159.4 L416.1 159.4 L417.6 159.3 L419.1 159.2 L420.7 159.1 L422.2 159.1 L423.8 158.9 L425.3 158.8 L426.8 158.7 L428.4 158.6 L429.9 158.5 L431.5 158.3 L433.0 158.2 L434.5 158.0 L436.1 157.8 L437.6 157.6 L439.2 157.4 L440.7 157.1 L442.2 156.9 L443.8 156.6 L445.3 156.3 L446.9 156.0 L448.4 155.6 L449.9 155.2 L451.5 154.8 L453.0 154.4 L454.6 153.9 L456.1 153.4 L457.6 152.9 L459.2 152.3 L460.7 151.6 L462.3 151.0 L463.8 150.3 L465.3 149.6 L466.9 148.8 L468.4 148.0 L470.0 147.2 L471.5 146.3 L473.0 145.4 L474.6 144.4 L476.1 143.5 L477.7 142.5 L479.2 141.5 L480.7 140.4 L482.3 139.4 L483.8 138.3 L485.4 137.2 L486.9 136.2 L488.4 135.2 L490.0 134.1 L491.5 133.1 L493.1 132.1 L494.6 131.1 L496.1 130.1 L497.7 129.2 L499.2 128.3 L500.8 127.5 L502.3 126.7 L503.8 125.9 L505.4 125.2 L506.9 124.6 L508.5 123.9 L510.0 123.4 L511.5 122.9 L513.1 122.5 L514.6 122.1 L516.2 121.8 L517.7 121.5 L519.2 121.3 L520.8 121.1 L522.3 121.0 L523.9 120.9 L525.4 120.9 L526.9 121.0 L528.5 121.0 L530.0 121.2 L531.6 121.3 L533.1 121.6 L534.6 121.8 L536.2 122.2 L537.7 122.6 L539.3 123.0 L540.8 123.5 L542.3 124.0 L543.9 124.5 L545.4 125.2 L547.0 125.8 L548.5 126.5 L550.0 127.2 L551.6 128.0 L553.1 128.9 L554.7 129.8 L556.2 130.8 L557.7 131.8 L559.3 132.8 L560.8 133.9 L562.4 135.1 L563.9 136.3 L565.4 137.6 L567.0 139.0 L568.5 140.4 L570.1 141.9 L571.6 143.4 L573.1 145.1 L574.7 146.8 L576.2 148.6 L577.8 150.4 L579.3 152.4 L580.8 154.4 L582.4 156.5 L583.9 158.6 L585.5 160.9 L587.0 163.3 L588.5 165.8 L590.1 168.4 L591.6 171.1 L593.2 173.8 L594.7 176.8 L596.2 179.7 L597.8 182.9 L599.3 186.1 L600.9 189.5 L602.4 193.0 L603.9 196.6 L605.5 200.4 L607.0 204.4 L608.6 208.4 L610.1 212.6 L611.6 217.0 L613.2 221.4 L614.7 226.1 L616.3 230.8 L617.8 235.8 L619.3 241.0 L620.9 246.3 L622.4 251.7 L624.0 257.4 L625.5 263.2 L627.0 269.2 L628.6 275.4 L630.1 281.8 L631.7 288.4 L633.2 295.1 L634.7 302.1 L636.3 304.0 L637.8 304.0 L639.4 304.0 L640.9 304.0 L642.4 304.0 L644.0 304.0 L645.5 304.0 L647.1 304.0 L648.6 304.0 L650.1 304.0 L651.7 304.0 L653.2 304.0 L654.8 304.0 L656.3 304.0 L657.8 304.0 L659.4 304.0 L660.9 304.0 L662.5 304.0 L664.0 304.0" fill="none" stroke="var(--sig)" stroke-width="2" stroke-linejoin="round"/>
+    <g fill="var(--ink)"></g>
+    <g fill="var(--ink-3)" font-family="var(--mono)" font-size="11"><text x="48.0" y="322" text-anchor="middle">10</text><text x="202.0" y="322" text-anchor="middle">100</text><text x="356.0" y="322" text-anchor="middle">1k</text><text x="510.0" y="322" text-anchor="middle">10k</text><text x="664.0" y="322" text-anchor="middle">100k</text><text x="42" y="304.0" text-anchor="end" dominant-baseline="middle">-2</text><text x="42" y="268.0" text-anchor="end" dominant-baseline="middle">-1.5</text><text x="42" y="232.0" text-anchor="end" dominant-baseline="middle">-1</text><text x="42" y="196.0" text-anchor="end" dominant-baseline="middle">-0.5</text><text x="42" y="160.0" text-anchor="end" dominant-baseline="middle">0 dB</text><text x="42" y="124.0" text-anchor="end" dominant-baseline="middle">+0.5</text><text x="42" y="88.0" text-anchor="end" dominant-baseline="middle">+1</text><text x="42" y="52.0" text-anchor="end" dominant-baseline="middle">+1.5</text><text x="42" y="16.0" text-anchor="end" dominant-baseline="middle">+2</text>
+      <line x1="48" y1="352" x2="72" y2="352" stroke="var(--sig)" stroke-width="2"/><text x="78" y="352" dominant-baseline="middle">all knobs centred, as drawn</text>
+    </g>
+  </svg></div>
+  <figcaption><span>Every knob centred: the module should be a straight line at 0&nbsp;dB</span>
+  <a href="data/response.json" target="_blank" rel="noopener">Raw data &rarr;</a></figcaption>
+</figure>
+<p>With every knob centred the response should be a straight line. It is within
+0.54&nbsp;dB from 20&nbsp;Hz to 20&nbsp;kHz, and the rise towards 12&nbsp;kHz is C33 (see
+<a href="filters.html">the shelves</a>).</p>
 
 <h2>The team&rsquo;s LTspice models</h2>
-<div class="tw"><table><thead><tr><th class="r">File</th><th class="">What it models</th><th class="">Committed results</th></tr></thead><tbody><tr><td class="r"><code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code></td><td class="">Low-mid band, OPA1644 model, pots as resistor pairs</td><td class="">Yes, AC run of 30&nbsp;Sep, completed with no errors</td></tr><tr><td class="r"><code>High_Bandpass_Filter/LTSPICE/BandB.asc</code></td><td class="">High-mid band</td><td class="">Yes</td></tr><tr><td class="r"><code>High_Pass_filter/hpf.asc</code></td><td class="">High-pass, generic op amp</td><td class="">No</td></tr><tr><td class="r"><code>Low_Pass_Filter/lpf.asc</code></td><td class="">Low-pass, generic op amp</td><td class="">No</td></tr><tr><td class="r"><code>Variable_Gain/variable gain.asc</code></td><td class="">Gain stage, generic op amp</td><td class="">No</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="r">File</th><th class="">What it models</th><th class="">Committed results</th></tr></thead><tbody><tr><td class="r"><code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code></td><td class="">Low-mid band, OPA1644 model, pots as resistor pairs</td><td class="">Yes, AC run of 30&nbsp;Sep</td></tr><tr><td class="r"><code>High_Bandpass_Filter/LTSPICE/BandB.asc</code></td><td class="">High-mid band</td><td class="">Yes</td></tr><tr><td class="r"><code>High_Pass_filter/hpf.asc</code></td><td class="">First draft of the high shelf&rsquo;s filter, generic op amp</td><td class="">No</td></tr><tr><td class="r"><code>Low_Pass_Filter/lpf.asc</code></td><td class="">First draft of the low shelf&rsquo;s filter, generic op amp</td><td class="">No</td></tr><tr><td class="r"><code>Variable_Gain/variable gain.asc</code></td><td class="">The level stage, generic op amp</td><td class="">No</td></tr></tbody></table></div>
+<p>There is no LTspice model of the whole module yet. The shelves only work as shelves once
+the dry path, the level stages and the summer are all present, so a model of the full sheet is
+the one worth drawing next.</p>
 
-<h2>The model is still linked by an absolute path</h2>
+<h2>The BandA model is linked by an absolute path</h2>
 <p>Each op amp&rsquo;s <code>ModelFile</code> in <code>BandA.asc</code> points at a folder on the
 machine the file was drawn on:</p>
 <pre><code>C:\Users\ebul0\Downloads\sbom627d\OPA164x.LIB</code></pre>
 <p>On anyone else&rsquo;s machine the simulation stops with &ldquo;This sub-circuit name is not
 defined&rdquo;. A copy of the library is already committed beside the schematic, at
 <code>LT_SPICE/BandA/OPA164x.LIB</code>. Point the model at that with a relative path and it
-will run anywhere. The <code>hpf</code>, <code>lpf</code> and gain models use LTspice&rsquo;s
-built-in op amp, so they run as they are.</p>
+will run anywhere.</p>
 
-<h2>How this site works out the response</h2>
-<p>LTspice is not available where this site is built, so the response on the
-<a href="bands.html">bands page</a> is worked out from the KiCad sheet directly by
-<code>build/_eq_response.py</code>. It reads the netlist, splits each pot at its wiper into two
-resistors, treats each op amp as a gain of a million, and solves the circuit at 401 frequencies
-from 10&nbsp;Hz to 100&nbsp;kHz &mdash; the same nodal analysis SPICE does for an AC run.</p>
-<p>Ideal op amps are a fair assumption here. The OPA1644 has 11&nbsp;MHz of gain-bandwidth; at
-20&nbsp;kHz that still leaves it hundreds of times more gain than any stage asks for. What it
-cannot show is noise, headroom or the op amps&rsquo; own distortion &mdash; those need the real
-model, or a real board.</p>
-
-<h2>Re-running BandA</h2>
-<ol>
-  <li>Open <code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code> in LTspice.</li>
-  <li>Fix the model path as above.</li>
-  <li>Run. The analysis is already set: <code>.ac dec 100 10 100k</code>.</li>
-  <li>Plot <code>V(output)</code>. With the file&rsquo;s pot settings it should peak at
-  +9.5&nbsp;dB near 1.26&nbsp;kHz.</li>
-</ol>
-<p>To try other knob positions, change the resistor pairs standing in for each pot (R4/R5
-width, R9/R10 and R13/R14 frequency, R18/R19 boost/cut), keeping each pair&rsquo;s sum at
-10k.</p>
-
-<div class="next"><a href="gain.html">&larr; Gain stage</a><a href="status.html">What is left &rarr;</a></div>
+<div class="next"><a href="board.html">&larr; Board &amp; parts</a><a href="status.html">What is left &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at e2f6864<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

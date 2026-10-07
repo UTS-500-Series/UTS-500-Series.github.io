@@ -1,14 +1,13 @@
 """Equaliser module - page content.
 
-Written from the Equaliser repository at commit e2f6864 (1 Oct 2026; the design files last
-changed in c804e9e, 30 Sep): https://github.com/UTS-500-Series/Equaliser
+Written from the Equaliser repository at commit 10142c5 (7 Oct 2026; the schematic was
+finalised in 8a0d895 on 5 Oct and the board started the same day):
+https://github.com/UTS-500-Series/Equaliser
 
-The two parametric bands are drawn with values on Combined_EQ/Combined_EQ.kicad_sch. That
-sheet's image and viewer data come from _kicad_sch.py, and every response figure on these
-pages comes from _eq_response.py, which solves the same netlist (ideal op amps, linear pots)
-and is checked against the team's own LTspice run. The high-pass, low-pass and gain sections
-are still on sheets of their own; their images come from _kicad_sch.py too (SHEETS below).
-Rerun both scripts when the repository changes:
+The whole equaliser is drawn on Combined_EQ/Combined_EQ.kicad_sch. That sheet's image and
+viewer data come from _kicad_sch.py, and every response figure on these pages comes from
+_eq_response.py, which solves the same netlist (ideal op amps, linear pots); the low-mid band
+is also checked against the team's own LTspice run. Rerun both when the repository changes:
 
     python3 build/_kicad_sch.py --module equaliser
     python3 build/_eq_response.py
@@ -18,20 +17,17 @@ import shell
 from shell import fig, pic, table
 
 SRC = 'https://github.com/UTS-500-Series/Equaliser'
-COMMIT = 'e2f6864'
+COMMIT = '10142c5'
 SCH = 'Combined_EQ/Combined_EQ.kicad_sch'      # read by _kicad_sch.py, relative to the repository
-SHEETS = {'hpf': 'High_Pass_filter/HPF/HPF.kicad_sch',
-          'lpf': 'Low_Pass_Filter/LPF/LPF.kicad_sch',
-          'gain': 'Variable_Gain/GAIN/variablegain/variablegain.kicad_sch'}
 
-POWER = {'+16V', '-16V', '+48V', 'VCC', 'VEE'}
-GROUND = {'AGND', 'CHASSIS', 'B+/C+/F+/G+/GND'}
+POWER = {'+16V', '-16V', 'VCC', 'VEE'}
+GROUND = {'B+/C+/F+/G+/GND/M+/N+/O+/P+', 'CHASSIS'}
 
 
 def net_class(n):
     if n in GROUND: return 'gnd'
     if n in POWER: return 'pwr'
-    if n.startswith('Net-(R') or n in ('GAIN_ADJ', 'SC_LINK'): return 'ctl'
+    if n.startswith('Net-(R') or n.startswith('Net-(J'): return 'ctl'
     return 'sig'
 
 
@@ -40,131 +36,271 @@ def net_class(n):
 _BAND = {
     'low': dict(ic='IC3', sum='A', i1='B', i2='C', out='D', fin='R29', fb='R39', mix='RV8',
                 feed='R30', damp='R31', sfb='R32', loop='R35', q='RV7', qg='R27', qs='R28',
-                f='RV9', ri1='R36', ri2='R38', rb1='R34', rb2='R37', c1='C8', c2='C9',
-                cc='C7', rd='R33', cap='12.7&nbsp;nF', name='low-mid'),
+                f='RV9', ri1='R36', ri2='R38', rb1='R34', rb2='R37', c1=('C8', 'C39', 'C40'),
+                c2=('C9', 'C42', 'C43'), cc='C7', rd='R33', cap='12.7&nbsp;nF', name='low-mid'),
     'high': dict(ic='IC2', sum='E', i1='F', i2='G', out='H', fin='R16', fb='R22', mix='RV5',
                  feed='R17', damp='R18', sfb='R19', loop='R23', q='RV2', qg='R14', qs='R15',
-                 f='RV6', ri1='R24', ri2='R26', rb1='R21', rb2='R25', c1='C3', c2='C6',
-                 cc='C2', rd='R20', cap='2.3&nbsp;nF', name='high-mid'),
+                 f='RV6', ri1='R24', ri2='R26', rb1='R21', rb2='R25', c1=('C3', 'C41'),
+                 c2=('C6', 'C44'), cc='C2', rd='R20', cap='2.3&nbsp;nF', name='high-mid'),
 }
-NOTES = {'J1': '500-series 15-pin card edge (EDAC 306). Only +16 V, -16 V, ground and +48 V '
-               'reach it so far, and the op amps are not yet on those rails.'}
+NOTES = {
+    'J1': '500-series 15-pin card edge. Audio in on pins 10 (+) and 8 (-), out on 2 (+) and 4 '
+          '(-), supply on 12 and 14 through R6 and R5, ground on 5 and 13, chassis on 1.',
+    'IC1': 'INA137 balanced line receiver. Turns the balanced input into one signal at half '
+           'the level (-6 dB).',
+    'IC4': 'OPA1644 quad. A buffers the input, B buffers the bands\' output, D is the low '
+           'shelf\'s low-pass filter and C the high shelf\'s high-pass filter.',
+    'IC5': 'OPA1644 quad. A and B are the shelves\' level stages, D inverts the dry signal and '
+           'C sums everything into the output. Pin 4 (V+) is drawn on -16V: it should be +16V.',
+    'IC6': 'DRV134 balanced line driver. Turns the summed signal back into a balanced output, '
+           'at twice the level (+6 dB).',
+    'SW1': 'Bypass. One position takes the outputs from the DRV134, the other joins them '
+           'straight to the inputs. Works unpowered.',
+    'R1': '47R in the cold input leg: with C1 to chassis, keeps radio frequencies out.',
+    'R3': '47R in the hot input leg: with C5 to chassis, keeps radio frequencies out.',
+    'C1': '470 pF from the cold input to chassis. RF filter with R1.',
+    'C5': '470 pF from the hot input to chassis. RF filter with R3.',
+    'C4': '47 uF input coupling, cold leg. Blocks DC from the source.',
+    'C10': '47 uF input coupling, hot leg. Blocks DC from the source.',
+    'R2': '100k, holds the INA137\'s cold input at ground for DC.',
+    'R4': '100k, holds the INA137\'s hot input at ground for DC.',
+    'R5': '10R in series with the -16 V supply from J1 pin 14.',
+    'R6': '10R in series with the +16 V supply from J1 pin 12.',
+    'C18': '100 uF reservoir on -16 V.',
+    'C20': '100 uF reservoir on +16 V.',
+    'C11': '1 uF on -16 V.',
+    'C12': '1 uF on +16 V.',
+    'C23': '1 uF coupling from the high-mid band into buffer IC4B.',
+    'R7': '100k, holds IC4B\'s input at ground for DC.',
+    'C35': '100 pF from the cold output to ground.',
+    'C36': '100 pF from the hot output to ground.',
+    'R8': 'Low shelf filter, first resistor: 6.2k plus one gang of RV1.',
+    'R9': 'Low shelf filter, second resistor: 6.2k plus the other gang of RV1.',
+    'RV1': 'Low shelf frequency, 100k dual gang, each gang wired as a variable resistor. '
+           'Towards pin 3 is a higher corner.',
+    'C24': 'Low shelf filter: 10 nF from the middle of the resistor chain to the output. '
+           'With C27, 20 nF.',
+    'C27': 'Low shelf filter: 10 nF in parallel with C24.',
+    'C46': 'Low shelf filter: 10 nF from IC4D\'s + input to ground. With C47, 20 nF.',
+    'C47': 'Low shelf filter: 10 nF in parallel with C46.',
+    'R10': 'Low shelf filter gain, with R11: 1 + 16k/27k = 1.59, which makes it Butterworth.',
+    'R11': 'Low shelf filter feedback, with R10.',
+    'R12': 'High shelf input divider, top. With R13, scales the signal by 0.64.',
+    'R13': 'High shelf input divider, bottom.',
+    'C25': '270 pF, first series capacitor of the high shelf filter.',
+    'C26': '270 pF, second series capacitor of the high shelf filter.',
+    'R40': 'High shelf filter: 30k plus one gang of RV4, from between the capacitors to the output.',
+    'R42': 'High shelf filter: 30k plus the other gang of RV4, from IC4C\'s + input to ground.',
+    'RV4': 'High shelf frequency, 100k dual gang, each gang wired as a variable resistor. '
+           'Towards pin 3 is a higher corner.',
+    'R41': 'High shelf filter gain, with R43: 1.59.',
+    'R43': 'High shelf filter feedback, with R41.',
+    'RV3': 'Low shelf level. Towards pin 3 boosts, centre is flat, towards pin 1 cuts.',
+    'R45': 'Low shelf level stage, input end of RV3.',
+    'R46': 'Low shelf level stage, output end of RV3.',
+    'C29': '220 pF across the low shelf level stage.',
+    'RV10': 'High shelf level. Towards pin 3 boosts, centre is flat, towards pin 1 cuts.',
+    'R47': 'High shelf level stage, input end of RV10.',
+    'R48': 'High shelf level stage, output end of RV10.',
+    'C33': '220 pF across the high shelf level stage. Makes the flat response rise 0.5 dB '
+           'around 12 kHz; 22 pF would not.',
+    'R44': 'Dry-signal inverter input (IC5D), 10k.',
+    'R49': 'Dry-signal inverter feedback, 10k: gain -1.',
+    'R50': 'Dry signal into the summer, 10k.',
+    'R51': 'High shelf level stage into the summer, 16k.',
+    'R52': 'Low shelf level stage into the summer, 16k.',
+    'R53': 'High shelf filter straight into the summer, 16k.',
+    'R54': 'Low shelf filter straight into the summer, 16k.',
+    'R55': 'Summer feedback, 10k.',
+    'C28': '100 pF across the summer.',
+    'J2': '24-pin header with nothing connected and no footprint.',
+    'J3': '24-pin header with nothing connected and no footprint.',
+}
+for fb, what in (('FB1', 'cold input'), ('FB2', 'hot input'), ('FB3', 'hot output'),
+                 ('FB4', 'cold output')):
+    NOTES[fb] = 'Ferrite bead in the %s, at the card edge.' % what
+for c in ('C13', 'C14', 'C15', 'C16', 'C17', 'C19', 'C21', 'C22', 'C30', 'C31', 'C32', 'C34',
+          'C37', 'C38'):
+    NOTES[c] = '100 nF supply decoupling.'
+for h in ('H1', 'H2', 'H3', 'H4'):
+    NOTES[h] = 'M3 mounting hole.'
 for b in _BAND.values():
     n = b['name']
     NOTES.update({
         b['ic']: 'OPA1644 quad op amp: the whole %s band. Unit %s sums, %s and %s integrate, '
-                 '%s mixes the band back into the signal.' % (n, b['sum'], b['i1'], b['i2'], b['out']),
+                 '%s mixes the band back into the signal.' % (n, b['sum'], b['i1'], b['i2'], b['out'])
+                 + (' Pin 4 (V+) is drawn on -16V: it should be +16V.' if b['ic'] == 'IC2' else ''),
         b['fin']: 'Band input into the output stage\'s inverting input. With %s, gain of -1 for '
                   'the dry signal.' % b['fb'],
         b['fb']: 'Output-stage feedback. Sets the dry gain to -1 with %s.' % b['fin'],
-        b['mix']: 'Boost/cut. Pin 1 is the band input, pin 3 the band output; the wiper feeds '
-                  'the filter. Pin 1 end is full boost, centre is flat.',
+        b['mix']: '%s boost/cut. Pin 1 is the band input, pin 3 the band output; the wiper feeds '
+                  'the filter. Pin 1 end is full boost, centre is flat.' % n.capitalize(),
         b['feed']: 'From the boost/cut wiper into the summer\'s + input: the filter\'s input.',
         b['damp']: 'Band-pass output back into the summer\'s + input. Sets the damping.',
         b['sfb']: 'Summer feedback.',
         b['loop']: 'Low-pass output back to the summer\'s - input: closes the state-variable loop.',
-        b['q']: 'Width (Q). Its wiper goes to ground through %s; pin 1 end is narrowest.' % b['qg'],
+        b['q']: '%s width (Q). Its wiper goes to ground through %s; pin 1 end is narrowest.' % (n.capitalize(), b['qg']),
         b['qg']: 'From the width pot\'s wiper to ground.',
         b['qs']: 'From the width pot to the summer\'s - input.',
-        b['f']: 'Frequency, dual gang: one gang per integrator, so both move together. Pin 1 '
-                'end is the top of the range.',
-        b['ri1']: 'Integrator input resistor, first integrator. Sets the top frequency with %s.' % b['c1'],
+        b['f']: '%s frequency, dual gang: one gang per integrator, so both move together. Pin 1 '
+                'end is the top of the range.' % n.capitalize(),
+        b['ri1']: 'Integrator input resistor, first integrator.',
         b['ri2']: 'Integrator input resistor, second integrator.',
         b['rb1']: 'Bottom of the first frequency gang to ground. Sets the bottom of the range.',
         b['rb2']: 'Bottom of the second frequency gang to ground.',
-        b['c1']: '%s integrator capacitor. This value is what places the band.' % b['cap'],
-        b['c2']: '%s integrator capacitor, matching %s.' % (b['cap'], b['c1']),
         b['cc']: '10 uF, couples the band-pass output into the output stage\'s + input.',
         b['rd']: '100k, holds the output stage\'s + input at ground for DC.',
     })
+    for grp, which in ((b['c1'], 'first'), (b['c2'], 'second')):
+        for c in grp:
+            NOTES[c] = ('Part of the %s integrator capacitor, %s in all (%s in parallel). This '
+                        'value is what places the band.' % (which, b['cap'], ' + '.join(grp)))
 
 
 def resp():
     return json.load(open(os.path.join(shell.DATA_DIR, 'response.json')))
 
 
-def response_chart():
-    """Both bands at full boost and full cut, with the frequency knob at the bottom, middle and
-    top of its travel, and the team's LTspice run on top. Drawn inline so it follows the
-    site's theme."""
-    d = resp()
-    W, H, L, R, T, B = 680, 340, 48, 16, 16, 36
-    fmin, fmax, dbmin, dbmax = 10, 100000, -12, 12
+COLOURS = {'lowshelf': 'var(--warn)', 'lowmid': 'var(--sig)', 'highmid': 'var(--ctl)',
+           'highshelf': 'var(--good)'}
+LABELS = {'lowshelf': 'low shelf', 'lowmid': 'low-mid band', 'highmid': 'high-mid band',
+          'highshelf': 'high shelf'}
+
+
+def chart(curves, caption, keys, dots=None, dbmin=-12, dbmax=12, step=6, aria=''):
+    """Response curves drawn inline so they follow the site's theme. `curves` is a list of
+    (points, colour, dashed); `keys` a list of (colour, label, dashed)."""
+    W, H, L, R, T, B = 680, 364, 48, 16, 16, 60      # the key sits in a row under the axis
+    fmin, fmax = 10, 100000
     X = lambda f: L + (math.log10(f) - 1) / (math.log10(fmax) - 1) * (W - L - R)
-    Y = lambda db: T + (dbmax - db) / (dbmax - dbmin) * (H - T - B)
+    Y = lambda db: T + (dbmax - min(max(db, dbmin), dbmax)) / (dbmax - dbmin) * (H - T - B)
     grid, lab = [], []
     for f in (10, 100, 1000, 10000, 100000):
         grid.append('<line x1="%.1f" y1="%d" x2="%.1f" y2="%d"/>' % (X(f), T, X(f), H - B))
         lab.append('<text x="%.1f" y="%d" text-anchor="middle">%s</text>'
                    % (X(f), H - B + 18, {10: '10', 100: '100', 1000: '1k', 10000: '10k', 100000: '100k'}[f]))
-    for db in range(dbmin, dbmax + 1, 6):
+    db = dbmin
+    while db <= dbmax + 1e-9:
         grid.append('<line x1="%d" y1="%.1f" x2="%d" y2="%.1f"/>' % (L, Y(db), W - R, Y(db)))
         lab.append('<text x="%d" y="%.1f" text-anchor="end" dominant-baseline="middle">%s</text>'
-                   % (L - 6, Y(db), '%+d' % db if db else '0 dB'))
+                   % (L - 6, Y(db), ('%+g' % db) if db else '0 dB'))
+        db += step
     paths = []
-    for c in d['curves']:
-        col = 'var(--sig)' if c['band'] == 'low' else 'var(--ctl)'
-        dash = ' stroke-dasharray="5 4"' if c['gain'] == 'cut' else ''
-        p = 'M' + ' L'.join('%.1f %.1f' % (X(f), Y(db)) for f, db in c['points'])
-        paths.append(f'<path d="{p}" fill="none" stroke="{col}" stroke-width="2"{dash} stroke-linejoin="round"/>')
-    dots = ''.join('<circle cx="%.1f" cy="%.1f" r="2.2"/>' % (X(f), Y(db))
-                   for f, db in d['ltspice']['points'][::8])
-    key = lambda y, col, t, dash='': (
-        f'<line x1="{L+12}" y1="{y}" x2="{L+36}" y2="{y}" stroke="{col}" stroke-width="2"{dash}/>'
-        f'<text x="{L+42}" y="{y}" dominant-baseline="middle">{t}</text>')
-    lo, hi = d['ranges']['low'], d['ranges']['high']
+    for pts, col, dash in curves:
+        p = 'M' + ' L'.join('%.1f %.1f' % (X(f), Y(d)) for f, d in pts)
+        paths.append('<path d="%s" fill="none" stroke="%s" stroke-width="2"%s stroke-linejoin="round"/>'
+                     % (p, col, ' stroke-dasharray="5 4"' if dash else ''))
+    dotsvg = ''.join('<circle cx="%.1f" cy="%.1f" r="2.2"/>' % (X(f), Y(d)) for f, d in (dots or []))
+    keysvg, x, y = [], L, H - 12
+    for col, text, dash in keys:
+        if col == 'dot':
+            keysvg.append('<circle cx="%d" cy="%d" r="2.6" fill="var(--ink)"/>' % (x + 12, y))
+        else:
+            keysvg.append('<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="%s" stroke-width="2"%s/>'
+                          % (x, y, x + 24, y, col, ' stroke-dasharray="5 4"' if dash else ''))
+        keysvg.append('<text x="%d" y="%d" dominant-baseline="middle">%s</text>' % (x + 30, y, text))
+        x += 30 + 7 * len(text.replace('&rsquo;', "'")) + 22
     return f"""<figure>
-  <div style="background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 10px 6px"><svg viewBox="0 0 {W} {H}" role="img" style="width:100%;height:auto;display:block"
-       aria-label="Both bands at full boost and full cut: low-mid from {lo['f1']} to {lo['f0']} Hz, high-mid from {hi['f1']} to {hi['f0']} Hz, plus or minus {lo['boost']:.1f} dB">
+  <div style="background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 10px 6px"><svg viewBox="0 0 {W} {H}" role="img" style="width:100%;height:auto;display:block" aria-label="{aria}">
     <g stroke="var(--rule)" stroke-width="1">{''.join(grid)}</g>
     <line x1="{L}" y1="{Y(0):.1f}" x2="{W-R}" y2="{Y(0):.1f}" stroke="var(--ink-3)" stroke-width="1"/>
     {''.join(paths)}
-    <g fill="var(--ink)">{dots}</g>
+    <g fill="var(--ink)">{dotsvg}</g>
     <g fill="var(--ink-3)" font-family="var(--mono)" font-size="11">{''.join(lab)}
-      {key(T+10, 'var(--sig)', 'low-mid band')}
-      {key(T+26, 'var(--ctl)', 'high-mid band')}
-      {key(T+42, 'var(--ink-3)', 'full cut', ' stroke-dasharray="5 4"')}
-      <circle cx="{L+24}" cy="{T+58}" r="2.6" fill="var(--ink)"/><text x="{L+42}" y="{T+58}" dominant-baseline="middle">team's LTspice run</text>
+      {''.join(keysvg)}
     </g>
   </svg></div>
-  <figcaption><span>Each band at full boost (solid) and full cut (dashed), frequency knob at the
-  bottom, middle and top of its travel &mdash; worked out from the <code>{SCH}</code> netlist</span>
+  <figcaption><span>{caption}</span>
   <a href="data/response.json" target="_blank" rel="noopener">Raw data &rarr;</a></figcaption>
 </figure>"""
 
 
+def curves_for(sections, freqs):
+    d = resp()
+    return [(c['points'], COLOURS[c['section']], c['gain'] == 'cut') for c in d['curves']
+            if c['section'] in sections and c['freq'] in freqs]
+
+
+def overview_chart():
+    secs = ['lowshelf', 'lowmid', 'highmid', 'highshelf']
+    return chart(curves_for(secs, (0.5,)),
+                 'Each section at full boost (solid) and full cut (dashed), its frequency knob '
+                 'centred and every other knob centred &mdash; worked out from the '
+                 '<code>%s</code> netlist' % SCH,
+                 [(COLOURS[s], LABELS[s], False) for s in secs] + [('var(--ink-3)', 'full cut', True)],
+                 aria='All four sections at full boost and full cut')
+
+
+def bands_chart():
+    d = resp()
+    return chart(curves_for(['lowmid', 'highmid'], (0, 0.5, 1)),
+                 'Each band at full boost (solid) and full cut (dashed), frequency knob at the '
+                 'bottom, middle and top of its travel, measured at the module&rsquo;s output',
+                 [(COLOURS['lowmid'], 'low-mid band', False), (COLOURS['highmid'], 'high-mid band', False),
+                  ('var(--ink-3)', 'full cut', True), ('dot', 'team&rsquo;s LTspice run', False)],
+                 dots=d['ltspice']['points'][::8],
+                 aria='Both mid bands at full boost and full cut across their frequency ranges')
+
+
+def shelves_chart():
+    return chart(curves_for(['lowshelf', 'highshelf'], (0, 0.5, 1)),
+                 'Each shelf at full boost (solid) and full cut (dashed), frequency knob at the '
+                 'bottom, middle and top of its travel, measured at the module&rsquo;s output',
+                 [(COLOURS['lowshelf'], 'low shelf', False), (COLOURS['highshelf'], 'high shelf', False),
+                  ('var(--ink-3)', 'full cut', True)],
+                 aria='Both shelves at full boost and full cut across their frequency ranges')
+
+
+def flat_chart():
+    d = resp()
+    return chart([(d['flatcurve'], 'var(--sig)', False)],
+                 'Every knob centred: the module should be a straight line at 0&nbsp;dB',
+                 [('var(--sig)', 'all knobs centred, as drawn', False)],
+                 dbmin=-2, dbmax=2, step=0.5, aria='The flat response with every knob centred')
+
+
 def blocks():
-    """What exists and how it connects, drawn for this site."""
-    box = lambda x, y, w, h, t, s='', dash='': (
-        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="var(--surface)" stroke="var(--rule)"{dash}/>'
+    """The signal path, drawn for this site."""
+    box = lambda x, y, w, h, t, s='', col='var(--rule)': (
+        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="var(--surface)" stroke="{col}"/>'
         f'<text x="{x+w/2}" y="{y+h/2-(6 if s else 0)}" text-anchor="middle" dominant-baseline="middle" '
         f'fill="var(--ink)" font-family="var(--display)" font-size="13">{t}</text>'
         + (f'<text x="{x+w/2}" y="{y+h/2+10}" text-anchor="middle" dominant-baseline="middle" '
            f'fill="var(--ink-3)" font-family="var(--mono)" font-size="10">{s}</text>' if s else ''))
-    arrow = lambda x1, y1, x2, y2, dash='': (
-        f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="var(--sig)" stroke-width="2"{dash} marker-end="url(#eah)"/>')
+    line = lambda pts: ('<polyline points="%s" fill="none" stroke="var(--sig)" stroke-width="2" '
+                        'marker-end="url(#eah)"/>' % ' '.join('%d,%d' % p for p in pts))
     txt = lambda x, y, t, a='middle', c='var(--ink-3)': (
         f'<text x="{x}" y="{y}" text-anchor="{a}" fill="{c}" font-family="var(--mono)" font-size="11">{t}</text>')
-    dsh = ' stroke-dasharray="5 4"'
     return f"""<figure>
   <div style="background:var(--surface-2);border:1px solid var(--rule);border-radius:8px;padding:10px">
-  <svg viewBox="0 0 720 230" role="img" style="width:100%;height:auto;display:block"
-       aria-label="The main sheet chains a low-mid band into a high-mid band. The high-pass, low-pass and gain stages are on separate sheets, and nothing is wired to the edge connector yet">
+  <svg viewBox="0 0 720 300" role="img" style="width:100%;height:auto;display:block"
+       aria-label="Input receiver, then the low-mid and high-mid bands in series, then the dry signal and the two shelves in parallel into a summer, then the line driver and the bypass switch">
     <defs><marker id="eah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0 0L10 5L0 10z" fill="var(--sig)"/></marker></defs>
-    {txt(14, 24, 'ON THE MAIN SHEET', 'start', 'var(--ctl)')}
-    {txt(40, 76, 'in')}{arrow(56, 72, 128, 72, dsh)}
-    {box(130, 40, 190, 64, 'Low-mid band', 'IC3 &middot; 191 Hz&ndash;1.26 kHz')}
-    {arrow(320, 72, 388, 72)}
-    {box(390, 40, 190, 64, 'High-mid band', 'IC2 &middot; 1.05&ndash;6.9 kHz')}
-    {arrow(580, 72, 648, 72, dsh)}{txt(676, 76, 'out')}
-    {txt(14, 148, 'ON SHEETS OF THEIR OWN, NOT YET JOINED', 'start', 'var(--ctl)')}
-    {box(40, 164, 190, 52, 'High-pass filter', 'OPA1641', dsh)}
-    {box(265, 164, 190, 52, 'Low-pass filter', 'OPA1641', dsh)}
-    {box(490, 164, 190, 52, 'Gain stage', 'OPA1641', dsh)}
+    {txt(22, 46, 'IN')}{line([(36, 42), (58, 42)])}
+    {box(60, 18, 130, 48, 'Input receiver', 'IC1 INA137 &middot; &minus;6 dB')}
+    {line([(190, 42), (218, 42)])}
+    {box(220, 18, 150, 48, 'Low-mid band', 'IC3 &middot; 191 Hz&ndash;1.26 kHz')}
+    {line([(370, 42), (398, 42)])}
+    {box(400, 18, 150, 48, 'High-mid band', 'IC2 &middot; 1.05&ndash;6.9 kHz')}
+    {line([(550, 42), (600, 42), (600, 92), (60, 92), (60, 112)])}
+    {txt(330, 86, 'buffered by IC4B, then split three ways')}
+    {box(20, 114, 170, 44, 'Dry', 'IC5D, inverted')}
+    {box(210, 114, 230, 44, 'Low shelf', 'IC4D low-pass &rarr; IC5A level')}
+    {box(460, 114, 240, 44, 'High shelf', 'IC4C high-pass &rarr; IC5B level')}
+    {line([(105, 158), (105, 190), (330, 190), (330, 202)])}
+    {line([(325, 158), (325, 172), (340, 172), (340, 202)])}
+    {line([(580, 158), (580, 190), (350, 190), (350, 202)])}
+    {box(250, 204, 180, 40, 'Summer', 'IC5C')}
+    {line([(430, 224), (468, 224)])}
+    {box(470, 204, 140, 40, 'Line driver', 'IC6 DRV134 &middot; +6 dB')}
+    {line([(610, 224), (628, 224)])}
+    {box(630, 204, 76, 40, 'Bypass', 'SW1')}
+    {txt(668, 270, 'OUT')}
+    {line([(668, 244), (668, 258)])}
   </svg></div>
-  <figcaption><span>What is drawn, and how much of it is joined up &mdash; dashed lines are not wired yet</span>
-  <a href="schematic.html">The main schematic &rarr;</a></figcaption>
+  <figcaption><span>The signal path. Every block is on the one sheet, <code>{SCH}</code></span>
+  <a href="schematic.html">The schematic &rarr;</a></figcaption>
 </figure>"""
 
 
@@ -172,192 +308,284 @@ def schematic(caption):
     return fig('schematic', caption + ' &mdash; <code>%s</code> at <code>%s</code>' % (SCH, COMMIT))
 
 
-def _r():
-    return resp()['ranges']
-
-
-R = _r()
-LO, HI = R['low'], R['high']
-khz = lambda f: '%.3g&nbsp;kHz' % (f / 1000) if f >= 1000 else '%d&nbsp;Hz' % f
+R = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'site',
+                                'equaliser', 'data', 'response.json')))['ranges']
+LS, LM, HM, HS = R['lowshelf'], R['lowmid'], R['highmid'], R['highshelf']
+khz = lambda f: ('%.3g&nbsp;kHz' % (f / 1000)).replace('.0&', '&') if f >= 1000 else '%d&nbsp;Hz' % f
+dbs = lambda v: ('+%.1f' % v if v > 0 else '&minus;%.1f' % -v) + '&nbsp;dB'
+FLATDB = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'site',
+                                     'equaliser', 'data', 'response.json')))['flat']
 
 NAV = [("Start here", [("index.html", "01", "Overview"),
-                       ("schematic.html", "02", "The main schematic")]),
-       ("The circuit", [("bands.html", "03", "Parametric bands"),
-                        ("filters.html", "04", "High- and low-pass filters"),
-                        ("gain.html", "05", "Gain stage")]),
-       ("Practical", [("simulation.html", "06", "Simulating it"),
-                      ("status.html", "07", "What is left"),
-                      ("files.html", "08", "Design files")])]
+                       ("schematic.html", "02", "The schematic")]),
+       ("The circuit", [("io.html", "03", "Input, output &amp; power"),
+                        ("bands.html", "04", "Parametric bands"),
+                        ("filters.html", "05", "The shelves")]),
+       ("Practical", [("board.html", "06", "Board &amp; parts"),
+                      ("simulation.html", "07", "Simulating it"),
+                      ("status.html", "08", "What is left"),
+                      ("files.html", "09", "Design files")])]
 
 PAGES = {}
 
 PAGES['index.html'] = ("Overview", f"""
 <p class="eyebrow">Equaliser module</p>
 <h1>The equaliser</h1>
-<p class="lede">Two fully parametric bands, low-mid and high-mid, each with its own frequency,
-width and boost/cut, plus a high-pass filter, a low-pass filter and a gain stage. The two bands
-are drawn with values on one sheet; the other three sections are drawn on sheets of their own.</p>
+<p class="lede">A four-band equaliser: a low shelf, two fully parametric mid bands and a high
+shelf, between a balanced input receiver and a balanced line driver, with a hard bypass. The
+whole circuit is on one sheet with values, and the board is being laid out.</p>
 
 <div class="note warn">
   <h4>Work in progress</h4>
   <p>Written from the <a href="{SRC}">Equaliser repository</a> at commit
-  <code>{COMMIT}</code>. The bands are complete as circuits, with values, and their response on
-  these pages is worked out from the schematic itself. Nothing is wired to the edge connector
-  yet, the op amps are not on the rack's supply, and nothing has been built or measured.</p>
+  <code>{COMMIT}</code> (7&nbsp;October). The schematic was finished on 5&nbsp;October; the board
+  has its parts being placed and no tracks yet. Every response figure on these pages is worked
+  out from the schematic itself. Nothing has been built or measured.</p>
+  <p><strong>One wiring fault stops it working as drawn:</strong> two of the four OPA1644s have
+  their positive supply pin on &minus;16&nbsp;V. See <a href="io.html#power">power</a>.</p>
 </div>
 
-""" + blocks() + f"""
+<dl class="spec">
+  <div><dt>Format</dt><dd>500 series</dd></div>
+  <div><dt>Supply</dt><dd>&plusmn;16 V</dd></div>
+  <div><dt>Bands</dt><dd>4</dd></div>
+  <div><dt>Knobs</dt><dd>10, plus bypass</dd></div>
+  <div><dt>Mid bands</dt><dd>&plusmn;{LM['boost']:.1f} dB</dd></div>
+  <div><dt>Low shelf</dt><dd>&plusmn;{LS['boost1']:.1f} dB</dd></div>
+  <div><dt>Op amps</dt><dd>4 &times; OPA1644</dd></div>
+  <div><dt>Components</dt><dd>129</dd></div>
+</dl>
 
-<h2>What exists</h2>
-""" + table(["Section", "Where it is drawn", "Values", "Response"],
-            [['<a href="bands.html">Low-mid band</a>', "Main sheet, IC3", "Yes",
-              "%s&ndash;%s, &plusmn;%.1f&nbsp;dB; matches the team&rsquo;s LTspice run" % (khz(LO['f1']), khz(LO['f0']), LO['boost'])],
-             ['<a href="bands.html">High-mid band</a>', "Main sheet, IC2", "Yes",
-              "%s&ndash;%s, &plusmn;%.1f&nbsp;dB" % (khz(HI['f1']), khz(HI['f0']), HI['boost'])],
-             ['<a href="filters.html">High-pass filter</a>', "Own sheet", "Yes", "Cutoff 4.6&ndash;20&nbsp;kHz as drawn"],
-             ['<a href="filters.html">Low-pass filter</a>', "Own sheet", "Yes", "Will not work as drawn: a capacitor is missing"],
-             ['<a href="gain.html">Gain stage</a>', "Own sheet", "Yes", "Will not work as drawn: its inputs are swapped"],
-             ["Edge connector", "Main sheet, J1", "&mdash;", "Power pins only; no audio wired"],
-             ["Board", "<code>Combined_EQ.kicad_pcb</code>", "&mdash;", "Card outline and J1 only"]],
-            ["r", "", "", ""]) + """
+""" + blocks() + """
 
-<h2>Why the OPA164x</h2>
-<p>Every section uses TI's OPA164x family: the quad OPA1644 for the bands, the single OPA1641
-for the other three. That is a sensible choice for filters. It is a JFET-input part, so its
-input bias current is picoamps rather than the NE5532's hundreds of nanoamps &mdash; which
-matters when a pot wiper sits in the signal path. Bias current through a pot is offset, and
-offset through a pot is a click every time the knob turns.</p>
-<p>The cost is that the desk now carries three op-amp types (the compressor and preamp use the
-NE5532), which the bill of materials and the spares box both need to account for. The OPA1644
-footprint on the main sheet is TSSOP-14, a 0.65&nbsp;mm-pitch surface-mount package: fine to
-hand-solder with flux and a fine tip, but worth knowing before ordering.</p>
+<h2>What it does</h2>
+""" + table(["Section", "Frequency", "Boost / cut", "Width (Q)"],
+            [['<a href="filters.html">Low shelf</a>', "%s&ndash;%s" % (khz(LS['f0']), khz(LS['f1'])),
+              "%s / %s" % (dbs(LS['boost1']), dbs(LS['cut1'])), "&mdash;"],
+             ['<a href="bands.html">Low-mid band</a>', "%s&ndash;%s" % (khz(LM['f1']), khz(LM['f0'])),
+              "&plusmn;%.1f&nbsp;dB" % LM['boost'], "%.1f&ndash;%.1f" % (LM['q1'], LM['q0'])],
+             ['<a href="bands.html">High-mid band</a>', "%s&ndash;%s" % (khz(HM['f1']), khz(HM['f0'])),
+              "&plusmn;%.1f&nbsp;dB" % HM['boost'], "%.1f&ndash;%.1f" % (HM['q1'], HM['q0'])],
+             ['<a href="filters.html">High shelf</a>', "%s&ndash;%s" % (khz(HS['f0']), khz(HS['f1'])),
+              "%s / %s" % (dbs(HS['boost0']), dbs(HS['cut0'])), "&mdash;"]],
+            ["r", "n", "n", "n"]) + """
+<p>Shelf frequencies are the corner, where the shelf reaches half its depth; their boost and
+cut are the most each reaches inside the audio band (at 20&nbsp;Hz for the low shelf with its
+corner at the top of its range, at 20&nbsp;kHz for the high shelf with its corner at the
+bottom).</p>
+<p>The two mid bands are the state-variable circuits the team drew first, now in series on the
+main sheet. The shelves grew out of the separate high-pass, low-pass and gain sheets: each
+filter now feeds a level stage, and a summer adds or subtracts the filtered signal from the
+dry one. With every level knob centred the module is flat to within """ + '%.1f' % FLATDB + """&nbsp;dB
+from 20&nbsp;Hz to 20&nbsp;kHz.</p>
+
+""" + overview_chart() + """
+
+<h2>Why the OPA1644</h2>
+<p>The filters, buffers and summer all run on TI&rsquo;s OPA1644, a quad JFET-input op amp.
+Its input bias current is picoamps rather than the NE5532&rsquo;s hundreds of nanoamps, which
+matters when a pot wiper sits in the signal path: bias current through a pot is offset, and
+offset through a pot is a click every time the knob turns. Its footprint on the sheet is
+TSSOP-14, a 0.65&nbsp;mm-pitch surface-mount package: fine to hand-solder with flux and a fine
+tip, but worth knowing before ordering. The team&rsquo;s parts list has the TL084 in its place,
+which shares the pinout; see <a href="board.html">board &amp; parts</a>.</p>
+<p>The input and output use TI&rsquo;s matched pair for balanced lines, the INA137 receiver and
+the DRV134 driver. The receiver halves the level and the driver doubles it, so the module is
+unity gain overall with 6&nbsp;dB of extra headroom inside.</p>
 
 <h2>How the repository is laid out</h2>
 """ + table(["Folder", "What is in it"],
-            [["<code>Combined_EQ/</code>", "The main schematic: both bands and J1. Its board has the card outline and J1 placed."],
-             ["<code>Low_Bandpass_Filter/</code>", "The low-mid band on its own sheet, the team&rsquo;s LTspice model "
-              "<code>LT_SPICE/BandA.asc</code> and its results, and a board with 15 footprints and no outline"],
-             ["<code>High_Bandpass_Filter/</code>", "The high-mid band on its own sheet, and its LTspice model <code>BandB.asc</code>"],
-             ["<code>High_Pass_filter/</code>", "The high-pass filter sheet and an LTspice model <code>hpf.asc</code>"],
-             ["<code>Low_Pass_Filter/</code>", "The low-pass filter sheet and <code>lpf.asc</code>"],
-             ["<code>Variable_Gain/</code>", "The gain stage sheet and <code>variable gain.asc</code>"],
+            [["<code>Combined_EQ/</code>", "The design: the whole equaliser on one sheet, and its board"],
+             ["<code>Components/</code>", "Vendor library files (symbols, footprints, 3D models) for the DRV134, INA137 and OPA1644, in every CAD format"],
+             ["<code>BOM.xlsx</code>, <code>Capacitor BOM.xlsx</code>", "The team&rsquo;s parts list, with suppliers for the capacitors"],
+             ["<code>Low_Bandpass_Filter/</code>", "The low-mid band on its own sheet and the team&rsquo;s LTspice model "
+              "<code>LT_SPICE/BandA.asc</code> with its results"],
+             ["<code>High_Bandpass_Filter/</code>", "The high-mid band on its own sheet, and <code>BandB.asc</code>"],
+             ["<code>High_Pass_filter/</code>, <code>Low_Pass_Filter/</code>, <code>Variable_Gain/</code>",
+              "The first drafts of the shelves&rsquo; parts, each on its own sheet with an LTspice model"],
              ["<code>Combined Equaliser/</code>", "An empty KiCad project, a leftover from setting up <code>Combined_EQ/</code>"],
-             ["<code>EQ BOM.docx</code>", "A bill-of-materials table with its columns set up and no rows filled"]],
+             ["<code>EQ BOM.docx</code>", "An earlier bill-of-materials table, columns only"]],
             ["r", ""]) + """
-<p>The band sheets in <code>Low_Bandpass_Filter/</code> and <code>High_Bandpass_Filter/</code>
-are the same circuits as the main sheet&rsquo;s two bands, part for part, with their own
-reference designators. The main sheet is the one to keep editing; the separate copies will
-drift if both are changed.</p>
+<p>The sheets in the section folders are earlier drafts. Two of them still have the faults this
+site pointed out (the low-pass sheet&rsquo;s missing capacitor, the gain sheet&rsquo;s swapped
+inputs); both are fixed on the main sheet, which is the one to keep editing.</p>
 """)
 
-PAGES['schematic.html'] = ("The main schematic", """
+PAGES['schematic.html'] = ("The schematic", """
 <p class="eyebrow">Start here &mdash; 02</p>
-<h1>The main schematic</h1>
-<p class="lede">Both bands and the card edge connector are on one sheet. Click any part for its
-role and the nets it touches, or switch to <em>Connections</em> to see the same netlist as a
-graph.</p>
+<h1>The schematic</h1>
+<p class="lede">The whole equaliser is on one sheet, drawn as labelled blocks. Click any part
+for its role and the nets it touches, or switch to <em>Connections</em> to see the same
+netlist as a graph.</p>
 
 """ + schematic("The equaliser") + """
 
 <h2>Reading it</h2>
 """ + table(["Where", "What"],
-            [["Top left", "The low-mid band: IC3 (drawn as one 14-pin block, units A&ndash;D), the frequency gang RV9, width RV7 and boost/cut RV8 along the bottom."],
-             ["Top right", "The high-mid band, laid out the same way: IC2 (units E&ndash;H), RV6, RV2 and RV5."],
-             ["Middle", "The one wire joining them: the low-mid band&rsquo;s output <code>Do</code> is the high-mid band&rsquo;s input."],
-             ["Bottom left", "J1, the 15-pin card edge, with its pin labels from Radial&rsquo;s 500-series pinout."]],
+            [["Top row", "Balanced input receiver (IC1 and the input filtering), then the low-mid band (IC3) and the high-mid band (IC2), each drawn the same way."],
+             ["Middle", "The buffer (IC4B), the low-pass and high-pass filters (IC4D, IC4C), the variable gain stages (IC5A, IC5B) and the summer (IC5C, with the dry inverter IC5D)."],
+             ["Right", "The balanced line driver (IC6) and the bypass switch (SW1)."],
+             ["Bottom left", "J1, the card edge, and the rail filtering. J2 and J3 are 24-pin headers with nothing connected."],
+             ["Bottom", "IC5 drawn as one block with its supply pins."]],
             ["r", ""]) + """
-<p>Within each band the op amp units talk through local labels: <code>A+</code>,
-<code>A-</code> and <code>Ao</code> are unit A&rsquo;s inputs and output, and so on. The labels
-<code>B+</code>, <code>C+</code>, <code>F+</code> and <code>G+</code> are drawn on ground, which is
-right: those are the integrators&rsquo; + inputs.</p>
+<p>Blocks talk through global labels named after the op amp unit they belong to: <code>A+</code>,
+<code>A-</code> and <code>Ao</code> are unit A&rsquo;s inputs and output, and so on through
+<code>P</code>. The labels on ground (<code>B+</code>, <code>C+</code>, <code>F+</code>,
+<code>G+</code>, <code>M+</code>&ndash;<code>P+</code>) are right: those are + inputs that sit at
+ground.</p>
 
 <div class="note">
   <h4>About this drawing</h4>
-  <p>The sheet is saved by KiCad 9, which is not installed where the site is built, so this
-  image is drawn by the site&rsquo;s own generator from the <code>.kicad_sch</code> file. The positions, symbols
-  and wires are the file&rsquo;s; the lettering is close to KiCad&rsquo;s but not identical. The
-  exported PDF is on <a href="files.html">Design files</a>.</p>
+  <p>The sheet is saved by KiCad 9. This image is drawn by the site&rsquo;s own generator from
+  the <code>.kicad_sch</code> file, and its netlist matches KiCad&rsquo;s own export net for
+  net. The positions, symbols and wires are the file&rsquo;s; the lettering is close to
+  KiCad&rsquo;s but not identical. The PDF KiCad exports is on <a href="files.html">Design
+  files</a>.</p>
 </div>
 
 <h2>J1, as drawn</h2>
-""" + table(["Pin", "Label", "Connected to"],
-            [["1", "CHASSIS", "&mdash;"],
-             ["2", "+OUT+4", "&mdash;"], ["3", "+OUT-2", "&mdash;"], ["4", "-OUT", "&mdash;"],
-             ["5", "AGND", "&mdash;"],
-             ["6", "SC_LINK", "&mdash;"],
-             ["7", "-IN-2", "&mdash;"], ["8", "-IN+4", "&mdash;"], ["9", "+IN-2", "&mdash;"],
-             ["10", "+IN+4", "&mdash;"], ["11", "GAIN_ADJ", "&mdash;"],
-             ["12", "+16V", "A +16V power symbol only"],
-             ["<strong>13</strong>", "<strong>GND</strong>", "<strong>The circuit&rsquo;s ground</strong>"],
-             ["14", "-16V", "A &minus;16V power symbol only"],
-             ["15", "+48V", "A +48V power symbol only"]],
+""" + table(["Pin", "Standard function", "Connected to"],
+            [["1", "Chassis", "C1 and C5, the input RF capacitors"],
+             ["2", "Output + (+4)", "SW1 through FB3, with C36 to ground"],
+             ["3", "Output + (&minus;2)", "&mdash;"],
+             ["4", "Output &minus;", "SW1 through FB4, with C35 to ground"],
+             ["5", "Audio ground", "The circuit&rsquo;s ground"],
+             ["6, 7", "Link, Input &minus; (&minus;2)", "&mdash;"],
+             ["8", "Input &minus; (+4)", "FB1, R1, then the INA137&rsquo;s &minus; input"],
+             ["9", "Input + (&minus;2)", "&mdash;"],
+             ["10", "Input + (+4)", "FB2, R3, then the INA137&rsquo;s + input"],
+             ["11", "Gain trim", "&mdash;"],
+             ["12", "+16 V", "R6 (10&nbsp;&Omega;), then the +16&nbsp;V rail"],
+             ["13", "PSU ground", "The circuit&rsquo;s ground"],
+             ["14", "&minus;16 V", "R5 (10&nbsp;&Omega;), then the &minus;16&nbsp;V rail"],
+             ["15", "+48 V", "&mdash;"]],
             ["n", "", ""]) + """
-
-<div class="note warn">
-  <h4>Three things to join before this is a working card</h4>
-  <p><strong>The op amps have no supply.</strong> IC2 and IC3 take their rails from
-  <code>VCC</code> and <code>VEE</code> power symbols, but J1 brings in <code>+16V</code> and
-  <code>-16V</code>. KiCad treats differently named power symbols as different nets, so as drawn
-  nothing powers the op amps. Rename the op amps&rsquo; symbols to +16V and &minus;16V (or the
-  connector&rsquo;s to VCC and VEE), and add decoupling: 100&nbsp;nF from each rail to ground
-  at each op amp, and a bulk capacitor per rail where it comes in.</p>
-  <p><strong>No audio goes in or out.</strong> The low-mid band&rsquo;s input (the free end of
-  R29 and RV8 pin 1) and the high-mid band&rsquo;s output <code>Ho</code> end in bare wires.
-  They need to reach J1&rsquo;s input and output pins, through whatever input and output
-  stages the module will have, using the same pinout as the
-  <a href="../compressor/connector.html">compressor&rsquo;s edge connector</a>.</p>
-  <p><strong>Two grounds.</strong> The circuit&rsquo;s ground goes to pin 13, the rack&rsquo;s
-  power ground. Pin 5, audio ground, is not connected to anything. Decide which the audio
-  returns to before laying out.</p>
-</div>
+<p>That is the standard pinout, the same as the
+<a href="../compressor/connector.html">compressor&rsquo;s</a> main input and output. One
+difference: pins 5 and 13 are both on the one ground net here, so the rack&rsquo;s supply
+return and audio ground are joined on the card wherever the layout puts them. The compressor
+keeps them apart and joins them at one point; worth deciding where that join is before the
+ground tracks go down.</p>
 
 <h2>Parts on this sheet</h2>
 """ + table(["Kind", "Parts", "Count"],
-            [["Op amps", "IC2, IC3 OPA1644 (quad, TSSOP-14)", "2"],
-             ["Resistors", "R14&ndash;R39, all on 0207 axial footprints", "26"],
-             ["Capacitors", "C3, C6 2.3&nbsp;nF; C8, C9 12.7&nbsp;nF; C2, C7 10&nbsp;&micro;F. No footprints yet.", "6"],
-             ["Pots", "RV6, RV9 10k dual gang; RV2, RV5, RV7, RV8 10k. No footprints yet.", "6"],
-             ["Connector", "J1, 15-pin card edge", "1"]],
+            [["Op amps", "IC2&ndash;IC5 OPA1644 (quad, TSSOP-14)", "4"],
+             ["Line receiver and driver", "IC1 INA137, IC6 DRV134 (DIP-8)", "2"],
+             ["Resistors", "R1&ndash;R55, 0207 axial", "55"],
+             ["Capacitors", "C1&ndash;C47 (no C45)", "46"],
+             ["Pots", "RV1, RV4 100k dual; RV6, RV9 10k dual; RV2, RV3, RV5, RV7, RV8, RV10 10k. All Alps RK097 right-angle footprints", "10"],
+             ["Ferrite beads", "FB1&ndash;FB4, one per audio pin", "4"],
+             ["Switch", "SW1, DPDT slide", "1"],
+             ["Connectors", "J1 card edge; J2, J3 unconnected headers", "3"],
+             ["Mounting holes", "H1&ndash;H4, M3", "4"]],
             ["r", "", "n"]))
 
-PAGES['bands.html'] = ("Parametric bands", f"""
+PAGES['io.html'] = ("Input, output &amp; power", """
 <p class="eyebrow">The circuit &mdash; 03</p>
-<h1>The parametric bands</h1>
-<p class="lede">Each band is a state-variable filter wired as a peaking equaliser: four op
-amps, one quad package, and three knobs &mdash; frequency, width and boost/cut. The two bands
-are the same circuit; only the two integrator capacitors differ.</p>
+<h1>Input, output and power</h1>
+<p class="lede">A balanced receiver at the front, a balanced driver at the back, a switch that
+can join the two, and the supply that feeds it all.</p>
 
-""" + response_chart() + f"""
+<h2>The input</h2>
+<p>Each input leg comes off the card edge through a ferrite bead (FB2 hot, FB1 cold) and a
+47&nbsp;&Omega; resistor (R3, R1) with 470&nbsp;pF to chassis (C5, C1). Bead, resistor and
+capacitor together keep radio frequencies out: the RC corner is about 7&nbsp;MHz, far above
+audio. Then a 47&nbsp;&micro;F capacitor in each leg (C10, C4) blocks any DC the source carries,
+with 100k to ground after it (R4, R2) so the INA137&rsquo;s inputs have a DC path.</p>
+<p><strong>IC1, the INA137,</strong> is a difference amplifier with laser-trimmed resistors
+inside. It subtracts the cold leg from the hot one, which cancels anything common to both
+(hum and noise picked up on the cable) and halves the result: &minus;6&nbsp;dB. Its output goes
+straight into IC4A, wired as a follower, which is what drives the first band.</p>
+<div class="note">
+  <h4>Matching the input capacitors</h4>
+  <p>A balanced input rejects hum only as well as its two legs match. With 47&nbsp;&micro;F
+  coupling capacitors the corner sits well below 1&nbsp;Hz, so even a 20% mismatch between C4
+  and C10 makes no measurable difference at 50&nbsp;Hz. The parts list has them as bipolar electrolytics (Jaycar RY6820),
+  which is right: a balanced source can sit either side of ground.</p>
+</div>
+
+<h2>The output</h2>
+<p>The summer&rsquo;s output (<code>Po</code>) drives <strong>IC6, the DRV134</strong>, which
+produces two outputs in antiphase at twice the level each side: +6&nbsp;dB, undoing the
+receiver&rsquo;s &minus;6&nbsp;dB. Its sense pins are tied to its outputs at the chip, the usual
+connection. From there each leg goes through SW1, gets 100&nbsp;pF to ground (C36, C35) and
+leaves through a ferrite bead (FB3, FB4).</p>
+<p>Counting inversions: the receiver does not invert, each band inverts once (two bands, so the
+signal comes out of them the right way up), the dry inverter and the summer invert once each,
+and the driver does not invert. The output is in phase with the input.</p>
+
+<h2>Bypass</h2>
+<p>SW1 is a double-pole slide switch. In one position the output pins take the DRV134&rsquo;s
+outputs. In the other they are joined straight to the input legs, after the ferrite beads and
+before the 47&nbsp;&Omega; resistors: a hard bypass, which works with the module unpowered.
+Both poles are wired consistently (hot to hot, cold to cold in either position).</p>
+<p>On the board as placed so far, SW1 sits next to the card edge connector, at the back of the
+module. See <a href="board.html">board &amp; parts</a>.</p>
+
+<h2 id="power">Power</h2>
+<p>J1 pin 12 feeds <code>+16V</code> through R6 and pin 14 feeds <code>&minus;16V</code> through
+R5, both 10&nbsp;&Omega;. Each rail has a 100&nbsp;&micro;F reservoir (C20, C18), 1&nbsp;&micro;F
+(C12, C11) and 100&nbsp;nF next to every chip. The 10&nbsp;&Omega; resistors and the reservoirs
+form a filter against noise on the rack&rsquo;s rails, as on the compressor.</p>
+<p>From the datasheets&rsquo; typical figures, sixteen op amp channels at 1.8&nbsp;mA, the INA137
+at 2.4&nbsp;mA and the DRV134 at 5.2&nbsp;mA come to about 37&nbsp;mA per rail before any load,
+well inside the 130&nbsp;mA a 500-series slot allows.</p>
+
+<div class="note warn">
+  <h4>IC2 and IC5 have no positive supply</h4>
+  <p>On the sheet, the symbol on <strong>pin 4 (V+)</strong> of both IC2 and IC5 is a
+  <code>&minus;16V</code> power symbol. Pin 11 (V&minus;) is on &minus;16&nbsp;V as well, so both
+  chips have &minus;16&nbsp;V on both supply pins and nothing across them. IC3 and IC4 are
+  wired correctly. KiCad&rsquo;s ERC doesn&rsquo;t flag it, because both pins are on a
+  legitimate power net.</p>
+  <p>As drawn, the high-mid band (IC2), both shelf level stages, the dry inverter and the summer
+  (all IC5) are dead, so nothing reaches the output. The fix is to change those two symbols to
+  <code>+16V</code>. Their 100&nbsp;nF decoupling capacitors then decouple +16&nbsp;V, as they
+  should. Do it before the board is routed, or the copper will carry the same mistake.</p>
+</div>
+""")
+
+PAGES['bands.html'] = ("Parametric bands", f"""
+<p class="eyebrow">The circuit &mdash; 04</p>
+<h1>The parametric bands</h1>
+<p class="lede">Each mid band is a state-variable filter wired as a peaking equaliser: four op
+amps, one quad package, and three knobs &mdash; frequency, width and boost/cut. The two bands
+are the same circuit; only the integrator capacitors differ.</p>
+
+""" + bands_chart() + f"""
 
 <h2>What the knobs do</h2>
 """ + table(["", "Low-mid", "High-mid"],
             [["Op amp", "IC3", "IC2"],
-             ["Integrator caps", "C8, C9 12.7&nbsp;nF", "C3, C6 2.3&nbsp;nF"],
+             ["Integrator caps", "12.7&nbsp;nF each: C8, C39, C40 and C9, C42, C43", "2.3&nbsp;nF each: C3, C41 and C6, C44"],
              ["Frequency pot", "RV9, dual gang", "RV6, dual gang"],
-             ["Frequency range", "%s&ndash;%s" % (khz(LO['f1']), khz(LO['f0'])), "%s&ndash;%s" % (khz(HI['f1']), khz(HI['f0']))],
-             ["Frequency at centre", khz(LO['f0.5']), khz(HI['f0.5'])],
+             ["Frequency range", "%s&ndash;%s" % (khz(LM['f1']), khz(LM['f0'])), "%s&ndash;%s" % (khz(HM['f1']), khz(HM['f0']))],
+             ["Frequency at centre", khz(LM['f0.5']), khz(HM['f0.5'])],
              ["Boost/cut pot", "RV8", "RV5"],
-             ["Boost/cut range", "&plusmn;%.1f&nbsp;dB" % LO['boost'], "&plusmn;%.1f&nbsp;dB" % HI['boost']],
+             ["Boost/cut range", "&plusmn;%.1f&nbsp;dB" % LM['boost'], "&plusmn;%.1f&nbsp;dB" % HM['boost']],
              ["Width pot", "RV7", "RV2"],
-             ["Q range", "%.1f&ndash;%.0f, %.1f at centre" % (LO['q1'], LO['q0'], LO['q0.5']),
-              "%.1f&ndash;%.0f, %.1f at centre" % (HI['q1'], HI['q0'], HI['q0.5'])]],
+             ["Q range", "%.1f&ndash;%.0f, %.1f at centre" % (LM['q1'], LM['q0'], LM['q0.5']),
+              "%.1f&ndash;%.0f, %.1f at centre" % (HM['q1'], HM['q0'], HM['q0.5'])]],
             ["r", "n", "n"]) + f"""
 <p>Every figure here is worked out from the schematic&rsquo;s netlist with linear pots and
-ideal op amps (<a href="simulation.html">how</a>). Q is the centre frequency over the width
-between the points at half the peak&rsquo;s height in dB. With the boost/cut knob centred, each band is
-flat to within 0.01&nbsp;dB from 10&nbsp;Hz to 100&nbsp;kHz. The
-two frequency ranges overlap slightly, between {khz(HI['f1'])} and {khz(LO['f0'])}, so between
-them they cover {khz(LO['f1'])} to {khz(HI['f0'])} with no gap.</p>
+ideal op amps (<a href="simulation.html">how</a>), at each band&rsquo;s own output. Q is the
+centre frequency over the width between the points at half the peak&rsquo;s height in dB. The
+two frequency ranges overlap slightly, between {khz(HM['f1'])} and {khz(LM['f0'])}, so between
+them they cover {khz(LM['f1'])} to {khz(HM['f0'])} with no gap.</p>
+<p>The integrator capacitors are now built from standard values in parallel: 10&nbsp;nF +
+2.2&nbsp;nF + 470&nbsp;pF makes the low-mid band&rsquo;s 12.67&nbsp;nF, and 2.2&nbsp;nF +
+100&nbsp;pF the high-mid band&rsquo;s 2.3&nbsp;nF. The parts list has them as C0G ceramics,
+which hold their value with temperature and voltage &mdash; what a filter capacitor needs.</p>
 
 <h2>How a band works</h2>
 <p>A state-variable filter is a summing amplifier followed by two integrators in a loop. The
 summer (unit A in the low-mid band) produces a high-pass output, the first integrator (B) a
 band-pass, the second (C) a low-pass, and the low-pass is fed back to the summer to close the
-loop. The reason it is used for parametric EQ is that its centre frequency and its width are
-set by different parts, so one knob can move without disturbing the other.</p>
+loop. It is used for parametric EQ because its centre frequency and its width are set by
+different parts, so one knob can move without disturbing the other.</p>
 """ + table(["Job", "Low-mid parts", "What sets it"],
             [["Summer", "IC3A, R32 feedback, R35 from the low-pass", "Unity gain round the loop"],
-             ["Integrators", "IC3B with C8, IC3C with C9", "Each gang of RV9 feeds one integrator through 10k (R36, R38), with 2k2 (R34, R37) at the bottom of the track"],
+             ["Integrators", "IC3B and IC3C with their 12.7&nbsp;nF", "Each gang of RV9 feeds one integrator through 10k (R36, R38), with 2k2 (R34, R37) at the bottom of the track"],
              ["Width", "R31 from the band-pass back to A+, RV7 with R27, R28", "How much band-pass is fed back: more feedback, wider band"],
              ["Mix", "IC3D, R29, R39, C7, R33, RV8", "Adds the band-pass to, or takes it from, the dry signal"]],
             ["r", "", ""]) + """
@@ -365,11 +593,11 @@ set by different parts, so one knob can move without disturbing the other.</p>
 <h3>Frequency</h3>
 <p>Each integrator&rsquo;s time constant is its 10k input resistor times its capacitor, so the
 top of each range is 1&nbsp;/&nbsp;(2&pi;&nbsp;&times;&nbsp;10k&nbsp;&times;&nbsp;C): 1.25&nbsp;kHz
-for 12.7&nbsp;nF and 6.9&nbsp;kHz for 2.3&nbsp;nF. Turning RV9 down taps the signal lower on a
-10k track that ends in 2k2, which scales down what reaches the integrator. At the bottom of the
-track the integrator sees only 2.2/12.2 of the signal through about 11.8k, the same as a
-65k resistor, so the range spans about 6.5 to 1. Both gangs move together, which is what keeps
-the width constant as the frequency changes.</p>
+for 12.7&nbsp;nF and 6.9&nbsp;kHz for 2.3&nbsp;nF. Turning RV9 away from pin 1 taps the signal
+lower on a 10k track that ends in 2k2, which scales down what reaches the integrator. At the
+far end the integrator sees only 2.2/12.2 of the signal through about 11.8k, the same as a
+65k resistor, so the range spans about 6.5 to 1. Both gangs move together, which keeps the
+width constant as the frequency changes.</p>
 
 <h3>Boost and cut</h3>
 <p>The output stage (IC3D) takes the dry signal into its &minus; input through R29, with R39 as
@@ -384,202 +612,271 @@ input (pin 1) and its output (pin 3), and its wiper is what the filter listens t
   <li>Wiper at centre: the input and the output are equal and opposite, so the wiper sits at
   zero and the filter hears nothing. The band is <strong>flat</strong>.</li>
 </ul>
-<p>Because each band inverts, the two bands together come out in phase with the input. Any
-inverting stage added later (the <a href="gain.html">gain stage</a> is one) flips the module&rsquo;s
-polarity, so count them before wiring J1&rsquo;s balanced pins.</p>
+
+<div class="note warn">
+  <h4>The knobs turn the opposite way to the shelves&rsquo;</h4>
+  <p>If pin 3 is a pot&rsquo;s clockwise end, as is usual, then on both mid bands clockwise
+  <strong>cuts</strong> (RV8, RV5), <strong>lowers</strong> the frequency (RV9, RV6) and
+  <strong>widens</strong> the band (RV7, RV2). On both shelves clockwise boosts and raises the
+  corner. Most desks boost and raise the frequency clockwise on every band. Swapping the outer
+  pins of RV5 and RV8, and of both gangs of RV6 and RV9, brings the mid bands into line; the
+  board isn&rsquo;t routed yet, so now is the cheap time. Whether width should go wider or
+  narrower clockwise is a panel-legend decision either way.</p>
+</div>
 
 <h2>Checked against the team&rsquo;s simulation</h2>
 <p>The low-mid band was simulated in LTspice on 30&nbsp;September
 (<code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code>), with the frequency pot at the top of its
 range, the width pot centred and full boost. That run peaks at
-<strong>+9.52&nbsp;dB at 1.26&nbsp;kHz</strong>; the netlist calculation gives
-<strong>+9.54&nbsp;dB at 1.26&nbsp;kHz</strong> for the same settings, and the dots on the chart
-lie on the calculated curve. Two different methods, one using TI&rsquo;s OPA1644 model and one
-ideal op amps, agree &mdash; which says the KiCad sheet and the LTspice file describe the same
-circuit.</p>
+<strong>+9.52&nbsp;dB at 1.26&nbsp;kHz</strong>; the netlist calculation of the band on the
+main sheet gives <strong>+9.54&nbsp;dB at 1.26&nbsp;kHz</strong> for the same settings, and the
+dots on the chart lie on the calculated curve. One method uses TI&rsquo;s OPA1644 model and the
+other ideal op amps, and they agree.</p>
 """)
 
-PAGES['filters.html'] = ("High- and low-pass filters", """
-<p class="eyebrow">The circuit &mdash; 04</p>
-<h1>The high- and low-pass filters</h1>
-<p class="lede">Two second-order Sallen-Key filters, each on one OPA1641, each on a sheet of its
-own. The high-pass works as drawn. The low-pass is missing a capacitor.</p>
-
-<h2>High-pass filter</h2>
-""" + pic("hpf.svg", "High-pass filter &mdash; High_Pass_filter/HPF/HPF.kicad_sch at " + COMMIT) + """
-<p>R1 (5.6k) and R2 (10k) divide the input down by 3.9&nbsp;dB. C1 and C2 (270&nbsp;pF each)
-then pass the signal to the op amp&rsquo;s + input; R4 plus one gang of RV1 goes from the + input
-to ground, and R3 plus the other gang feeds the output back to the point between the
-capacitors. R6 (16k) and R5 (27k) give the op amp a gain of 1.59, +4.0&nbsp;dB, which cancels the
-input divider and sets the filter&rsquo;s Q at about 0.7.</p>
-<p>RV1 is a 100k <strong>dual-gang</strong> pot, one gang in each resistor, so both resistors
-rise and fall together and the knob sweeps the cutoff cleanly:</p>
-""" + table(["RV1", "Resistance per side", "Cutoff (&minus;3&nbsp;dB)"],
-            [["Fully one way", "30k", "20&nbsp;kHz"],
-             ["Quarter", "55k", "11&nbsp;kHz"],
-             ["Centre", "80k", "7.6&nbsp;kHz"],
-             ["Three quarters", "105k", "5.8&nbsp;kHz"],
-             ["Fully the other way", "130k", "4.6&nbsp;kHz"]],
-            ["r", "n", "n"]) + """
-<div class="note warn">
-  <h4>Is 4.6&ndash;20&nbsp;kHz the range you want?</h4>
-  <p>On a desk channel the high-pass usually trims rumble and handling noise, somewhere from
-  20 to 300&nbsp;Hz. At 270&nbsp;pF this one removes everything below the top of the audio band.
-  If a rumble filter is the aim, scale both capacitors up together: 27&nbsp;nF puts the same
-  knob at 45&ndash;200&nbsp;Hz with nothing else changed.</p>
-</div>
-
-<h2>Low-pass filter</h2>
-""" + pic("lpf.svg", "Low-pass filter &mdash; Low_Pass_Filter/LPF/LPF.kicad_sch at " + COMMIT) + """
-<p>The signal goes through R1 (6.2k), along RV1&rsquo;s 100k track and through R2 (6.2k) to the
-op amp&rsquo;s + input. RV1&rsquo;s wiper carries C1 (20&nbsp;nF) back from the output. R4 and R3
-set the same gain of 1.59.</p>
-
-<div class="note warn">
-  <h4>The capacitor to ground is missing</h4>
-  <p>A Sallen-Key low-pass needs two capacitors: one from the middle of the resistor chain back
-  to the output (C1 here) and one from the op amp&rsquo;s + input to ground. The sheet has only
-  the first. Without the second, no current flows in R2, the + input simply follows the wiper,
-  and C1 is pure positive feedback through a stage with a gain above 1. That makes the circuit
-  unstable: it will latch to a rail rather than filter.</p>
-  <p>The team&rsquo;s LTspice model <code>lpf.asc</code> has the missing part: 10&nbsp;nF to ground.
-  Adding it to the sheet makes this a working filter.</p>
-</div>
-
-<h3>The knob, once the capacitor is back</h3>
-<p>RV1 is a single pot with its wiper as the tap between the two halves. Turning it does not
-change the total resistance; it moves resistance from one side of C1 to the other. The cutoff
-depends on the <em>product</em> of the two sides, and a product with a fixed sum is largest when
-the two are equal. So the cutoff is lowest at the centre and rises towards either end:</p>
-""" + table(["RV1 position", "0%", "25%", "50%", "75%", "100%"],
-            [["Corner frequency, with 10&nbsp;nF to ground", "440&nbsp;Hz", "220&nbsp;Hz", "200&nbsp;Hz", "220&nbsp;Hz", "440&nbsp;Hz"]],
-            ["r", "n", "n", "n", "n", "n"]) + """
-<p>Both halves of the knob do the same thing, so no panel legend can be drawn for it, and the Q
-moves as well. The high-pass already shows the fix: a <strong>dual-gang pot</strong> with one gang
-in place of each resistor, so both sides rise and fall together.</p>
-<p>As with the high-pass, the range is worth a second look. A desk low-pass usually trims hiss
-somewhere above a few kilohertz; 200&ndash;440&nbsp;Hz removes most of a voice. Dividing both
-capacitors by 20 (1&nbsp;nF and 470&nbsp;pF) moves it to about 4&ndash;9&nbsp;kHz.</p>
-""")
-
-PAGES['gain.html'] = ("Gain stage", """
+PAGES['filters.html'] = ("The shelves", f"""
 <p class="eyebrow">The circuit &mdash; 05</p>
-<h1>The gain stage</h1>
-<p class="lede">One op amp, one pot, &plusmn;10&nbsp;dB. The idea is sound and the values are
-right; as drawn, the op amp&rsquo;s two inputs are the wrong way round.</p>
+<h1>The shelves</h1>
+<p class="lede">A low shelf and a high shelf, built from the high-pass, low-pass and gain
+circuits the team first drew on separate sheets. Each filter picks out the frequencies its
+shelf acts on, a level stage sets how much, and a summer adds the result to the dry signal or
+takes it away.</p>
 
-""" + pic("gain.svg", "Variable gain stage &mdash; Variable_Gain/GAIN/variablegain/variablegain.kicad_sch at " + COMMIT) + """
+""" + shelves_chart() + """
 
-<h2>What it is meant to do</h2>
-<p>C1 (100&nbsp;&micro;F) blocks DC at the input. Then R1 (4.7k), the 10k track of RV1 and R2
-(4.7k) run in series from the input to the op amp&rsquo;s output, and the wiper goes to the op
-amp&rsquo;s input. C2 (220&nbsp;pF) sits between that input and the output.</p>
-<p>Wired as an inverting amplifier, the wiper is a virtual earth, and the gain is the resistance
-on the output side of the wiper over the resistance on the input side. Turning the knob moves
-resistance from one side to the other:</p>
-""" + table(["RV1 wiper", "Input side", "Output side", "Gain"],
-            [["At the input end", "4.7k", "14.7k", "+9.9&nbsp;dB"],
-             ["Centre", "9.7k", "9.7k", "0&nbsp;dB"],
-             ["At the output end", "14.7k", "4.7k", "&minus;9.9&nbsp;dB"]],
-            ["r", "n", "n", "n"]) + """
-<p>That is a neat single-knob trim: unity at the centre detent, symmetrical either side. C2 rolls
-the top off above about 50&nbsp;kHz at full gain. The team&rsquo;s
-LTspice model <code>variable gain.asc</code> has the same values.</p>
+<h2>How a shelf is made</h2>
+<p>After the two bands, buffer IC4B feeds three paths at once:</p>
+<ul>
+  <li><strong>Dry:</strong> IC5D inverts the signal (R44 and R49, both 10k).</li>
+  <li><strong>Low shelf:</strong> IC4D low-pass filters it. The filtered signal goes to the
+      summer directly through R54, and through the level stage IC5A, which inverts it, through
+      R52.</li>
+  <li><strong>High shelf:</strong> the same, with IC4C high-pass filtering, the level stage
+      IC5B, and R53 and R51.</li>
+</ul>
+<p>The summer, IC5C, adds the five inputs with its 10k feedback resistor R55. The dry signal
+comes in through 10k, so it reaches the output at unity, inverted back the right way up. Each
+filter comes in twice through 16k: once directly, and once through its level stage, inverted.
+With a level stage at a gain of exactly 1, those two copies are equal and opposite and cancel,
+and the shelf does nothing. Turn the level knob up and the inverted copy wins, so the filtered
+band is added to the dry signal: <strong>boost</strong>. Turn it down and the direct copy wins,
+which subtracts: <strong>cut</strong>.</p>
+
+<h3>The level stages</h3>
+<p>Each level stage is the team&rsquo;s variable-gain circuit: R45 (4.7k), the 10k track of RV3
+and R46 (4.7k) in series from input to output, with the wiper on the op amp&rsquo;s &minus;
+input. The gain is the resistance on the output side of the wiper over the resistance on the
+input side, from 4.7k/14.7k (&minus;9.9&nbsp;dB) to 14.7k/4.7k (+9.9&nbsp;dB), and exactly 1 at
+the centre. That is the circuit from the gain sheet with its inputs the right way round.</p>
+
+<h3>The filters</h3>
+""" + table(["", "Low shelf (IC4D)", "High shelf (IC4C)"],
+            [["Filter", "Sallen-Key low-pass", "Sallen-Key high-pass"],
+             ["Capacitors", "20&nbsp;nF and 20&nbsp;nF (C24+C27, C46+C47)", "270&nbsp;pF and 270&nbsp;pF (C25, C26)"],
+             ["Resistors", "6.2k + one gang of RV1, each side (R8, R9)", "30k + one gang of RV4, each side (R40, R42)"],
+             ["Gain", "1.59 (R11 16k / R10 27k): Butterworth", "1.59 (R43 16k / R41 27k), after a 0.64 divider (R12, R13)"],
+             ["&minus;3&nbsp;dB point", "75&nbsp;Hz to 1.28&nbsp;kHz", "4.5 to 19.6&nbsp;kHz"],
+             ["Frequency pot", "RV1, 100k dual, both gangs as variable resistors", "RV4, 100k dual, the same"]],
+            ["r", "", ""]) + f"""
+<p>Both filters now do what the separate sheets were reaching for. The low-pass has its
+capacitor to ground, and a dual-gang pot moves both resistors together, so the corner sweeps
+cleanly instead of being lowest in the middle of the knob&rsquo;s travel. The ranges that looked
+odd for a high-pass and a low-pass &mdash; a high-pass at 4.5&ndash;20&nbsp;kHz, a low-pass
+below 1.3&nbsp;kHz &mdash; make sense for shelves: they pick out the top and bottom of the audio
+band, which is what a shelf lifts or lowers.</p>
+
+<h2>What they do</h2>
+""" + table(["Frequency knob", "Low shelf corner", "Boost / cut at 20&nbsp;Hz", "High shelf corner", "Boost / cut at 20&nbsp;kHz"],
+            [["Towards pin 1", khz(LS['f0']), "%s / %s" % (dbs(LS['boost0']), dbs(LS['cut0'])),
+              khz(HS['f0']), "%s / %s" % (dbs(HS['boost0']), dbs(HS['cut0']))],
+             ["Centre", khz(LS['f0.5']), "%s / %s" % (dbs(LS['boost0.5']), dbs(LS['cut0.5'])),
+              khz(HS['f0.5']), "%s / %s" % (dbs(HS['boost0.5']), dbs(HS['cut0.5']))],
+             ["Towards pin 3", khz(LS['f1']), "%s / %s" % (dbs(LS['boost1']), dbs(LS['cut1'])),
+              khz(HS['f1']), "%s / %s" % (dbs(HS['boost1']), dbs(HS['cut1']))]],
+            ["r", "n", "n", "n", "n"]) + f"""
+<p>The corner is where the shelf has reached half its depth in dB. With its corner at the
+bottom of the range the low shelf hasn&rsquo;t fully arrived by 20&nbsp;Hz, which is why its cut
+reads less there.</p>
 
 <div class="note warn">
-  <h4>Swap pins 2 and 3</h4>
-  <p>On the sheet, the wiper goes to pin 3, the OPA1641&rsquo;s <strong>+</strong> input, and
-  ground to pin 2, the <strong>&minus;</strong> input. The feedback through R2 and C2 then
-  arrives at the + input: positive feedback, so the output swings to a rail and stays there.
-  With the wiper on pin 2 and pin 3 grounded, the stage works as above.</p>
+  <h4>Three things the response shows</h4>
+  <ul>
+    <li><strong>The high shelf is weaker and lopsided.</strong> It reaches about
+        {dbs(HS['boost0'])} / {dbs(HS['cut0'])} where the low shelf reaches
+        &plusmn;{LS['boost1']:.1f}&nbsp;dB, and with its corner at the top of the range it barely
+        acts below 20&nbsp;kHz. Its path has the R12/R13 divider (&times;0.64) ahead of the
+        filter, which the low shelf&rsquo;s doesn&rsquo;t, so its two copies arrive at the summer
+        smaller. If the two shelves should match, that divider is the place to look.</li>
+    <li><strong>A dip beside each shelf.</strong> Boosting the low shelf dips the response by
+        about 3&nbsp;dB just above the corner, and cutting it bumps it by about 1.4&nbsp;dB; the
+        high shelf does the same below its corner by 1&ndash;2&nbsp;dB. That comes from adding a
+        second-order (Q&nbsp;0.71) filter to the dry signal. Some classic equalisers have this on
+        purpose. A lower-Q filter would make it smaller.</li>
+    <li><strong>C33 tilts the flat response.</strong> With every knob centred the module rises
+        to +{FLATDB:.1f}&nbsp;dB around 12&nbsp;kHz. C33 (220&nbsp;pF across the high shelf&rsquo;s
+        level stage) rolls off the inverted copy of the high-passed signal but not the direct
+        one, so they stop cancelling at the top of the band. At 22&nbsp;pF the module is flat to
+        0.05&nbsp;dB. C29 on the low shelf does the same thing in principle, but there is almost
+        no low-passed signal up where it acts.</li>
+  </ul>
+</div>
+""")
+
+PAGES['board.html'] = ("Board &amp; parts", """
+<p class="eyebrow">Practical &mdash; 06</p>
+<h1>Board and parts</h1>
+<p class="lede">The board was started on 5&nbsp;October: the outline, the card edge, the input
+section, part of the low-mid band and all ten pots are placed. Nothing is routed yet.</p>
+
+<figure>
+  <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of the equaliser board as placed so far" loading="lazy"></div>
+  <figcaption><span>The board at <code>10142c5</code>, from above. Parts not yet placed sit around the outline. The pots are stand-in blocks: KiCad&rsquo;s library has no model for the RK097</span>
+  <a href="files/combined-3d-top.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<h2>Where it stands</h2>
+""" + table(["", "Now"],
+            [["Outline", "The 500-series card template with its edge-connector tab. KiCad reports it as not closed, so DRC can&rsquo;t check against it yet"],
+             ["Placed", "44 of the 127 footprints: J1, the input section and bypass switch at the back, IC1, IC3, IC4, all ten pots along the front edge, the four mounting holes"],
+             ["Not placed", "IC2, IC5, IC6 and most of the resistors and capacitors"],
+             ["Tracks", "None yet"],
+             ["Front panel", "Not drawn yet"]],
+            ["r", ""]) + """
+
+<div class="note warn">
+  <h4>Two placement questions to settle before routing</h4>
+  <p><strong>The knobs, as placed, are 7.5&nbsp;mm apart in a single line.</strong> The pots are
+  right-angle parts on the main card, in two rows along its front edge. A right-angle pot puts
+  its shaft at a fixed height above the board, so every shaft comes through the panel on the
+  same line, wherever the pot sits on the card. With the ten pots alternating between the rows,
+  their shafts are 7.5&nbsp;mm apart, centre to centre. That is too close for any knob larger
+  than about 7&nbsp;mm, and the back row&rsquo;s shafts have to pass between the front
+  row&rsquo;s bodies. Ten knobs in one line on a 133&nbsp;mm panel get about 12&nbsp;mm each
+  at best, once the mounting screws have their space. The
+  compressor solved the same problem with a <a href="../compressor/boards.html">front
+  board</a> behind the panel; the <a href="../faceplate/mounting.html">faceplate guide</a>
+  compares the options.</p>
+  <p><strong>The bypass switch is at the back.</strong> SW1 is placed beside J1, at the rack end
+  of the card, so it can&rsquo;t be reached once the module is in the rack. If bypass is a panel
+  control, it needs to move to the front, as a panel or right-angle toggle.</p>
 </div>
 
-<p>The stage inverts, so if it ends up in the chain with the two bands, the module as a whole
-inverts. That only matters for how J1&rsquo;s balanced pins are wired, but it does matter.</p>
+<h2>Footprints to check</h2>
+<ul>
+  <li><strong>C18 and C20</strong> (100&nbsp;&micro;F) are on 5&nbsp;mm ceramic disc footprints.
+      The parts list has an 8&nbsp;mm electrolytic can (Jaycar RE6334), which needs a radial
+      footprint like C4&rsquo;s.</li>
+  <li><strong>C2 and C7</strong> (10&nbsp;&micro;F) are on a 4 &times; 2.5&nbsp;mm film-capacitor
+      footprint. The parts list has bipolar electrolytics (Jaycar RY6810), so these need radial
+      footprints too.</li>
+  <li><strong>J2 and J3</strong>, the two 24-pin headers, have no footprint and nothing
+      connected. If they are a leftover, delete them; if they are meant for a front board, they
+      need wiring.</li>
+  <li><strong>The pots</strong> use Alps RK097 footprints. The parts list&rsquo;s dual pot is a
+      Bourns PTD902; check its pins against the RK097 footprint before ordering.</li>
+</ul>
+
+<h2>The parts list</h2>
+<p><code>BOM.xlsx</code> in the repository is the team&rsquo;s list so far. The capacitors are
+specified in detail; the rest is quantities.</p>
+""" + table(["Parts", "Specified as", "Supplier"],
+            [["Filter capacitors, 100&nbsp;pF to 10&nbsp;nF", "TDK FG28 C0G, 5% radial, 5&nbsp;mm pitch", "DigiKey / element14"],
+             ["100&nbsp;nF and 1&nbsp;&micro;F", "50&nbsp;V monolithic ceramic (RC5490, RC5499)", "Jaycar"],
+             ["100&nbsp;&micro;F reservoirs", "35&nbsp;V low-ESR electrolytic (RE6334)", "Jaycar"],
+             ["47&nbsp;&micro;F and 10&nbsp;&micro;F coupling", "Bipolar electrolytic (RY6820, RY6810)", "Jaycar"],
+             ["Resistors", "Quantities by value only", "&mdash;"],
+             ["Op amps", "TL084 &times; 4", "&mdash;"],
+             ["Dual pots", "Bourns PTD902-1015K-A104, 100k log", "DigiKey / element14"],
+             ["Standoffs", "M3 &times; 20&nbsp;mm aluminium hex", "DigiKey / element14"]],
+            ["r", "", ""]) + """
+<div class="note">
+  <h4>TL084 or OPA1644</h4>
+  <p>The sheet says OPA1644 and the parts list says TL084. They share the quad pinout and both
+  have JFET inputs, so either works in the circuit, and the TL084 comes in TSSOP-14 to fit the
+  footprint. The OPA1644 is about three times quieter (5&nbsp;nV/&radic;Hz against the
+  TL084&rsquo;s 18) and drives the 10k loads here more comfortably. Settle on one so the sheet
+  and the order agree.</p>
+  <p>The dual pot is log taper, and these pages assume linear: on RV1 and RV4, wired as
+  variable resistors, a log track spreads the frequency sweep more evenly across the knob, but
+  it changes where on the travel each corner frequency sits.</p>
+</div>
 """)
 
 PAGES['simulation.html'] = ("Simulating it", f"""
-<p class="eyebrow">Practical &mdash; 06</p>
+<p class="eyebrow">Practical &mdash; 07</p>
 <h1>Simulating it</h1>
-<p class="lede">The low-mid band&rsquo;s LTspice model now runs, and it agrees with the KiCad
-sheet. It still only runs on the machine it was drawn on.</p>
+<p class="lede">The site solves the whole sheet; the team&rsquo;s LTspice model of the low-mid
+band agrees with it.</p>
+
+<h2>How this site works out the response</h2>
+<p>LTspice is not available where this site is built, so every response on these pages is
+worked out from the KiCad sheet directly by <code>build/_eq_response.py</code>. It reads the
+netlist, splits each pot at its wiper into two resistors, treats each op amp as a gain of a
+million, and solves the circuit at 401 frequencies from 10&nbsp;Hz to 100&nbsp;kHz &mdash; the
+same nodal analysis SPICE does for an AC run. It starts at the INA137&rsquo;s output and ends at
+the DRV134&rsquo;s input; the receiver&rsquo;s &minus;6&nbsp;dB and the driver&rsquo;s +6&nbsp;dB
+cancel, so that is also the module&rsquo;s response from input to output.</p>
+<p>It solves the circuit as it should be powered: the two op amps with their supply pin on the
+wrong rail are treated as working (see <a href="io.html#power">power</a>).</p>
+<p>Ideal op amps are a fair assumption here. The OPA1644 has 11&nbsp;MHz of gain-bandwidth; at
+20&nbsp;kHz that still leaves it hundreds of times more gain than any stage asks for. What it
+cannot show is noise, headroom or the op amps&rsquo; own distortion &mdash; those need the real
+model, or a real board.</p>
+
+""" + flat_chart() + f"""
+<p>With every knob centred the response should be a straight line. It is within
+{FLATDB:.2f}&nbsp;dB from 20&nbsp;Hz to 20&nbsp;kHz, and the rise towards 12&nbsp;kHz is C33 (see
+<a href="filters.html">the shelves</a>).</p>
 
 <h2>The team&rsquo;s LTspice models</h2>
 """ + table(["File", "What it models", "Committed results"],
-            [["<code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code>", "Low-mid band, OPA1644 model, pots as resistor pairs", "Yes, AC run of 30&nbsp;Sep, completed with no errors"],
+            [["<code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code>", "Low-mid band, OPA1644 model, pots as resistor pairs", "Yes, AC run of 30&nbsp;Sep"],
              ["<code>High_Bandpass_Filter/LTSPICE/BandB.asc</code>", "High-mid band", "Yes"],
-             ["<code>High_Pass_filter/hpf.asc</code>", "High-pass, generic op amp", "No"],
-             ["<code>Low_Pass_Filter/lpf.asc</code>", "Low-pass, generic op amp", "No"],
-             ["<code>Variable_Gain/variable gain.asc</code>", "Gain stage, generic op amp", "No"]],
+             ["<code>High_Pass_filter/hpf.asc</code>", "First draft of the high shelf&rsquo;s filter, generic op amp", "No"],
+             ["<code>Low_Pass_Filter/lpf.asc</code>", "First draft of the low shelf&rsquo;s filter, generic op amp", "No"],
+             ["<code>Variable_Gain/variable gain.asc</code>", "The level stage, generic op amp", "No"]],
             ["r", "", ""]) + """
+<p>There is no LTspice model of the whole module yet. The shelves only work as shelves once
+the dry path, the level stages and the summer are all present, so a model of the full sheet is
+the one worth drawing next.</p>
 
-<h2>The model is still linked by an absolute path</h2>
+<h2>The BandA model is linked by an absolute path</h2>
 <p>Each op amp&rsquo;s <code>ModelFile</code> in <code>BandA.asc</code> points at a folder on the
 machine the file was drawn on:</p>
 <pre><code>C:\\Users\\ebul0\\Downloads\\sbom627d\\OPA164x.LIB</code></pre>
 <p>On anyone else&rsquo;s machine the simulation stops with &ldquo;This sub-circuit name is not
 defined&rdquo;. A copy of the library is already committed beside the schematic, at
 <code>LT_SPICE/BandA/OPA164x.LIB</code>. Point the model at that with a relative path and it
-will run anywhere. The <code>hpf</code>, <code>lpf</code> and gain models use LTspice&rsquo;s
-built-in op amp, so they run as they are.</p>
-
-<h2>How this site works out the response</h2>
-<p>LTspice is not available where this site is built, so the response on the
-<a href="bands.html">bands page</a> is worked out from the KiCad sheet directly by
-<code>build/_eq_response.py</code>. It reads the netlist, splits each pot at its wiper into two
-resistors, treats each op amp as a gain of a million, and solves the circuit at 401 frequencies
-from 10&nbsp;Hz to 100&nbsp;kHz &mdash; the same nodal analysis SPICE does for an AC run.</p>
-<p>Ideal op amps are a fair assumption here. The OPA1644 has 11&nbsp;MHz of gain-bandwidth; at
-20&nbsp;kHz that still leaves it hundreds of times more gain than any stage asks for. What it
-cannot show is noise, headroom or the op amps&rsquo; own distortion &mdash; those need the real
-model, or a real board.</p>
-
-<h2>Re-running BandA</h2>
-<ol>
-  <li>Open <code>Low_Bandpass_Filter/LT_SPICE/BandA.asc</code> in LTspice.</li>
-  <li>Fix the model path as above.</li>
-  <li>Run. The analysis is already set: <code>.ac dec 100 10 100k</code>.</li>
-  <li>Plot <code>V(output)</code>. With the file&rsquo;s pot settings it should peak at
-  +9.5&nbsp;dB near 1.26&nbsp;kHz.</li>
-</ol>
-<p>To try other knob positions, change the resistor pairs standing in for each pot (R4/R5
-width, R9/R10 and R13/R14 frequency, R18/R19 boost/cut), keeping each pair&rsquo;s sum at
-10k.</p>
+will run anywhere.</p>
 """)
 
 PAGES['status.html'] = ("What is left", """
-<p class="eyebrow">Practical &mdash; 07</p>
+<p class="eyebrow">Practical &mdash; 08</p>
 <h1>What is left</h1>
-<p class="lede">In rough order &mdash; each step unblocks the next.</p>
+<p class="lede">The circuit is complete. What remains is one wiring fix, some decisions that
+are cheap now and dear after routing, and the board.</p>
 """ + table(["Step", "Why it comes here"],
-            [["Fix the low-pass and gain sheets",
-              "Add the low-pass&rsquo;s capacitor to ground, swap the gain stage&rsquo;s inputs. Both are one-minute edits."],
-             ["Check the filter ranges",
-              "The high-pass sits at 4.6&ndash;20&nbsp;kHz and the low-pass at 200&ndash;440&nbsp;Hz. Confirm that is intended before choosing parts."],
-             ["Decide the signal chain",
-              "Which order the high-pass, bands, low-pass and gain go in, and what drives J1&rsquo;s balanced input and output."],
-             ["Bring every section onto the main sheet",
-              "Then the copies in the section folders can go, so there is one place to edit."],
-             ["Join the supply",
-              "Op amps on <code>VCC</code>/<code>VEE</code>, connector on <code>+16V</code>/<code>-16V</code>: one name for each rail, plus decoupling."],
-             ["Wire the audio to J1",
-              "Input and output through the card edge, as on the compressor."],
-             ["Give every part a footprint",
-              "The capacitors and pots have none yet, and the pots set the panel layout."],
-             ["Lay out the board",
-              "<code>Combined_EQ.kicad_pcb</code> has the card outline and J1 already."],
-             ["Fill in the bill of materials", "<code>EQ BOM.docx</code> has columns and no rows."]],
+            [["Put IC2 and IC5 on +16&nbsp;V",
+              "Their V+ pins are on &minus;16&nbsp;V, so as drawn the module has no output. Two symbols to change (<a href=\"io.html#power\">power</a>)."],
+             ["Decide the knob directions",
+              "The mid bands cut and lower their frequency clockwise, the shelves boost and raise it. Swapping pot pins is free before routing (<a href=\"bands.html\">bands</a>)."],
+             ["Settle the panel",
+              "As placed, ten shafts come through the panel in one line, 7.5&nbsp;mm apart. A front board, or a different arrangement, changes the placement (<a href=\"board.html\">board</a>)."],
+             ["Move the bypass switch",
+              "If bypass is a panel control, SW1 has to be at the front of the card, not by J1."],
+             ["Fix the footprints",
+              "Radial footprints for the 100&nbsp;&micro;F and 10&nbsp;&micro;F electrolytics; delete or wire J2 and J3."],
+             ["Decide where the grounds join",
+              "Pins 5 and 13 are on one net. Choose the single point where supply return meets audio ground."],
+             ["Consider C33 and the high shelf&rsquo;s divider",
+              "22&nbsp;pF for C33 makes the module flat; the R12/R13 divider is why the high shelf is weaker (<a href=\"filters.html\">shelves</a>). Both optional."],
+             ["Finish placement, close the outline and route", "Then DRC can check the board against the sheet."],
+             ["Finish the parts list",
+              "Part numbers for the resistors, the 10k pots, the switch and the chips, and one op amp on both the sheet and the order."],
+             ["Draw the faceplate",
+              "From the board&rsquo;s shaft positions, as the compressor&rsquo;s is drawn from its front board."]],
             ["r", ""]) + """
-
-<h2>The panel is the binding constraint</h2>
-<p>Counting what is drawn: three knobs per band, one each for the high-pass, the low-pass and the
-gain. That is <strong>nine knobs</strong>, before any bypass switch. The compressor fits nine
-functions on the same 38.10&nbsp;mm faceplate only by using concentric and pull-switch pots, and
-three of the equaliser&rsquo;s knobs are dual-gang already, which rules out the simplest
-concentric pairings. Worth settling on the
-<a href="../faceplate/">faceplate</a> before footprints are chosen, because the pot type decides
-the footprint.</p>
 """)
 
 import content_files
-PAGES['files.html'] = content_files.page('equaliser', '08')
+PAGES['files.html'] = content_files.page('equaliser', '09')

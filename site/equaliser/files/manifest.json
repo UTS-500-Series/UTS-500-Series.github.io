@@ -1,13 +1,13 @@
 {
  "repo": "https://github.com/UTS-500-Series/Equaliser",
- "commit": "e2f6864",
- "date": "2026-10-01",
+ "commit": "10142c5",
+ "date": "2026-10-07",
  "kicad": "10.0.6",
  "schematics": [
   {
    "name": "combined",
    "source": "Combined_EQ/Combined_EQ.kicad_sch",
-   "label": "Main schematic: both parametric bands and the card edge connector",
+   "label": "Main schematic: the whole equaliser, from the card edge in to the card edge out",
    "files": [
     "combined.pdf",
     "combined.svg"
@@ -16,7 +16,7 @@
   {
    "name": "lbp",
    "source": "Low_Bandpass_Filter/LBP.kicad_sch",
-   "label": "Low-mid band on its own sheet",
+   "label": "Low-mid band on its own sheet (earlier draft)",
    "files": [
     "lbp.pdf",
     "lbp.svg"
@@ -25,7 +25,7 @@
   {
    "name": "hbp",
    "source": "High_Bandpass_Filter/HBP/HBP.kicad_sch",
-   "label": "High-mid band on its own sheet",
+   "label": "High-mid band on its own sheet (earlier draft)",
    "files": [
     "hbp.pdf",
     "hbp.svg"
@@ -34,7 +34,7 @@
   {
    "name": "hpf",
    "source": "High_Pass_filter/HPF/HPF.kicad_sch",
-   "label": "High-pass filter section",
+   "label": "High-pass filter on its own sheet (earlier draft)",
    "files": [
     "hpf.pdf",
     "hpf.svg"
@@ -43,7 +43,7 @@
   {
    "name": "lpf",
    "source": "Low_Pass_Filter/LPF/LPF.kicad_sch",
-   "label": "Low-pass filter section",
+   "label": "Low-pass filter on its own sheet (earlier draft)",
    "files": [
     "lpf.pdf",
     "lpf.svg"
@@ -52,7 +52,7 @@
   {
    "name": "gain",
    "source": "Variable_Gain/GAIN/variablegain/variablegain.kicad_sch",
-   "label": "Variable gain stage",
+   "label": "Variable gain stage on its own sheet (earlier draft)",
    "files": [
     "gain.pdf",
     "gain.svg"
@@ -63,13 +63,13 @@
   {
    "name": "combined",
    "source": "Combined_EQ/Combined_EQ.kicad_pcb",
-   "label": "Main board: card outline and edge connector so far",
+   "label": "The equaliser card: parts being placed, no tracks yet",
    "stats": {
-    "footprints": 1,
+    "footprints": 127,
     "segments": 0,
     "vias": 0,
     "zones": 0,
-    "outline": 10
+    "outline": 15
    },
    "files": [
     "combined-3d-top.png",
@@ -83,7 +83,7 @@
   {
    "name": "lbp",
    "source": "Low_Bandpass_Filter/LBP.kicad_pcb",
-   "label": "Low-mid band board",
+   "label": "Low-mid band board (earlier draft)",
    "stats": {
     "footprints": 15,
     "segments": 0,

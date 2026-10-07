@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The main schematic</span></a><h4>The circuit</h4><a href="bands.html"><i>03</i><span>Parametric bands</span></a><a href="filters.html"><i>04</i><span>High- and low-pass filters</span></a><a href="gain.html"><i>05</i><span>Gain stage</span></a><h4>Practical</h4><a href="simulation.html"><i>06</i><span>Simulating it</span></a><a href="status.html" class="on"><i>07</i><span>What is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html" class="on"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -31,23 +31,15 @@ try {
 </aside>
 <main class="main"><div class="wrap">
 
-<p class="eyebrow">Practical &mdash; 07</p>
+<p class="eyebrow">Practical &mdash; 08</p>
 <h1>What is left</h1>
-<p class="lede">In rough order &mdash; each step unblocks the next.</p>
-<div class="tw"><table><thead><tr><th class="r">Step</th><th class="">Why it comes here</th></tr></thead><tbody><tr><td class="r">Fix the low-pass and gain sheets</td><td class="">Add the low-pass&rsquo;s capacitor to ground, swap the gain stage&rsquo;s inputs. Both are one-minute edits.</td></tr><tr><td class="r">Check the filter ranges</td><td class="">The high-pass sits at 4.6&ndash;20&nbsp;kHz and the low-pass at 200&ndash;440&nbsp;Hz. Confirm that is intended before choosing parts.</td></tr><tr><td class="r">Decide the signal chain</td><td class="">Which order the high-pass, bands, low-pass and gain go in, and what drives J1&rsquo;s balanced input and output.</td></tr><tr><td class="r">Bring every section onto the main sheet</td><td class="">Then the copies in the section folders can go, so there is one place to edit.</td></tr><tr><td class="r">Join the supply</td><td class="">Op amps on <code>VCC</code>/<code>VEE</code>, connector on <code>+16V</code>/<code>-16V</code>: one name for each rail, plus decoupling.</td></tr><tr><td class="r">Wire the audio to J1</td><td class="">Input and output through the card edge, as on the compressor.</td></tr><tr><td class="r">Give every part a footprint</td><td class="">The capacitors and pots have none yet, and the pots set the panel layout.</td></tr><tr><td class="r">Lay out the board</td><td class=""><code>Combined_EQ.kicad_pcb</code> has the card outline and J1 already.</td></tr><tr><td class="r">Fill in the bill of materials</td><td class=""><code>EQ BOM.docx</code> has columns and no rows.</td></tr></tbody></table></div>
-
-<h2>The panel is the binding constraint</h2>
-<p>Counting what is drawn: three knobs per band, one each for the high-pass, the low-pass and the
-gain. That is <strong>nine knobs</strong>, before any bypass switch. The compressor fits nine
-functions on the same 38.10&nbsp;mm faceplate only by using concentric and pull-switch pots, and
-three of the equaliser&rsquo;s knobs are dual-gang already, which rules out the simplest
-concentric pairings. Worth settling on the
-<a href="../faceplate/">faceplate</a> before footprints are chosen, because the pot type decides
-the footprint.</p>
+<p class="lede">The circuit is complete. What remains is one wiring fix, some decisions that
+are cheap now and dear after routing, and the board.</p>
+<div class="tw"><table><thead><tr><th class="r">Step</th><th class="">Why it comes here</th></tr></thead><tbody><tr><td class="r">Put IC2 and IC5 on +16&nbsp;V</td><td class="">Their V+ pins are on &minus;16&nbsp;V, so as drawn the module has no output. Two symbols to change (<a href="io.html#power">power</a>).</td></tr><tr><td class="r">Decide the knob directions</td><td class="">The mid bands cut and lower their frequency clockwise, the shelves boost and raise it. Swapping pot pins is free before routing (<a href="bands.html">bands</a>).</td></tr><tr><td class="r">Settle the panel</td><td class="">As placed, ten shafts come through the panel in one line, 7.5&nbsp;mm apart. A front board, or a different arrangement, changes the placement (<a href="board.html">board</a>).</td></tr><tr><td class="r">Move the bypass switch</td><td class="">If bypass is a panel control, SW1 has to be at the front of the card, not by J1.</td></tr><tr><td class="r">Fix the footprints</td><td class="">Radial footprints for the 100&nbsp;&micro;F and 10&nbsp;&micro;F electrolytics; delete or wire J2 and J3.</td></tr><tr><td class="r">Decide where the grounds join</td><td class="">Pins 5 and 13 are on one net. Choose the single point where supply return meets audio ground.</td></tr><tr><td class="r">Consider C33 and the high shelf&rsquo;s divider</td><td class="">22&nbsp;pF for C33 makes the module flat; the R12/R13 divider is why the high shelf is weaker (<a href="filters.html">shelves</a>). Both optional.</td></tr><tr><td class="r">Finish placement, close the outline and route</td><td class="">Then DRC can check the board against the sheet.</td></tr><tr><td class="r">Finish the parts list</td><td class="">Part numbers for the resistors, the 10k pots, the switch and the chips, and one op amp on both the sheet and the order.</td></tr><tr><td class="r">Draw the faceplate</td><td class="">From the board&rsquo;s shaft positions, as the compressor&rsquo;s is drawn from its front board.</td></tr></tbody></table></div>
 
 <div class="next"><a href="simulation.html">&larr; Simulating it</a><a href="files.html">Design files &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at e2f6864<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

@@ -3,21 +3,26 @@
 
     python3 build/_eq_response.py [--repo ../Equaliser]
 
-The equaliser's two parametric bands are drawn on Combined_EQ/Combined_EQ.kicad_sch with real
-values. This reads that sheet's netlist with _kicad_sch.py, turns every resistor, capacitor and
-potentiometer into an admittance, models each op amp as a gain of 10^6, and solves the circuit
-at each frequency (modified nodal analysis, the method SPICE's AC analysis uses). It writes
+The whole equaliser is drawn on Combined_EQ/Combined_EQ.kicad_sch with real values. This reads
+that sheet's netlist with _kicad_sch.py, turns every resistor, capacitor and potentiometer into
+an admittance, models each op amp as a gain of 10^6, and solves the circuit at each frequency
+(modified nodal analysis, the method SPICE's AC analysis uses). It writes
 site/equaliser/data/response.json, which is committed, so building the site never needs the
 repository.
 
-The same file carries the team's own LTspice result (Low_Bandpass_Filter/LT_SPICE/BandA.raw),
-read straight from the binary .raw file, so the page can show the two agree.
+The solve runs from the INA137's output to the DRV134's input: everything between them is op
+amps, resistors, capacitors and pots. The INA137 halves the level and the DRV134 doubles it, so
+that span is also the module's response from J1's input to its output.
+
+The same file carries the team's own LTspice result for the low-mid band
+(Low_Bandpass_Filter/LT_SPICE/BandA.raw), read straight from the binary .raw file, so the page
+can show the two agree.
 
 Ideal op amps mean this is the response the resistors and capacitors set, not the OPA1644's:
 fine inside the audio band, where the OPA1644's 11 MHz of gain-bandwidth is plenty. Pots are
 linear, and split at their wiper into two resistors. Standard library only.
 """
-import argparse, array, cmath, json, math, os, sys
+import argparse, array, json, math, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..'))
@@ -26,13 +31,19 @@ from _kicad_sch import Sheet
 
 SCH = 'Combined_EQ/Combined_EQ.kicad_sch'
 RAW = 'Low_Bandpass_Filter/LT_SPICE/BandA.raw'
-GND = 'B+/C+/F+/G+/GND'       # the labels B+, C+, F+, G+ sit on ground, so the net takes all names
-IN = 'Net-(R29-Pad1)'         # the low-mid band's input: R29 and RV8 pin 1, not yet wired to J1
-# OPA1644 units as (+, -, out). IC3 is the low-mid band, IC2 the high-mid.
-OPAMPS = [('A+', 'A-', 'Ao'), (GND, 'B-', 'Bo'), (GND, 'C-', 'Co'), ('D+', 'D-', 'Do'),
-          ('E+', 'E-', 'Eo'), (GND, 'F-', 'Fo'), (GND, 'G-', 'Go'), ('H+', 'H-', 'Ho')]
+QUAD = {'A': ('3', '2', '1'), 'B': ('5', '6', '7'), 'C': ('10', '9', '8'), 'D': ('12', '13', '14')}
 A0 = 1e6
 FREQS = [round(10 * 10 ** (i / 100), 3) for i in range(401)]      # 10 Hz to 100 kHz
+
+# The ten knobs. Positions run from 0 at a pot's pin 1 (or 4) to 1 at pin 3 (or 6); with the
+# usual pin 3 = clockwise, 1 is fully clockwise.
+SECTIONS = {
+    'lowshelf':  {'name': 'Low shelf',  'freq': 'RV1', 'gain': 'RV3'},
+    'lowmid':    {'name': 'Low-mid',    'freq': 'RV9', 'gain': 'RV8', 'q': 'RV7'},
+    'highmid':   {'name': 'High-mid',   'freq': 'RV6', 'gain': 'RV5', 'q': 'RV2'},
+    'highshelf': {'name': 'High shelf', 'freq': 'RV4', 'gain': 'RV10'},
+}
+FLAT = {s['gain']: 0.5 for s in SECTIONS.values()}
 
 
 def value(s):
@@ -47,8 +58,10 @@ def value(s):
 class Circuit:
     def __init__(self, path):
         sheet = Sheet(path)
-        pin = {p: n for n, ps in sheet.netlist().items() for p in ps}
+        self.pin = pin = {p: n for n, ps in sheet.netlist().items() for p in ps}
+        self.gnd = pin[('J1', '13')]
         self.elems = []                 # (kind, net a, net b, ohms or farads, pot key)
+        self.opamps = []                # (+, -, out) for every OPA1644 unit
         seen = set()
         for s in sheet.symbols:
             if sheet.is_power(s) or (s['ref'], s['unit']) in seen:
@@ -65,14 +78,21 @@ class Circuit:
                 R = value(s['value'])
                 self.elems.append(('top', pin[(ref, a)], pin[(ref, w)], R, ref))
                 self.elems.append(('bot', pin[(ref, w)], pin[(ref, b)], R, ref))
-        nets = {n for e in self.elems for n in e[1:3]} | {o[2] for o in OPAMPS}
-        self.nodes = sorted(nets - {GND})
+            elif 'OPA1644' in lib:
+                for p, m, o in QUAD.values():
+                    self.opamps.append(tuple(pin[(ref, x)] for x in (p, m, o)))
+        self.IN = pin[('IC4', '3')]     # the INA137's output, into buffer IC4A
+        self.OUT = pin[('IC6', '4')]    # the DRV134's input
+        self.LOWMID = pin[('IC3', '14')]  # the low-mid band's own output
+        self.HIGHMID = pin[('IC2', '8')]  # the high-mid band's own output
+        nets = {n for e in self.elems for n in e[1:3]} | {o[2] for o in self.opamps} | {self.IN}
+        self.nodes = sorted(nets - {self.gnd})
         self.idx = {n: i for i, n in enumerate(self.nodes)}
 
     def solve(self, f, pots, inp, out):
         """V(out) / V(inp) at f. `pots` maps a pot's reference to its wiper position, 0 at
         pin 1 (or 4) and 1 at pin 3 (or 6); unlisted pots sit at the centre."""
-        N = len(self.nodes); M = N + len(OPAMPS) + 1
+        N = len(self.nodes); M = N + len(self.opamps) + 1
         G = [[0j] * M for _ in range(M)]
         b = [0j] * M
         s = 2j * math.pi * f
@@ -80,6 +100,7 @@ class Circuit:
 
         def stamp(n1, n2, y):
             i, j = I(n1), I(n2)
+            if i == j: return
             if i is not None: G[i][i] += y
             if j is not None: G[j][j] += y
             if i is not None and j is not None:
@@ -92,7 +113,7 @@ class Circuit:
             else:
                 k = min(max(pots.get(ref, 0.5), 1e-4), 1 - 1e-4)
                 stamp(n1, n2, 1 / (v * (k if kind == 'top' else 1 - k)))
-        for r, (p, m, o) in enumerate(OPAMPS, N):
+        for r, (p, m, o) in enumerate(self.opamps, N):
             G[I(o)][r] += 1                     # the op amp sources current into its output
             G[r][I(o)] += 1                     # Vout = A0 (V+ - V-)
             if I(p) is not None: G[r][I(p)] -= A0
@@ -101,8 +122,9 @@ class Circuit:
         G[I(inp)][r] += 1; G[r][I(inp)] += 1; b[r] = 1
         return gauss(G, b)[I(out)]
 
-    def curve(self, pots, out):
-        return [[f, round(20 * math.log10(abs(self.solve(f, pots, IN, out))), 3)] for f in FREQS]
+    def curve(self, pots, out=None):
+        return [[f, round(20 * math.log10(abs(self.solve(f, pots, self.IN, out or self.OUT))), 3)]
+                for f in FREQS]
 
 
 def gauss(A, b):
@@ -142,8 +164,7 @@ def ltspice(path, node='V(output)'):
 
 
 def peak(curve):
-    f, db = max(curve, key=lambda p: abs(p[1]))
-    return f, db
+    return max(curve, key=lambda p: abs(p[1]))
 
 
 def q(curve):
@@ -153,41 +174,68 @@ def q(curve):
     return f0 / (max(inside) - min(inside))
 
 
+def shelf(curve, low):
+    """A shelf's depth at the edge of the audio band (20 Hz or 20 kHz) and its corner: the
+    frequency, coming in from that edge, where it has fallen to half that depth in dB."""
+    edge = 20 if low else 20000
+    pts = [p for p in curve if (p[0] >= edge if low else p[0] <= edge)]
+    pts = pts if low else pts[::-1]
+    end = pts[0][1]
+    corner = next(f for f, db in pts if abs(db) < abs(end) / 2)
+    return round(end, 2), round(corner)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--repo', default=os.path.join(ROOT, '..', 'Equaliser'))
     a = ap.parse_args()
     c = Circuit(os.path.join(a.repo, SCH))
-    flat = {'RV5': 0.5, 'RV8': 0.5}
-    # Wiper at pin 1 is full boost on RV8/RV5, the top of the frequency range on RV9/RV6,
-    # and the narrowest band on RV7/RV2.
-    bands = {'low': {'out': 'Do', 'gain': 'RV8', 'freq': 'RV9', 'q': 'RV7'},
-             'high': {'out': 'Ho', 'gain': 'RV5', 'freq': 'RV6', 'q': 'RV2'}}
     out = {'source': 'Equaliser repo, %s, computed by build/_eq_response.py' % SCH,
            'curves': [], 'ranges': {}}
-    for name, b in bands.items():
-        rng = {}
+    for key, sec in SECTIONS.items():
+        # which end of the gain pot boosts, worked out rather than assumed
+        lo = c.curve({**FLAT, sec['gain']: 0})
+        boost_at = 0 if max(abs(d) for _, d in lo) == max(d for _, d in lo) else 1
+        rng = {'boost_at': boost_at, 'freq_pot': sec['freq'], 'gain_pot': sec['gain']}
         for k in (0, 0.5, 1):
-            cv = c.curve({**flat, b['gain']: 0, b['freq']: k}, b['out'])
-            f0, pk = peak(cv)
-            rng['f%g' % k] = round(f0)
-            out['curves'].append({'band': name, 'freq': k, 'gain': 'boost', 'points': cv})
-            cut = c.curve({**flat, b['gain']: 1, b['freq']: k}, b['out'])
-            out['curves'].append({'band': name, 'freq': k, 'gain': 'cut', 'points': cut})
-            rng['boost'], rng['cut'] = round(pk, 2), round(peak(cut)[1], 2)
-        for k in (0, 0.5, 1):
-            rng['q%g' % k] = round(q(c.curve({**flat, b['gain']: 0, b['q']: k}, b['out'])), 2)
-        rng['flat'] = round(max(abs(db) for _, db in c.curve(flat, b['out'])), 3)
-        out['ranges'][name] = rng
+            for gain, g in (('boost', boost_at), ('cut', 1 - boost_at)):
+                cv = c.curve({**FLAT, sec['gain']: g, sec['freq']: k})
+                out['curves'].append({'section': key, 'freq': k, 'gain': gain, 'points': cv})
+                if 'q' in sec:
+                    # a band's own figures from its own output, clear of the shelves' ripple
+                    f0, pk = peak(c.curve({**FLAT, sec['gain']: g, sec['freq']: k}, getattr(c, key.upper())))
+                    if gain == 'boost':
+                        rng['f%g' % k] = round(f0)
+                    rng[gain] = round(pk, 2)
+                else:
+                    depth, corner = shelf(cv, key == 'lowshelf')
+                    if gain == 'boost':
+                        rng['f%g' % k] = corner
+                    rng['%s%g' % (gain, k)] = depth
+        if 'q' in sec:
+            for k in (0, 0.5, 1):
+                rng['q%g' % k] = round(q(c.curve({**FLAT, sec['gain']: boost_at, sec['q']: k},
+                                                 getattr(c, key.upper()))), 2)
+        out['ranges'][key] = rng
+    flat = c.curve(FLAT)
+    out['flat'] = round(max(abs(db) for f, db in flat if f <= 20000), 3)
+    out['flatcurve'] = flat
+    # every knob at full boost, frequencies centred: the most the module can add
+    out['allboost'] = c.curve({sec['gain']: out['ranges'][k]['boost_at'] for k, sec in SECTIONS.items()})
     # the LTspice file sets its pots as resistor pairs: frequency at the top end, Q at mid,
-    # full boost - the same settings as the low band's f0 boost curve above
+    # full boost. Compare it with the low-mid band's own output at the same settings.
+    lm = SECTIONS['lowmid']
+    band = c.curve({**FLAT, lm['gain']: out['ranges']['lowmid']['boost_at'], lm['freq']: 0}, c.LOWMID)
     date, pts = ltspice(os.path.join(a.repo, RAW))
-    out['ltspice'] = {'source': '%s, LTspice AC run of %s' % (RAW, date), 'points': pts}
+    out['ltspice'] = {'source': '%s, LTspice AC run of %s' % (RAW, date), 'points': pts,
+                      'netlist': band}
     dst = os.path.join(ROOT, 'site', 'equaliser', 'data', 'response.json')
     json.dump(out, open(dst, 'w'), separators=(',', ':'))
     for name, r in out['ranges'].items():
-        print('%-5s %s' % (name, r))
-    print('ltspice peak %.2f dB at %.0f Hz' % peak(pts)[::-1])
+        print('%-9s %s' % (name, r))
+    print('flat to %.3f dB; all boost peaks %.2f dB at %.0f Hz' % (out['flat'], *peak(out['allboost'])[::-1]))
+    print('low-mid band alone %.2f dB at %.0f Hz; ltspice %.2f dB at %.0f Hz'
+          % (*peak(band)[::-1], *peak(pts)[::-1]))
 
 
 if __name__ == '__main__':

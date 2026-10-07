@@ -14,15 +14,15 @@ also render correctly if this is ever demoted to an ordinary project site.
 
 | Module | Status | Source |
 |---|---|---|
-| Compressor | **Designed** — schematic complete, verified and simulated, main and front boards routed, parts list from Altronics, not built | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
+| Compressor | **Designed** — schematic complete, verified and simulated, main and front boards routed and ordered (3 Oct), parts list from Altronics, printable faceplate, not built | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
 | Preamp | **In progress** — schematic drawn and board routed, no component values yet | [`UTS-500-Series/Pre-Amp`](https://github.com/UTS-500-Series/Pre-Amp) |
-| Equaliser | **In progress** — two parametric bands drawn with values on one sheet; filters and gain on their own sheets; not wired to the card edge | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
+| Equaliser | **In progress** — whole circuit on one sheet with values (low and high shelves, two parametric bands, balanced in and out); board being placed, not routed | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
 
-Only the compressor has a design. Its pages are generated from `design.py` in the compressor
+Only the compressor has a finished, verified design. Its pages are generated from `design.py` in the compressor
 repository, which the KiCad schematic is verified against pin by pin, so its figures come
 from the design rather than from memory.
 
-The equaliser section is written from its own repository. Its main sheet, `Combined_EQ.kicad_sch`, is drawn and given a viewer by `build/_kicad_sch.py --module equaliser`, which also draws the high-pass, low-pass and gain sheets as plain images. The response figures come from `build/_eq_response.py`, which solves the main sheet's netlist (ideal op amps, linear pots) and carries the team's LTspice run alongside to show they agree. Rerun both, with the Equaliser repository checked out beside this one, when the sheets change.
+The equaliser section is written from its own repository. Its sheet, `Combined_EQ.kicad_sch`, holds the whole circuit and is drawn and given a viewer by `build/_kicad_sch.py --module equaliser`. The response figures come from `build/_eq_response.py`, which solves the sheet's netlist from the input receiver to the line driver (ideal op amps, linear pots) and carries the team's LTspice run of the low-mid band alongside to show they agree. Rerun both, with the Equaliser repository checked out beside this one, when the sheet changes.
 
 The preamp section is written from its own repository, a single KiCad 10 sheet. KiCad 10 cannot be installed where the site is built, so `build/_kicad_sch.py` draws that sheet as SVG and builds its viewer data straight from the `.kicad_sch` file. The sheet has no component values yet, so the pages describe what each part does and state no values. The topology follows ESP Projects 66 and 96, which the overview credits.
 
