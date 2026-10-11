@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Printing the faceplate &middot; UTS Mini Mixing Desk &mdash; Compressor</title>
+<meta name="description" content="How the UTS Mini Mixing Desk compressor module works, section by section.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Compressor module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><h4>Signal path</h4><a href="connector.html"><i>02</i><span>500-series interface</span></a><a href="input.html"><i>03</i><span>Balanced input &amp; pad</span></a><a href="vca.html"><i>04</i><span>The gain cell</span></a><a href="output.html"><i>05</i><span>Makeup &amp; output</span></a><h4>Control path</h4><a href="sidechain.html"><i>06</i><span>The sidechain</span></a><h4>Support</h4><a href="power.html"><i>07</i><span>Power &amp; references</span></a><a href="meters.html"><i>08</i><span>The LED meters</span></a><h4>Practical</h4><a href="panel.html"><i>09</i><span>The front panel</span></a><a href="printed.html" class="on"><i>10</i><span>Printing the faceplate</span></a><a href="boards.html"><i>11</i><span>The boards</span></a><a href="simulation.html"><i>12</i><span>The simulation</span></a><a href="parts.html"><i>13</i><span>Parts list</span></a><a href="using.html"><i>14</i><span>Setting up &amp; using it</span></a><a href="files.html"><i>15</i><span>Design files</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Practical</p>
+<h1>Printing the faceplate</h1>
+<p class="lede">A faceplate for an ordinary FDM printer, for when there is no laser cutter, CNC
+or panel shop to hand. It has the same holes and legend as the <code>toggle</code> layout, so it
+fits the front board as drawn.</p>
+
+<figure>
+  <div class="pane tall"><img src="img/faceplate-print.png" alt="The printed faceplate, front, in dark grey with a light legend" loading="lazy" style="max-height:520px;width:auto"></div>
+  <figcaption><span>The printed faceplate, rendered from its STL with the legend in a second colour</span>
+  <a href="https://github.com/UTS-500-Series/Compressor/tree/main/panel/print">The files &rarr;</a></figcaption>
+</figure>
+
+<h2>The files</h2>
+<p>Everything is in <a href="https://github.com/UTS-500-Series/Compressor/tree/main/panel/print"><code>panel/print/</code></a> in the compressor repository.</p>
+<div class="tw"><table><thead><tr><th class="r">File</th><th class="">What it is</th></tr></thead><tbody><tr><td class="r"><code>faceplate-multicolor.3mf</code></td><td class="">Panel and legend as one object with two parts, for a two-colour print in Bambu Studio or OrcaSlicer</td></tr><tr><td class="r"><code>faceplate-multicolor-prusaslicer.3mf</code></td><td class="">The same for PrusaSlicer, which keeps its part table in a different place</td></tr><tr><td class="r"><code>faceplate.stl</code></td><td class="">The faceplate on its own, already face down for printing</td></tr><tr><td class="r"><code>faceplate-legend.stl</code></td><td class="">The engraved legend and pot ticks as their own body, for a second colour</td></tr><tr><td class="r"><code>faceplate-fit-test.stl</code> and its 3MFs</td><td class="">A 27&nbsp;mm strip across THRESHOLD, HPF, KEY and the bottom of both meters, to print first</td></tr><tr><td class="r"><code>faceplate.scad</code></td><td class="">The OpenSCAD model. Every print setting is a parameter at the top</td></tr><tr><td class="r"><code>panel_data.scad</code></td><td class="">Hole positions and legend text, written by <code>panel/make_panel.py</code> from the same source as the DXF. Don&rsquo;t edit it by hand</td></tr><tr><td class="r"><code>build.sh</code></td><td class="">Rebuilds the STLs and 3MFs from the model (a few minutes)</td></tr></tbody></table></div>
+
+<h2>How it differs from the metal panel</h2>
+<ul>
+  <li><strong>3.2&nbsp;mm thick</strong>, the same as a 1/8&Prime; metal panel, so the rack screws
+      and everything behind the panel sit where the front board expects. The back is flat.</li>
+  <li><strong>Pot wells.</strong> Each pot hole has a 12.5&nbsp;mm counterbore on the front,
+      1.2&nbsp;mm deep, leaving 2.0&nbsp;mm of plastic under the nut. That gives the 9&nbsp;mm
+      pots&rsquo; short bushing about 3&nbsp;mm of thread, which the metal panel only gets by
+      being thinned round the pots. The 11&nbsp;mm knobs sit over the wells.</li>
+  <li><strong>Holes print oversize on purpose.</strong> Pot, toggle and screw holes come out
+      0.2&nbsp;mm larger than drawn (<code>hole_comp</code>), because FDM holes shrink. The meter
+      holes stay 2.2&nbsp;mm: they only let light out, and keeping them small leaves 0.8&nbsp;mm
+      of plastic between neighbours.</li>
+  <li><strong>37.8 &times; 132.6&nbsp;mm</strong> rather than the nominal 38.10 &times;
+      133.35, so it slides in beside the next module. The front edge has a 0.4&nbsp;mm chamfer so
+      first-layer squish doesn&rsquo;t flare it.</li>
+  <li><strong>The legend is engraved</strong> 0.4&nbsp;mm deep and drawn 30% larger than on the
+      mockup, whose 1.4&ndash;1.7&nbsp;mm capitals are too fine for a 0.4&nbsp;mm nozzle. Each pot
+      gets three ticks: start, middle and end of travel.</li>
+</ul>
+
+<h2>Printing it</h2>
+<ol>
+  <li><strong>Print the fit test first.</strong> Check that a pot and a toggle drop through their
+      holes, the pot nut sits inside its well, and the LEDs line up behind the meter holes. If a
+      hole is tight or loose, change <code>hole_comp</code> in <code>faceplate.scad</code> and
+      rebuild (or use OpenSCAD&rsquo;s Customizer).</li>
+  <li><strong>Material:</strong> PETG in black or dark grey. A light colour lets each meter LED
+      glow through the thin walls beside its hole, and PLA slowly gives way under a tightened nut
+      in a warm rack.</li>
+  <li><strong>Settings:</strong> 0.4&nbsp;mm nozzle, 0.2&nbsp;mm layers, 4 walls, 100% infill, no
+      supports. Print it as exported, face down; a textured PEI sheet gives the front a good
+      finish.</li>
+  <li><strong>Two colours (optional):</strong> in Bambu Studio or OrcaSlicer, import
+      <code>faceplate-multicolor.3mf</code> with File, Import (Cmd/Ctrl+I); in PrusaSlicer use the
+      <code>-prusaslicer</code> version. It loads as one object with two parts already lined up,
+      the panel on filament 1 and the legend on filament 2. The file has no print settings in it,
+      so Bambu Studio says it is loading geometry only; that is expected. The colours only swap
+      on the first two layers, but it still needs a multicolour unit (AMS, MMU) or a second
+      nozzle.</li>
+  <li><strong>One colour:</strong> print <code>faceplate.stl</code> and fill the engraving
+      afterwards with paint, or a white wax crayon rubbed in and wiped off.</li>
+</ol>
+
+<h2>Fitting it</h2>
+<ul>
+  <li>Snap the small anti-rotation tab off the front of each pot, as you would for a metal panel,
+      or it holds the pot off the back of the panel.</li>
+  <li>Tighten the nuts gently. Plastic creeps, and the nuts only need to hold the board.</li>
+</ul>
+
+<div class="note warn">
+  <h4>Not solved yet</h4>
+  <ul>
+    <li><strong>Grounding.</strong> A plastic panel doesn&rsquo;t ground the pot and toggle
+        bushings the way a metal panel tied to <code>CHASSIS</code> does. If touching a knob adds
+        hum, run a wire from a solder tag under one toggle&rsquo;s nut to the main board&rsquo;s
+        <code>H2</code>.</li>
+    <li><strong>The main board&rsquo;s bracket.</strong> The L-bracket that holds the main board
+        (see <a href="boards.html">the boards</a>) is meant to bolt to a metal panel. How it fixes
+        to a printed one, and whether the plastic holds up, hasn&rsquo;t been modelled or tried.</li>
+  </ul>
+</div>
+
+<div class="next"><a href="panel.html">&larr; The front panel</a><a href="boards.html">The boards &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Compressor &middot; documentation generated from the KiCad project<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

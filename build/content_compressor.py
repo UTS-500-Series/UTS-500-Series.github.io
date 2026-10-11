@@ -24,11 +24,12 @@ NAV = [
     ("Support", [("power.html", "07", "Power &amp; references"),
                  ("meters.html", "08", "The LED meters")]),
     ("Practical", [("panel.html", "09", "The front panel"),
-                   ("boards.html", "10", "The boards"),
-                   ("simulation.html", "11", "The simulation"),
-                   ("parts.html", "12", "Parts list"),
-                   ("using.html", "13", "Setting up &amp; using it"),
-                   ("files.html", "14", "Design files")]),
+                   ("printed.html", "10", "Printing the faceplate"),
+                   ("boards.html", "11", "The boards"),
+                   ("simulation.html", "12", "The simulation"),
+                   ("parts.html", "13", "Parts list"),
+                   ("using.html", "14", "Setting up &amp; using it"),
+                   ("files.html", "15", "Design files")]),
 ]
 
 PAGES = {}
@@ -58,7 +59,7 @@ schematic: what it does, how it does it, and why it was built that way.</p>
   <div><dt>Release</dt><dd>49 ms&ndash;3.5 s</dd></div>
   <div><dt>Components</dt><dd>166</dd></div>
   <div><dt>Nets</dt><dd>110</dd></div>
-  <div><dt>Boards</dt><dd>2, routed</dd></div>
+  <div><dt>Boards</dt><dd>2, ordered</dd></div>
 </dl>
 
 <h2>What a compressor actually does</h2>
@@ -104,15 +105,16 @@ is far more forgiving of component tolerance. Most classic bus compressors work 
   <a class="card" href="sidechain.html"><b>The sidechain</b><span>Measuring loudness and turning it into a control voltage, with attack and release.</span></a>
   <a class="card" href="power.html"><b>Power &amp; references</b><span>Rails, the &minus;5.1 V reference, and the bias voltages everything else depends on.</span></a>
   <a class="card" href="panel.html"><b>The front panel</b><span>Nine functions in 38 mm, three ways to arrange them, and why each one is a compromise.</span></a>
-  <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both laid out and routed.</span></a>
+  <a class="card" href="printed.html"><b>Printing the faceplate</b><span>A faceplate for an ordinary 3D printer, in one colour or two, with a fit test to print first.</span></a>
+  <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both routed, and ordered on 3 October.</span></a>
   <a class="card" href="simulation.html"><b>The simulation</b><span>What ngspice found when the schematic was simulated, and the fourteen values that changed because of it.</span></a>
   <a class="card" href="parts.html"><b>Parts list</b><span>Every part, ordered from Altronics where they stock it, with the rest from element14.</span></a>
 </div>
 
 <div class="note warn">
   <h4>Read this before building</h4>
-  <p>Both boards are laid out and routed and the circuit has been
-  <a href="simulation.html">simulated</a>, but nothing has been ordered or built. Every
+  <p>Both boards are routed and were ordered on 3 October, and the circuit has been
+  <a href="simulation.html">simulated</a>, but nothing has been built yet. Every
   performance figure on this site is <strong>calculated or simulated from the design</strong>,
   not measured. The netlist has been verified against the schematic automatically, ERC passes
   with no errors, and ngspice runs the schematic as drawn, but a simulation is only as good as
@@ -946,6 +948,8 @@ scales with 0&ndash;10 numerals, thin metal bat toggles. Same holes, same drawin
 """ + pic("panel-bone.svg", "The same layout in the bone finish") + """
 
 <h2>Machining</h2>
+<p>No machine shop? The same layout can be <a href="printed.html">3D printed</a>, with the
+legend engraved and, on a multicolour printer, filled in a second colour.</p>
 <p>The drawing below is 1:1 and dimensioned. A full drill schedule &mdash; every hole with its
 coordinates, diameter and the hardware it suits &mdash; is in <code>panel/README.md</code> in
 the repository, alongside the DXF.</p>
@@ -966,14 +970,107 @@ the repository, alongside the DXF.</p>
 </div>
 """)
 
-# ============================================================ 10 BOARDS
+# ============================================================ 10 PRINTED FACEPLATE
+PRINT = 'https://github.com/UTS-500-Series/Compressor/tree/main/panel/print'
+
+PAGES['printed.html'] = ("Printing the faceplate", f"""
+<p class="eyebrow">Practical</p>
+<h1>Printing the faceplate</h1>
+<p class="lede">A faceplate for an ordinary FDM printer, for when there is no laser cutter, CNC
+or panel shop to hand. It has the same holes and legend as the <code>toggle</code> layout, so it
+fits the front board as drawn.</p>
+
+<figure>
+  <div class="pane tall"><img src="img/faceplate-print.png" alt="The printed faceplate, front, in dark grey with a light legend" loading="lazy" style="max-height:520px;width:auto"></div>
+  <figcaption><span>The printed faceplate, rendered from its STL with the legend in a second colour</span>
+  <a href="{PRINT}">The files &rarr;</a></figcaption>
+</figure>
+
+<h2>The files</h2>
+<p>Everything is in <a href="{PRINT}"><code>panel/print/</code></a> in the compressor repository.</p>
+""" + table(["File", "What it is"],
+            [["<code>faceplate-multicolor.3mf</code>", "Panel and legend as one object with two parts, for a two-colour print in Bambu Studio or OrcaSlicer"],
+             ["<code>faceplate-multicolor-prusaslicer.3mf</code>", "The same for PrusaSlicer, which keeps its part table in a different place"],
+             ["<code>faceplate.stl</code>", "The faceplate on its own, already face down for printing"],
+             ["<code>faceplate-legend.stl</code>", "The engraved legend and pot ticks as their own body, for a second colour"],
+             ["<code>faceplate-fit-test.stl</code> and its 3MFs", "A 27&nbsp;mm strip across THRESHOLD, HPF, KEY and the bottom of both meters, to print first"],
+             ["<code>faceplate.scad</code>", "The OpenSCAD model. Every print setting is a parameter at the top"],
+             ["<code>panel_data.scad</code>", "Hole positions and legend text, written by <code>panel/make_panel.py</code> from the same source as the DXF. Don&rsquo;t edit it by hand"],
+             ["<code>build.sh</code>", "Rebuilds the STLs and 3MFs from the model (a few minutes)"]],
+            ["r", ""]) + """
+
+<h2>How it differs from the metal panel</h2>
+<ul>
+  <li><strong>3.2&nbsp;mm thick</strong>, the same as a 1/8&Prime; metal panel, so the rack screws
+      and everything behind the panel sit where the front board expects. The back is flat.</li>
+  <li><strong>Pot wells.</strong> Each pot hole has a 12.5&nbsp;mm counterbore on the front,
+      1.2&nbsp;mm deep, leaving 2.0&nbsp;mm of plastic under the nut. That gives the 9&nbsp;mm
+      pots&rsquo; short bushing about 3&nbsp;mm of thread, which the metal panel only gets by
+      being thinned round the pots. The 11&nbsp;mm knobs sit over the wells.</li>
+  <li><strong>Holes print oversize on purpose.</strong> Pot, toggle and screw holes come out
+      0.2&nbsp;mm larger than drawn (<code>hole_comp</code>), because FDM holes shrink. The meter
+      holes stay 2.2&nbsp;mm: they only let light out, and keeping them small leaves 0.8&nbsp;mm
+      of plastic between neighbours.</li>
+  <li><strong>37.8 &times; 132.6&nbsp;mm</strong> rather than the nominal 38.10 &times;
+      133.35, so it slides in beside the next module. The front edge has a 0.4&nbsp;mm chamfer so
+      first-layer squish doesn&rsquo;t flare it.</li>
+  <li><strong>The legend is engraved</strong> 0.4&nbsp;mm deep and drawn 30% larger than on the
+      mockup, whose 1.4&ndash;1.7&nbsp;mm capitals are too fine for a 0.4&nbsp;mm nozzle. Each pot
+      gets three ticks: start, middle and end of travel.</li>
+</ul>
+
+<h2>Printing it</h2>
+<ol>
+  <li><strong>Print the fit test first.</strong> Check that a pot and a toggle drop through their
+      holes, the pot nut sits inside its well, and the LEDs line up behind the meter holes. If a
+      hole is tight or loose, change <code>hole_comp</code> in <code>faceplate.scad</code> and
+      rebuild (or use OpenSCAD&rsquo;s Customizer).</li>
+  <li><strong>Material:</strong> PETG in black or dark grey. A light colour lets each meter LED
+      glow through the thin walls beside its hole, and PLA slowly gives way under a tightened nut
+      in a warm rack.</li>
+  <li><strong>Settings:</strong> 0.4&nbsp;mm nozzle, 0.2&nbsp;mm layers, 4 walls, 100% infill, no
+      supports. Print it as exported, face down; a textured PEI sheet gives the front a good
+      finish.</li>
+  <li><strong>Two colours (optional):</strong> in Bambu Studio or OrcaSlicer, import
+      <code>faceplate-multicolor.3mf</code> with File, Import (Cmd/Ctrl+I); in PrusaSlicer use the
+      <code>-prusaslicer</code> version. It loads as one object with two parts already lined up,
+      the panel on filament 1 and the legend on filament 2. The file has no print settings in it,
+      so Bambu Studio says it is loading geometry only; that is expected. The colours only swap
+      on the first two layers, but it still needs a multicolour unit (AMS, MMU) or a second
+      nozzle.</li>
+  <li><strong>One colour:</strong> print <code>faceplate.stl</code> and fill the engraving
+      afterwards with paint, or a white wax crayon rubbed in and wiped off.</li>
+</ol>
+
+<h2>Fitting it</h2>
+<ul>
+  <li>Snap the small anti-rotation tab off the front of each pot, as you would for a metal panel,
+      or it holds the pot off the back of the panel.</li>
+  <li>Tighten the nuts gently. Plastic creeps, and the nuts only need to hold the board.</li>
+</ul>
+
+<div class="note warn">
+  <h4>Not solved yet</h4>
+  <ul>
+    <li><strong>Grounding.</strong> A plastic panel doesn&rsquo;t ground the pot and toggle
+        bushings the way a metal panel tied to <code>CHASSIS</code> does. If touching a knob adds
+        hum, run a wire from a solder tag under one toggle&rsquo;s nut to the main board&rsquo;s
+        <code>H2</code>.</li>
+    <li><strong>The main board&rsquo;s bracket.</strong> The L-bracket that holds the main board
+        (see <a href="boards.html">the boards</a>) is meant to bolt to a metal panel. How it fixes
+        to a printed one, and whether the plastic holds up, hasn&rsquo;t been modelled or tried.</li>
+  </ul>
+</div>
+""")
+
+# ============================================================ 11 BOARDS
 PAGES['boards.html'] = ("The boards", """
 <p class="eyebrow">Practical</p>
 <h1>The boards</h1>
 <p class="lede">The compressor is two boards. The main board is the card that plugs into the
 rack; a small front board sits behind the faceplate and carries everything you touch or read.
-A 30-way ribbon joins them. Both are laid out, routed and pass DRC, and neither has been
-ordered yet.</p>
+A 30-way ribbon joins them. Both are routed and pass DRC, and both were ordered on
+3 October from the Gerbers in the repository.</p>
 
 """ + render("main-board-3d-angle.png", "Main board, KiCad 3D render") + """
 """ + render("front-board-3d-angle.png", "Front board, KiCad 3D render. The side shown faces the panel") + """
@@ -1084,15 +1181,35 @@ the repository: run <code>sh tools/get_3d_models.sh</code> once to download it. 
 simple models of the Salecom parts. The renders on this site stand a plain block and shaft in
 for the pots, because Alps' download is out of reach where they are made.</p>
 
+<h2>Ordering them</h2>
+<p>Each board&rsquo;s fab files are zipped ready to upload, in its <code>Gerbs/</code> folder:</p>
+""" + table(["Board", "File", "Size"],
+            [["Main", "<code>kicad_withpcb/compressor_with_pcb/Gerbs/compressor_with_pcb-gerbers.zip</code>",
+              "128.4 &times; 105.05&nbsp;mm, including the edge-connector tab"],
+             ["Front", "<code>kicad_withpcb/compressor_front/Gerbs/compressor_front-gerbers.zip</code>",
+              "35 &times; 110&nbsp;mm"]],
+            ["r", "", ""]) + """
+<p>Both are two-layer, 1.6&nbsp;mm FR-4 with 1&nbsp;oz copper and through-hole parts only, so
+there are no paste layers. The smallest track and gap are 0.2&nbsp;mm and the smallest drill
+0.4&nbsp;mm, which any standard fab process takes. The main board&rsquo;s fingers plug into the
+rack, so ask for gold fingers with a 30&ndash;45&deg; bevel if the fab offers it; plain HASL is
+fine for a prototype but wears with repeated insertion.</p>
+<p>The zips are plotted by <code>sh tools/plot_fab.sh</code>, which needs KiCad 10&rsquo;s
+<code>kicad-cli</code>. Re-run it after any change to either board, so the zips never lag the
+layout: the first set committed was plotted before the main board was last re-routed, and
+would have built the old copper.</p>
+
 <div class="note warn">
-  <h4>Check before ordering boards</h4>
+  <h4>Check when the boards arrive</h4>
   <ul>
     <li><strong>The main board was routed by script.</strong> IN&plusmn; and OUT&plusmn; run as
         pairs on the top layer and the ground pour on the bottom is one piece. It passes DRC
-        with nothing unconnected, but no one has reviewed the routing by eye yet.</li>
+        with nothing unconnected, but no one reviewed the routing by eye before it was ordered,
+        so check continuity on the audio path before powering it.</li>
     <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the pots under 2 mm of
         thread: counterbore the pot holes or use a thinner panel
-        (<a href="panel.html">front panel</a>).</li>
+        (<a href="panel.html">front panel</a>). The <a href="printed.html">printed
+        faceplate</a> has the counterbores built in.</li>
     <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, as is usual, RATIO
         turns clockwise for a harder ratio (its outer pins are swapped for that) and THRESHOLD
         turns clockwise for a higher threshold (see <a href="simulation.html">the
@@ -1429,4 +1546,4 @@ ever goes near a rack.</p>
 
 
 import content_files
-PAGES['files.html'] = content_files.page('compressor', '14')
+PAGES['files.html'] = content_files.page('compressor', '15')

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Board &amp; parts &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
+<meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html" class="on"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">Practical &mdash; 06</p>
+<h1>Board and parts</h1>
+<p class="lede">The board was started on 5&nbsp;October: the outline, the card edge, the input
+section, part of the low-mid band and all ten pots are placed. Nothing is routed yet.</p>
+
+<figure>
+  <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of the equaliser board as placed so far" loading="lazy"></div>
+  <figcaption><span>The board at <code>10142c5</code>, from above. Parts not yet placed sit around the outline. The pots are stand-in blocks: KiCad&rsquo;s library has no model for the RK097</span>
+  <a href="files/combined-3d-top.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<h2>Where it stands</h2>
+<div class="tw"><table><thead><tr><th class="r"></th><th class="">Now</th></tr></thead><tbody><tr><td class="r">Outline</td><td class="">The 500-series card template with its edge-connector tab. KiCad reports it as not closed, so DRC can&rsquo;t check against it yet</td></tr><tr><td class="r">Placed</td><td class="">44 of the 127 footprints: J1, the input section and bypass switch at the back, IC1, IC3, IC4, all ten pots along the front edge, the four mounting holes</td></tr><tr><td class="r">Not placed</td><td class="">IC2, IC5, IC6 and most of the resistors and capacitors</td></tr><tr><td class="r">Tracks</td><td class="">None yet</td></tr><tr><td class="r">Front panel</td><td class="">Not drawn yet</td></tr></tbody></table></div>
+
+<div class="note warn">
+  <h4>Two placement questions to settle before routing</h4>
+  <p><strong>The knobs, as placed, are 7.5&nbsp;mm apart in a single line.</strong> The pots are
+  right-angle parts on the main card, in two rows along its front edge. A right-angle pot puts
+  its shaft at a fixed height above the board, so every shaft comes through the panel on the
+  same line, wherever the pot sits on the card. With the ten pots alternating between the rows,
+  their shafts are 7.5&nbsp;mm apart, centre to centre. That is too close for any knob larger
+  than about 7&nbsp;mm, and the back row&rsquo;s shafts have to pass between the front
+  row&rsquo;s bodies. Ten knobs in one line on a 133&nbsp;mm panel get about 12&nbsp;mm each
+  at best, once the mounting screws have their space. The
+  compressor solved the same problem with a <a href="../compressor/boards.html">front
+  board</a> behind the panel; the <a href="../faceplate/mounting.html">faceplate guide</a>
+  compares the options.</p>
+  <p><strong>The bypass switch is at the back.</strong> SW1 is placed beside J1, at the rack end
+  of the card, so it can&rsquo;t be reached once the module is in the rack. If bypass is a panel
+  control, it needs to move to the front, as a panel or right-angle toggle.</p>
+</div>
+
+<h2>Footprints to check</h2>
+<ul>
+  <li><strong>C18 and C20</strong> (100&nbsp;&micro;F) are on 5&nbsp;mm ceramic disc footprints.
+      The parts list has an 8&nbsp;mm electrolytic can (Jaycar RE6334), which needs a radial
+      footprint like C4&rsquo;s.</li>
+  <li><strong>C2 and C7</strong> (10&nbsp;&micro;F) are on a 4 &times; 2.5&nbsp;mm film-capacitor
+      footprint. The parts list has bipolar electrolytics (Jaycar RY6810), so these need radial
+      footprints too.</li>
+  <li><strong>J2 and J3</strong>, the two 24-pin headers, have no footprint and nothing
+      connected. If they are a leftover, delete them; if they are meant for a front board, they
+      need wiring.</li>
+  <li><strong>The pots</strong> use Alps RK097 footprints. The parts list&rsquo;s dual pot is a
+      Bourns PTD902; check its pins against the RK097 footprint before ordering.</li>
+</ul>
+
+<h2>The parts list</h2>
+<p><code>BOM.xlsx</code> in the repository is the team&rsquo;s list so far. The capacitors are
+specified in detail; the rest is quantities.</p>
+<div class="tw"><table><thead><tr><th class="r">Parts</th><th class="">Specified as</th><th class="">Supplier</th></tr></thead><tbody><tr><td class="r">Filter capacitors, 100&nbsp;pF to 10&nbsp;nF</td><td class="">TDK FG28 C0G, 5% radial, 5&nbsp;mm pitch</td><td class="">DigiKey / element14</td></tr><tr><td class="r">100&nbsp;nF and 1&nbsp;&micro;F</td><td class="">50&nbsp;V monolithic ceramic (RC5490, RC5499)</td><td class="">Jaycar</td></tr><tr><td class="r">100&nbsp;&micro;F reservoirs</td><td class="">35&nbsp;V low-ESR electrolytic (RE6334)</td><td class="">Jaycar</td></tr><tr><td class="r">47&nbsp;&micro;F and 10&nbsp;&micro;F coupling</td><td class="">Bipolar electrolytic (RY6820, RY6810)</td><td class="">Jaycar</td></tr><tr><td class="r">Resistors</td><td class="">Quantities by value only</td><td class="">&mdash;</td></tr><tr><td class="r">Op amps</td><td class="">TL084 &times; 4</td><td class="">&mdash;</td></tr><tr><td class="r">Dual pots</td><td class="">Bourns PTD902-1015K-A104, 100k log</td><td class="">DigiKey / element14</td></tr><tr><td class="r">Standoffs</td><td class="">M3 &times; 20&nbsp;mm aluminium hex</td><td class="">DigiKey / element14</td></tr></tbody></table></div>
+<div class="note">
+  <h4>TL084 or OPA1644</h4>
+  <p>The sheet says OPA1644 and the parts list says TL084. They share the quad pinout and both
+  have JFET inputs, so either works in the circuit, and the TL084 comes in TSSOP-14 to fit the
+  footprint. The OPA1644 is about three times quieter (5&nbsp;nV/&radic;Hz against the
+  TL084&rsquo;s 18) and drives the 10k loads here more comfortably. Settle on one so the sheet
+  and the order agree.</p>
+  <p>The dual pot is log taper, and these pages assume linear: on RV1 and RV4, wired as
+  variable resistors, a log track spreads the frequency sweep more evenly across the knob, but
+  it changes where on the travel each corner frequency sits.</p>
+</div>
+
+<div class="next"><a href="filters.html">&larr; The shelves</a><a href="simulation.html">Simulating it &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

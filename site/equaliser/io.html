@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Input, output &amp; power &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
+<meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
+<link rel="icon" href="../brand/favicon.ico" sizes="48x48">
+<link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="../style.css">
+<script>
+/* Runs before paint so a stored preference does not flash narrow first. */
+try {
+  if (localStorage.getItem('uts-width') === 'wide')
+    document.documentElement.dataset.width = 'wide';
+} catch (e) {}
+</script>
+<script src="../vendor/cytoscape.min.js" defer></script>
+<script src="../viewer.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="side">
+  <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
+  <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html" class="on"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <div class="side-foot">
+    <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
+      <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
+    </button>
+  </div>
+</aside>
+<main class="main"><div class="wrap">
+
+<p class="eyebrow">The circuit &mdash; 03</p>
+<h1>Input, output and power</h1>
+<p class="lede">A balanced receiver at the front, a balanced driver at the back, a switch that
+can join the two, and the supply that feeds it all.</p>
+
+<h2>The input</h2>
+<p>Each input leg comes off the card edge through a ferrite bead (FB2 hot, FB1 cold) and a
+47&nbsp;&Omega; resistor (R3, R1) with 470&nbsp;pF to chassis (C5, C1). Bead, resistor and
+capacitor together keep radio frequencies out: the RC corner is about 7&nbsp;MHz, far above
+audio. Then a 47&nbsp;&micro;F capacitor in each leg (C10, C4) blocks any DC the source carries,
+with 100k to ground after it (R4, R2) so the INA137&rsquo;s inputs have a DC path.</p>
+<p><strong>IC1, the INA137,</strong> is a difference amplifier with laser-trimmed resistors
+inside. It subtracts the cold leg from the hot one, which cancels anything common to both
+(hum and noise picked up on the cable) and halves the result: &minus;6&nbsp;dB. Its output goes
+straight into IC4A, wired as a follower, which is what drives the first band.</p>
+<div class="note">
+  <h4>Matching the input capacitors</h4>
+  <p>A balanced input rejects hum only as well as its two legs match. With 47&nbsp;&micro;F
+  coupling capacitors the corner sits well below 1&nbsp;Hz, so even a 20% mismatch between C4
+  and C10 makes no measurable difference at 50&nbsp;Hz. The parts list has them as bipolar electrolytics (Jaycar RY6820),
+  which is right: a balanced source can sit either side of ground.</p>
+</div>
+
+<h2>The output</h2>
+<p>The summer&rsquo;s output (<code>Po</code>) drives <strong>IC6, the DRV134</strong>, which
+produces two outputs in antiphase at twice the level each side: +6&nbsp;dB, undoing the
+receiver&rsquo;s &minus;6&nbsp;dB. Its sense pins are tied to its outputs at the chip, the usual
+connection. From there each leg goes through SW1, gets 100&nbsp;pF to ground (C36, C35) and
+leaves through a ferrite bead (FB3, FB4).</p>
+<p>Counting inversions: the receiver does not invert, each band inverts once (two bands, so the
+signal comes out of them the right way up), the dry inverter and the summer invert once each,
+and the driver does not invert. The output is in phase with the input.</p>
+
+<h2>Bypass</h2>
+<p>SW1 is a double-pole slide switch. In one position the output pins take the DRV134&rsquo;s
+outputs. In the other they are joined straight to the input legs, after the ferrite beads and
+before the 47&nbsp;&Omega; resistors: a hard bypass, which works with the module unpowered.
+Both poles are wired consistently (hot to hot, cold to cold in either position).</p>
+<p>On the board as placed so far, SW1 sits next to the card edge connector, at the back of the
+module. See <a href="board.html">board &amp; parts</a>.</p>
+
+<h2 id="power">Power</h2>
+<p>J1 pin 12 feeds <code>+16V</code> through R6 and pin 14 feeds <code>&minus;16V</code> through
+R5, both 10&nbsp;&Omega;. Each rail has a 100&nbsp;&micro;F reservoir (C20, C18), 1&nbsp;&micro;F
+(C12, C11) and 100&nbsp;nF next to every chip. The 10&nbsp;&Omega; resistors and the reservoirs
+form a filter against noise on the rack&rsquo;s rails, as on the compressor.</p>
+<p>From the datasheets&rsquo; typical figures, sixteen op amp channels at 1.8&nbsp;mA, the INA137
+at 2.4&nbsp;mA and the DRV134 at 5.2&nbsp;mA come to about 37&nbsp;mA per rail before any load,
+well inside the 130&nbsp;mA a 500-series slot allows.</p>
+
+<div class="note warn">
+  <h4>IC2 and IC5 have no positive supply</h4>
+  <p>On the sheet, the symbol on <strong>pin 4 (V+)</strong> of both IC2 and IC5 is a
+  <code>&minus;16V</code> power symbol. Pin 11 (V&minus;) is on &minus;16&nbsp;V as well, so both
+  chips have &minus;16&nbsp;V on both supply pins and nothing across them. IC3 and IC4 are
+  wired correctly. KiCad&rsquo;s ERC doesn&rsquo;t flag it, because both pins are on a
+  legitimate power net.</p>
+  <p>As drawn, the high-mid band (IC2), both shelf level stages, the dry inverter and the summer
+  (all IC5) are dead, so nothing reaches the output. The fix is to change those two symbols to
+  <code>+16V</code>. Their 100&nbsp;nF decoupling capacitors then decouple +16&nbsp;V, as they
+  should. Do it before the board is routed, or the copper will carry the same mistake.</p>
+</div>
+
+<div class="next"><a href="schematic.html">&larr; The schematic</a><a href="bands.html">Parametric bands &rarr;</a></div>
+<footer>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  <a href="../index.html">All modules</a>
+</footer>
+</div></main>
+</div></body></html>

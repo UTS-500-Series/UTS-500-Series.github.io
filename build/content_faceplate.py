@@ -287,7 +287,9 @@ thing.</p>
               "2.0 mm), which is fine for testing but flexes more. Aluminium-core boards are "
               "stiffer."],
              ["<strong>3D print or laser-cut acrylic</strong>", "STL or DXF",
-              "A fit check only. Make one before ordering metal to catch misplaced holes."]],
+              "A fit check before ordering metal, or a usable panel in PETG. The compressor has "
+              'a ready-to-print one: see <a href="../compressor/printed.html">printing the '
+              "faceplate</a>."]],
             ["r", "", ""]) + """
 <p>Whichever you choose, generate it from the front board layout rather than retyping
 coordinates. The compressor does this: its front board is the master, and

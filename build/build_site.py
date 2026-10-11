@@ -98,15 +98,17 @@ built that way.</p>
 </div>
 
 <h2>How far along each module is</h2>
-<p>The compressor has been designed and both of its boards are laid out and routed: a main
-card and a front board behind the faceplate, joined by a ribbon. The whole circuit has been
-simulated in ngspice and its values corrected from that, and it has a parts list drawn from
-Altronics' stock. Nothing has been ordered or built yet. Its pages are generated from a netlist that the KiCad schematic is verified
+<p>The compressor has been designed and its boards were ordered on 3 October: a main card
+and a front board behind the faceplate, joined by a ribbon. The whole circuit has been
+simulated in ngspice and its values corrected from that, it has a parts list drawn from
+Altronics' stock, and its faceplate can be 3D printed as well as machined. Nothing has been
+built yet. Its pages are generated from a netlist that the KiCad schematic is verified
 against, pin by pin, so the figures in it come from the design rather than from memory.</p>
-<p>The equaliser is <strong>in progress</strong>: its two parametric bands are drawn with
-values on one sheet, and their response is worked out from that sheet and matches the team's
-LTspice run. The high-pass, low-pass and gain stages are on sheets of their own, and nothing is
-wired to the card edge yet.</p>
+<p>The equaliser is <strong>in progress</strong>: its schematic was finished on 5 October,
+with a low shelf, two parametric mid bands and a high shelf between a balanced receiver and
+line driver, all on one sheet. Its response is worked out from that sheet and matches the
+team's LTspice run where they overlap. Its board has been started: parts are being placed and
+nothing is routed yet.</p>
 <p>The preamp is also <strong>in progress</strong>: its schematic is drawn and its board is
 placed and routed, but no component values have been chosen. Its pages are written from its
 KiCad sheet, with the schematic drawn from that file.</p>
