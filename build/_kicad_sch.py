@@ -570,6 +570,14 @@ def main():
     if not os.path.exists(src):
         sys.exit('%s not found. Check out the module repository beside this one.' % src)
     sheet = Sheet(src)
+    # values the content module supplies for parts the sheet leaves blank (the preamp's are
+    # ESP's, not the repository's): drawn on the image and shown in the viewer
+    for s in sheet.symbols:
+        v = getattr(content, 'VALUES', {}).get(s['ref'])
+        if v and not sheet.is_power(s):
+            s['value'] = v
+            if 'Value' in s['props']:
+                s['props']['Value'][2] = Str(v)
     svg = sheet.svg()
     open(os.path.join(here, 'img', 'schematic.svg'), 'w').write(svg)
     vb = re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', svg)

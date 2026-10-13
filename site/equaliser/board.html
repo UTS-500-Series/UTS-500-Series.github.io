@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html" class="on"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html" class="on"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>Building it</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -33,70 +33,78 @@ try {
 
 <p class="eyebrow">Practical &mdash; 06</p>
 <h1>Board and parts</h1>
-<p class="lede">The board was started on 5&nbsp;October: the outline, the card edge, the input
-section, part of the low-mid band and all ten pots are placed. Nothing is routed yet.</p>
+<p class="lede">Two boards, ordered on 8&nbsp;October: the four-layer main card, and a small top
+board that carries the four dual frequency pots. They are drawn side by side in one KiCad
+file.</p>
 
 <figure>
-  <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of the equaliser board as placed so far" loading="lazy"></div>
-  <figcaption><span>The board at <code>10142c5</code>, from above. Parts not yet placed sit around the outline. The pots are stand-in blocks: KiCad&rsquo;s library has no model for the RK097</span>
+  <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of both equaliser boards, the pot board on the left beside the main card" loading="lazy"></div>
+  <figcaption><span>Both boards at <code>4d106d3</code>, from above. The narrow strip on the left with the four large pots is the top board; the rest is the main card. The pots are stand-in blocks: KiCad&rsquo;s library has no model for the RK097</span>
   <a href="files/combined-3d-top.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
 </figure>
 
-<h2>Where it stands</h2>
-<div class="tw"><table><thead><tr><th class="r"></th><th class="">Now</th></tr></thead><tbody><tr><td class="r">Outline</td><td class="">The 500-series card template with its edge-connector tab. KiCad reports it as not closed, so DRC can&rsquo;t check against it yet</td></tr><tr><td class="r">Placed</td><td class="">44 of the 127 footprints: J1, the input section and bypass switch at the back, IC1, IC3, IC4, all ten pots along the front edge, the four mounting holes</td></tr><tr><td class="r">Not placed</td><td class="">IC2, IC5, IC6 and most of the resistors and capacitors</td></tr><tr><td class="r">Tracks</td><td class="">None yet</td></tr><tr><td class="r">Front panel</td><td class="">Not drawn yet</td></tr></tbody></table></div>
+<h2>What was ordered</h2>
+<div class="tw"><table><thead><tr><th class="r"></th><th class="">Main card</th><th class="">Top board</th></tr></thead><tbody><tr><td class="r">Size</td><td class="">136.85 &times; 105&nbsp;mm, plus the 8&nbsp;mm edge-connector tab</td><td class="">22.5 &times; 105&nbsp;mm</td></tr><tr><td class="r">Carries</td><td class="">Everything else, including the six single pots along its front edge</td><td class="">RV1, RV4, RV6, RV9 (the frequency pots), the low shelf&rsquo;s 20&nbsp;nF caps, and the resistors at the ends of the pot tracks</td></tr><tr><td class="r">Joined by</td><td class="">J3, 17-pin header</td><td class="">J2, 17-pin header, wired pin for pin to J3</td></tr><tr><td class="r">Mounting</td><td class="">H2, H3 (M3)</td><td class="">H1, H4 (M3)</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="r"></th><th class="">Both boards</th></tr></thead><tbody><tr><td class="r">Layers</td><td class="">Four. Ground pour on In1 on each board; tracks on the front, back and In2</td></tr><tr><td class="r">Tracks</td><td class="">832 segments and 71 vias</td></tr><tr><td class="r">Parts</td><td class="">133 footprints. Through-hole except the five op amps (SOIC)</td></tr><tr><td class="r">Gerbers</td><td class=""><code>500_Series_EQ.zip</code> in the repository, exported 8&nbsp;October with KiCad 9.0.7</td></tr></tbody></table></div>
 
-<div class="note warn">
-  <h4>Two placement questions to settle before routing</h4>
-  <p><strong>The knobs, as placed, are 7.5&nbsp;mm apart in a single line.</strong> The pots are
-  right-angle parts on the main card, in two rows along its front edge. A right-angle pot puts
-  its shaft at a fixed height above the board, so every shaft comes through the panel on the
-  same line, wherever the pot sits on the card. With the ten pots alternating between the rows,
-  their shafts are 7.5&nbsp;mm apart, centre to centre. That is too close for any knob larger
-  than about 7&nbsp;mm, and the back row&rsquo;s shafts have to pass between the front
-  row&rsquo;s bodies. Ten knobs in one line on a 133&nbsp;mm panel get about 12&nbsp;mm each
-  at best, once the mounting screws have their space. The
-  compressor solved the same problem with a <a href="../compressor/boards.html">front
-  board</a> behind the panel; the <a href="../faceplate/mounting.html">faceplate guide</a>
-  compares the options.</p>
-  <p><strong>The bypass switch is at the back.</strong> SW1 is placed beside J1, at the rack end
-  of the card, so it can&rsquo;t be reached once the module is in the rack. If bypass is a panel
-  control, it needs to move to the front, as a panel or right-angle toggle.</p>
-</div>
+<h2>How the two boards fit together</h2>
+<p>The repository doesn&rsquo;t say in words, but the drawing points one way. The top
+board&rsquo;s holes H1 and H4 sit exactly 22.5&nbsp;mm (its own width) from the main
+card&rsquo;s H2 and H3, and the parts list orders two 20&nbsp;mm M3 standoffs. So the top board
+appears to stack 20&nbsp;mm above the main card, holes over holes, with its front edge in line
+with the card&rsquo;s. That gives the panel two columns of knobs 20&nbsp;mm apart, which is what
+fixes the earlier layout&rsquo;s ten shafts crammed into one line:</p>
+<div class="tw"><table><thead><tr><th class="n">Height on the card</th><th class="">Main card column</th><th class="">Top board column</th></tr></thead><tbody><tr><td class="n">64.5&nbsp;mm</td><td class="">RV3, low shelf level</td><td class=""></td></tr><tr><td class="n">72&nbsp;mm</td><td class=""></td><td class="">RV1, low shelf frequency</td></tr><tr><td class="n">79.5&nbsp;mm</td><td class="">RV7, low-mid width</td><td class=""></td></tr><tr><td class="n">87&nbsp;mm</td><td class=""></td><td class="">RV9, low-mid frequency</td></tr><tr><td class="n">94.5&nbsp;mm</td><td class="">RV8, low-mid boost/cut</td><td class=""></td></tr><tr><td class="n">109&nbsp;mm</td><td class="">RV2, high-mid width</td><td class=""></td></tr><tr><td class="n">116.5&nbsp;mm</td><td class=""></td><td class="">RV6, high-mid frequency</td></tr><tr><td class="n">124&nbsp;mm</td><td class="">RV5, high-mid boost/cut</td><td class=""></td></tr><tr><td class="n">131.5&nbsp;mm</td><td class=""></td><td class="">RV4, high shelf frequency</td></tr><tr><td class="n">139&nbsp;mm</td><td class="">RV10, high shelf level</td><td class=""></td></tr></tbody></table></div>
+<p>Heights are the pot positions measured down the card in the board file, so they read in the
+board&rsquo;s own coordinates; the faceplate needs them measured from the panel&rsquo;s top
+edge. J2 runs along the top board and J3 across the main card, so the 17 links between them are
+wires or a ribbon rather than a plug-in header pair.</p>
 
-<h2>Footprints to check</h2>
+<h2>What KiCad&rsquo;s checks say</h2>
+<p>We ran KiCad 10&rsquo;s design-rule check on the board as ordered. Nothing in it stops the
+module working; three things are worth knowing:</p>
 <ul>
-  <li><strong>C18 and C20</strong> (100&nbsp;&micro;F) are on 5&nbsp;mm ceramic disc footprints.
-      The parts list has an 8&nbsp;mm electrolytic can (Jaycar RE6334), which needs a radial
-      footprint like C4&rsquo;s.</li>
-  <li><strong>C2 and C7</strong> (10&nbsp;&micro;F) are on a 4 &times; 2.5&nbsp;mm film-capacitor
-      footprint. The parts list has bipolar electrolytics (Jaycar RY6810), so these need radial
-      footprints too.</li>
-  <li><strong>J2 and J3</strong>, the two 24-pin headers, have no footprint and nothing
-      connected. If they are a leftover, delete them; if they are meant for a front board, they
-      need wiring.</li>
-  <li><strong>The pots</strong> use Alps RK097 footprints. The parts list&rsquo;s dual pot is a
-      Bourns PTD902; check its pins against the RK097 footprint before ordering.</li>
+  <li><strong>The card edge pads are wired on one face only.</strong> Each J1 pin has a pad on
+      both faces of the card, and the tracks reach one of them. The compressor joins both faces
+      with vias. In a rack whose connector touches both faces of each finger it makes no
+      difference; with a meter, check each used pin reaches the circuit from the slot.</li>
+  <li><strong>The top board&rsquo;s ground</strong> has no copper link to the main card&rsquo;s;
+      it arrives through J2/J3 pin 15, so that wire must be fitted.</li>
+  <li><strong>The outline</strong> is reported as malformed because the pot footprints draw
+      their own edge marks and the two boards share an edge. The boards were ordered from it
+      as it is; it only matters if the file is edited and re-checked.</li>
+</ul>
+
+<h2>Fit notes for the build</h2>
+<ul>
+  <li><strong>C18 and C20</strong> (100&nbsp;&micro;F) are on 5&nbsp;mm disc footprints and
+      the parts list has 8&nbsp;mm electrolytic cans (Jaycar RE6334): spread their 3.5&nbsp;mm
+      leads to the 5&nbsp;mm holes, minding the polarity, which the footprint
+      doesn&rsquo;t mark.</li>
+  <li><strong>C2 and C7</strong> (10&nbsp;&micro;F) are on a 2.5&nbsp;mm film footprint and
+      the parts list has bipolar electrolytics (Jaycar RY6810), so their leads need the same
+      treatment.</li>
+  <li><strong>IC1, the INA137,</strong> has a DIP-8 footprint, and the parts list orders the
+      SOIC version (INA137UA) with a SOIC-to-DIP adapter.</li>
+  <li><strong>The pots</strong> are Bourns PTD901 (single) and PTD902 (dual) on Alps RK097
+      footprints. Check one against its footprint before soldering all ten.</li>
 </ul>
 
 <h2>The parts list</h2>
-<p><code>BOM.xlsx</code> in the repository is the team&rsquo;s list so far. The capacitors are
-specified in detail; the rest is quantities.</p>
-<div class="tw"><table><thead><tr><th class="r">Parts</th><th class="">Specified as</th><th class="">Supplier</th></tr></thead><tbody><tr><td class="r">Filter capacitors, 100&nbsp;pF to 10&nbsp;nF</td><td class="">TDK FG28 C0G, 5% radial, 5&nbsp;mm pitch</td><td class="">DigiKey / element14</td></tr><tr><td class="r">100&nbsp;nF and 1&nbsp;&micro;F</td><td class="">50&nbsp;V monolithic ceramic (RC5490, RC5499)</td><td class="">Jaycar</td></tr><tr><td class="r">100&nbsp;&micro;F reservoirs</td><td class="">35&nbsp;V low-ESR electrolytic (RE6334)</td><td class="">Jaycar</td></tr><tr><td class="r">47&nbsp;&micro;F and 10&nbsp;&micro;F coupling</td><td class="">Bipolar electrolytic (RY6820, RY6810)</td><td class="">Jaycar</td></tr><tr><td class="r">Resistors</td><td class="">Quantities by value only</td><td class="">&mdash;</td></tr><tr><td class="r">Op amps</td><td class="">TL084 &times; 4</td><td class="">&mdash;</td></tr><tr><td class="r">Dual pots</td><td class="">Bourns PTD902-1015K-A104, 100k log</td><td class="">DigiKey / element14</td></tr><tr><td class="r">Standoffs</td><td class="">M3 &times; 20&nbsp;mm aluminium hex</td><td class="">DigiKey / element14</td></tr></tbody></table></div>
+<p><code>BOM.xlsx</code> (updated 11&nbsp;October) has part numbers for everything that was
+ordered:</p>
+<div class="tw"><table><thead><tr><th class="r">Parts</th><th class="">Ordered as</th><th class="">Supplier</th></tr></thead><tbody><tr><td class="r">Filter capacitors, 100&nbsp;pF to 10&nbsp;nF</td><td class="">TDK FG28 C0G, 5% radial, 5&nbsp;mm pitch</td><td class="">DigiKey</td></tr><tr><td class="r">Op amps</td><td class="">OPA1644AID &times; 4, OPA1641AID &times; 1</td><td class="">DigiKey</td></tr><tr><td class="r">Line receiver and driver</td><td class="">INA137UA with a SOIC-to-DIP adapter, DRV134PA</td><td class="">DigiKey</td></tr><tr><td class="r">Dual pots</td><td class="">Bourns PTD902: 100k log, 100k linear, 10k linear &times; 2</td><td class="">DigiKey</td></tr><tr><td class="r">Single pots</td><td class="">Bourns PTD901 10k linear &times; 6</td><td class="">DigiKey</td></tr><tr><td class="r">Ferrite beads</td><td class="">Laird 28C0236-0JW-10 &times; 4</td><td class="">DigiKey</td></tr><tr><td class="r">Standoffs</td><td class="">M3 &times; 20&nbsp;mm aluminium hex &times; 2</td><td class="">DigiKey</td></tr><tr><td class="r">100&nbsp;nF and 1&nbsp;&micro;F</td><td class="">50&nbsp;V monolithic ceramic (RC5490, RC5499)</td><td class="">Jaycar</td></tr><tr><td class="r">100&nbsp;&micro;F reservoirs</td><td class="">35&nbsp;V low-ESR electrolytic (RE6334)</td><td class="">Jaycar</td></tr><tr><td class="r">47&nbsp;&micro;F and 10&nbsp;&micro;F coupling</td><td class="">Bipolar electrolytic (RY6820, RY6810)</td><td class="">Jaycar</td></tr><tr><td class="r">Resistors</td><td class="">0.5&nbsp;W metal film, packs of 8 (RR05xx)</td><td class="">Jaycar</td></tr></tbody></table></div>
 <div class="note">
-  <h4>TL084 or OPA1644</h4>
-  <p>The sheet says OPA1644 and the parts list says TL084. They share the quad pinout and both
-  have JFET inputs, so either works in the circuit, and the TL084 comes in TSSOP-14 to fit the
-  footprint. The OPA1644 is about three times quieter (5&nbsp;nV/&radic;Hz against the
-  TL084&rsquo;s 18) and drives the 10k loads here more comfortably. Settle on one so the sheet
-  and the order agree.</p>
-  <p>The dual pot is log taper, and these pages assume linear: on RV1 and RV4, wired as
-  variable resistors, a log track spreads the frequency sweep more evenly across the knob, but
-  it changes where on the travel each corner frequency sits.</p>
+  <h4>One log pot</h4>
+  <p>One of the two 100k duals is ordered log taper and the other linear; these pages assume
+  linear throughout. On RV1 or RV4, wired as variable resistors, a log track moves where on the
+  knob&rsquo;s travel each corner frequency falls, not the range itself. Whichever one gets the
+  log pot, its legend marks need to come from turning it, not from the linear figures here.</p>
 </div>
 
 <div class="next"><a href="filters.html">&larr; The shelves</a><a href="simulation.html">Simulating it &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4d106d3<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

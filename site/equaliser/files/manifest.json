@@ -1,7 +1,7 @@
 {
  "repo": "https://github.com/UTS-500-Series/Equaliser",
- "commit": "10142c5",
- "date": "2026-10-07",
+ "commit": "4d106d3",
+ "date": "2026-10-11",
  "kicad": "10.0.6",
  "schematics": [
   {
@@ -63,13 +63,13 @@
   {
    "name": "combined",
    "source": "Combined_EQ/Combined_EQ.kicad_pcb",
-   "label": "The equaliser card: parts being placed, no tracks yet",
+   "label": "Both equaliser boards as ordered: the main card, and the pot board drawn beside it",
    "stats": {
-    "footprints": 127,
-    "segments": 0,
-    "vias": 0,
-    "zones": 0,
-    "outline": 15
+    "footprints": 133,
+    "segments": 832,
+    "vias": 71,
+    "zones": 2,
+    "outline": 17
    },
    "files": [
     "combined-3d-top.png",

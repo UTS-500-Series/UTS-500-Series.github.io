@@ -35,26 +35,26 @@ class Module:
 MODULES = [
     Module('compressor', 'Compressor',
            'Feedback compressor built round a discrete current-steering gain cell. '
-           'Simulated, boards ordered, parts from Altronics, and a faceplate you can 3D print.',
-           'designed',
+           'Simulated, boards and parts ordered, being built, and a faceplate you can 3D print.',
+           'building',
            'How the UTS Mini Mixing Desk compressor module works, section by section.',
            'documentation generated from the KiCad project',
            content='content_compressor', repo='Compressor'),
 
     Module('preamp', 'Preamp',
            'Discrete low-noise balanced mic preamp with switchable phantom power. '
-           'Drawn and laid out; no values yet.',
-           'progress',
+           'Board ordered and being built, with ESP Project 66 values.',
+           'building',
            'How the UTS Mini Mixing Desk microphone preamp works, from its KiCad schematic.',
-           'written from the Pre-Amp repository at 5e6a308',
+           'written from the Pre-Amp repository at 5e6a308, with ESP Project 66 values',
            content='content_preamp', repo='Pre-Amp'),
 
     Module('equaliser', 'Equaliser',
            'Four bands: low and high shelves and two state-variable parametric mids, between a '
-           'balanced receiver and line driver. Schematic finished; board being laid out.',
-           'progress',
+           'balanced receiver and line driver. Boards ordered and being built.',
+           'building',
            'How the UTS Mini Mixing Desk equaliser module works, and how far along it is.',
-           'written from the Equaliser repository at 10142c5',
+           'written from the Equaliser repository at 4d106d3',
            content='content_equaliser', repo='Equaliser'),
 ]
 

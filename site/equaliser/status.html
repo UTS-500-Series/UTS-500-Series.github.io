@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>What is left &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
+<title>Building it &middot; UTS Mini Mixing Desk &mdash; Equaliser</title>
 <meta name="description" content="How the UTS Mini Mixing Desk equaliser module works, and how far along it is.">
 <link rel="icon" href="../brand/favicon.ico" sizes="48x48">
 <link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html" class="on"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html" class="on"><i>08</i><span>Building it</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -32,14 +32,37 @@ try {
 <main class="main"><div class="wrap">
 
 <p class="eyebrow">Practical &mdash; 08</p>
-<h1>What is left</h1>
-<p class="lede">The circuit is complete. What remains is one wiring fix, some decisions that
-are cheap now and dear after routing, and the board.</p>
-<div class="tw"><table><thead><tr><th class="r">Step</th><th class="">Why it comes here</th></tr></thead><tbody><tr><td class="r">Put IC2 and IC5 on +16&nbsp;V</td><td class="">Their V+ pins are on &minus;16&nbsp;V, so as drawn the module has no output. Two symbols to change (<a href="io.html#power">power</a>).</td></tr><tr><td class="r">Decide the knob directions</td><td class="">The mid bands cut and lower their frequency clockwise, the shelves boost and raise it. Swapping pot pins is free before routing (<a href="bands.html">bands</a>).</td></tr><tr><td class="r">Settle the panel</td><td class="">As placed, ten shafts come through the panel in one line, 7.5&nbsp;mm apart. A front board, or a different arrangement, changes the placement (<a href="board.html">board</a>).</td></tr><tr><td class="r">Move the bypass switch</td><td class="">If bypass is a panel control, SW1 has to be at the front of the card, not by J1.</td></tr><tr><td class="r">Fix the footprints</td><td class="">Radial footprints for the 100&nbsp;&micro;F and 10&nbsp;&micro;F electrolytics; delete or wire J2 and J3.</td></tr><tr><td class="r">Decide where the grounds join</td><td class="">Pins 5 and 13 are on one net. Choose the single point where supply return meets audio ground.</td></tr><tr><td class="r">Consider C33 and the high shelf&rsquo;s divider</td><td class="">22&nbsp;pF for C33 makes the module flat; the R12/R13 divider is why the high shelf is weaker (<a href="filters.html">shelves</a>). Both optional.</td></tr><tr><td class="r">Finish placement, close the outline and route</td><td class="">Then DRC can check the board against the sheet.</td></tr><tr><td class="r">Finish the parts list</td><td class="">Part numbers for the resistors, the 10k pots, the switch and the chips, and one op amp on both the sheet and the order.</td></tr><tr><td class="r">Draw the faceplate</td><td class="">From the board&rsquo;s shaft positions, as the compressor&rsquo;s is drawn from its front board.</td></tr></tbody></table></div>
+<h1>Building it</h1>
+<p class="lede">The boards are ordered and the module is being built. Most of the questions
+this page used to list were settled before ordering; what is left is for the bench and the
+faceplate.</p>
+
+<h2>Settled before ordering</h2>
+<div class="tw"><table><thead><tr><th class="r">Was</th><th class="">Now</th></tr></thead><tbody><tr><td class="r">IC2 and IC5 had V+ on &minus;16&nbsp;V</td><td class="">Fixed: every op amp is powered from both rails</td></tr><tr><td class="r">Ten shafts in one line, 7.5&nbsp;mm apart</td><td class="">The frequency pots moved to a top board, giving two columns of knobs (<a href="board.html">board</a>)</td></tr><tr><td class="r">J2 and J3 unconnected, no footprint</td><td class="">17-pin headers joining the two boards</td></tr><tr><td class="r">Parts list said TL084</td><td class="">OPA1644 ordered, matching the sheet</td></tr><tr><td class="r">Board not routed</td><td class="">Routed on four layers and ordered</td></tr></tbody></table></div>
+
+<h2>On the bench</h2>
+<div class="tw"><table><thead><tr><th class="r">Item</th><th class="">What to do</th></tr></thead><tbody><tr><td class="r">Wire J2 to J3</td><td class="">All 17 pins, pin for pin, including pin 15 (the top board&rsquo;s only ground)</td></tr><tr><td class="r">C18, C20, C2, C7</td><td class="">Electrolytics on footprints drawn for other parts: bend the leads, and fit C18/C20 the right way round (<a href="board.html">fit notes</a>)</td></tr><tr><td class="r">Card edge</td><td class="">Each J1 pin is wired on one face only: check continuity from the rack slot</td></tr><tr><td class="r">IC4A</td><td class="">Unused, inputs open. Tie it off if the module whistles (<a href="io.html#power">power</a>)</td></tr><tr><td class="r">C33</td><td class="">Optional: 22&nbsp;pF instead of 220&nbsp;pF flattens the 12&nbsp;kHz rise (<a href="filters.html">shelves</a>)</td></tr><tr><td class="r">Bypass</td><td class="">SW1 is at the rack end of the card, so set it before the module goes in</td></tr></tbody></table></div>
+
+<h2>Bringing it up</h2>
+<ol>
+  <li>Before soldering the five op amps, power the board from a bench supply through the card
+  edge and check the rails at their pads: +16&nbsp;V on pin 4 and &minus;16&nbsp;V on pin 11 of
+  each OPA1644, pin 7 and pin 4 on U1.</li>
+  <li>Fit everything, power up with every knob centred and SW1 on the EQ side, and feed a
+  1&nbsp;kHz tone. The output should match the input level to within half a dB.</li>
+  <li>Sweep each boost/cut knob and check its band moves. If pin 3 of each pot is its
+  clockwise end, the mid bands boost anticlockwise (<a href="bands.html">bands</a>).</li>
+  <li>Flip SW1 to bypass: the output should equal the input exactly, powered or not.</li>
+</ol>
+
+<h2>Still to draw</h2>
+<p>The faceplate: ten knob holes in two columns from the pot positions above, plus the legend,
+which has to follow the mid bands&rsquo; reversed directions. The compressor&rsquo;s
+<a href="../compressor/printed.html">printed faceplate</a> is the pattern to copy.</p>
 
 <div class="next"><a href="simulation.html">&larr; Simulating it</a><a href="files.html">Design files &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4d106d3<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

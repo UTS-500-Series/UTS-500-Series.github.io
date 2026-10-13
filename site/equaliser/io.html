@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html" class="on"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html" class="on"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>Building it</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -45,7 +45,8 @@ with 100k to ground after it (R4, R2) so the INA137&rsquo;s inputs have a DC pat
 <p><strong>IC1, the INA137,</strong> is a difference amplifier with laser-trimmed resistors
 inside. It subtracts the cold leg from the hot one, which cancels anything common to both
 (hum and noise picked up on the cable) and halves the result: &minus;6&nbsp;dB. Its output goes
-straight into IC4A, wired as a follower, which is what drives the first band.</p>
+straight into U1, an OPA1641 wired as a follower, which is what drives the first band. (On the
+earlier sheet that buffer was IC4A; unit A of IC4 is now unused.)</p>
 <div class="note">
   <h4>Matching the input capacitors</h4>
   <p>A balanced input rejects hum only as well as its two legs match. With 47&nbsp;&micro;F
@@ -69,34 +70,40 @@ and the driver does not invert. The output is in phase with the input.</p>
 outputs. In the other they are joined straight to the input legs, after the ferrite beads and
 before the 47&nbsp;&Omega; resistors: a hard bypass, which works with the module unpowered.
 Both poles are wired consistently (hot to hot, cold to cold in either position).</p>
-<p>On the board as placed so far, SW1 sits next to the card edge connector, at the back of the
-module. See <a href="board.html">board &amp; parts</a>.</p>
+<p>On the ordered board SW1 sits near the card edge connector, at the back of the module, so it
+is set before the module goes into the rack rather than from the panel. See
+<a href="board.html">board &amp; parts</a>.</p>
 
 <h2 id="power">Power</h2>
 <p>J1 pin 12 feeds <code>+16V</code> through R6 and pin 14 feeds <code>&minus;16V</code> through
 R5, both 10&nbsp;&Omega;. Each rail has a 100&nbsp;&micro;F reservoir (C20, C18), 1&nbsp;&micro;F
 (C12, C11) and 100&nbsp;nF next to every chip. The 10&nbsp;&Omega; resistors and the reservoirs
 form a filter against noise on the rack&rsquo;s rails, as on the compressor.</p>
-<p>From the datasheets&rsquo; typical figures, sixteen op amp channels at 1.8&nbsp;mA, the INA137
-at 2.4&nbsp;mA and the DRV134 at 5.2&nbsp;mA come to about 37&nbsp;mA per rail before any load,
-well inside the 130&nbsp;mA a 500-series slot allows.</p>
+<p>From the datasheets&rsquo; typical figures, seventeen op amp channels at 1.8&nbsp;mA (IC4A
+draws current even unused), the INA137 at 2.4&nbsp;mA and the DRV134 at 5.2&nbsp;mA come to
+about 38&nbsp;mA per rail before any load, well inside the 130&nbsp;mA a 500-series slot
+allows.</p>
+
+<div class="note">
+  <h4>The supply fault is fixed</h4>
+  <p>Until the board was laid out, IC2 and IC5 (now IC8) had a &minus;16&nbsp;V symbol on pin 4
+  (V+), which would have left the high-mid band, the shelves&rsquo; level stages and the summer
+  unpowered. On the ordered sheet every op amp has pin 4 on +16&nbsp;V and pin 11 on
+  &minus;16&nbsp;V, each with its own 100&nbsp;nF to ground.</p>
+</div>
 
 <div class="note warn">
-  <h4>IC2 and IC5 have no positive supply</h4>
-  <p>On the sheet, the symbol on <strong>pin 4 (V+)</strong> of both IC2 and IC5 is a
-  <code>&minus;16V</code> power symbol. Pin 11 (V&minus;) is on &minus;16&nbsp;V as well, so both
-  chips have &minus;16&nbsp;V on both supply pins and nothing across them. IC3 and IC4 are
-  wired correctly. KiCad&rsquo;s ERC doesn&rsquo;t flag it, because both pins are on a
-  legitimate power net.</p>
-  <p>As drawn, the high-mid band (IC2), both shelf level stages, the dry inverter and the summer
-  (all IC5) are dead, so nothing reaches the output. The fix is to change those two symbols to
-  <code>+16V</code>. Their 100&nbsp;nF decoupling capacitors then decouple +16&nbsp;V, as they
-  should. Do it before the board is routed, or the copper will carry the same mistake.</p>
+  <h4>IC4A is left floating</h4>
+  <p>With U1 doing the input buffering, IC4&rsquo;s unit A (pins 1&ndash;3) connects to nothing.
+  An unused op amp with open inputs can drift to a rail or oscillate, which adds supply current
+  and can couple noise into its neighbours in the same package. It is usually harmless, but if
+  the built module shows a whistle or a hot IC4, tie it off by hand: bridge pin 1 to pin 2, and
+  run a short wire from pin 3 to ground.</p>
 </div>
 
 <div class="next"><a href="schematic.html">&larr; The schematic</a><a href="bands.html">Parametric bands &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4d106d3<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

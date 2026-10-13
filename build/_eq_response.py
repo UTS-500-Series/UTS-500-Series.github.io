@@ -32,6 +32,7 @@ from _kicad_sch import Sheet
 SCH = 'Combined_EQ/Combined_EQ.kicad_sch'
 RAW = 'Low_Bandpass_Filter/LT_SPICE/BandA.raw'
 QUAD = {'A': ('3', '2', '1'), 'B': ('5', '6', '7'), 'C': ('10', '9', '8'), 'D': ('12', '13', '14')}
+SINGLE = ('3', '2', '6')                # OPA1641: +, -, out
 A0 = 1e6
 FREQS = [round(10 * 10 ** (i / 100), 3) for i in range(401)]      # 10 Hz to 100 kHz
 
@@ -58,7 +59,20 @@ def value(s):
 class Circuit:
     def __init__(self, path):
         sheet = Sheet(path)
-        self.pin = pin = {p: n for n, ps in sheet.netlist().items() for p in ps}
+        nets = sheet.netlist()
+        # the frequency pots sit on a board of their own, wired pin for pin from J2 to J3:
+        # join each J2 pin's net to the matching J3 pin's net
+        alias = {}
+        for n, ps in nets.items():
+            for r, p in ps:
+                if r == 'J3':
+                    other = [m for m, qs in nets.items() if ('J2', p) in qs]
+                    if other and other[0] != n:
+                        alias[n] = other[0]
+        self.pin = pin = {p: alias.get(n, n) for n, ps in nets.items() for p in ps}
+        count = {}
+        for n in pin.values():
+            count[n] = count.get(n, 0) + 1
         self.gnd = pin[('J1', '13')]
         self.elems = []                 # (kind, net a, net b, ohms or farads, pot key)
         self.opamps = []                # (+, -, out) for every OPA1644 unit
@@ -78,10 +92,13 @@ class Circuit:
                 R = value(s['value'])
                 self.elems.append(('top', pin[(ref, a)], pin[(ref, w)], R, ref))
                 self.elems.append(('bot', pin[(ref, w)], pin[(ref, b)], R, ref))
-            elif 'OPA1644' in lib:
-                for p, m, o in QUAD.values():
-                    self.opamps.append(tuple(pin[(ref, x)] for x in (p, m, o)))
-        self.IN = pin[('IC4', '3')]     # the INA137's output, into buffer IC4A
+            elif 'OPA1644' in lib or 'OPA1641' in lib:
+                for unit in (QUAD.values() if 'OPA1644' in lib else [SINGLE]):
+                    nn = tuple(pin.get((ref, x)) for x in unit)
+                    # skip a unit with nothing on its inputs (IC4A is left unused)
+                    if None not in nn and count[nn[0]] > 1 and count[nn[1]] > 1:
+                        self.opamps.append(nn)
+        self.IN = pin[('U1', '3')]      # the INA137's output, into buffer U1
         self.OUT = pin[('IC6', '4')]    # the DRV134's input
         self.LOWMID = pin[('IC3', '14')]  # the low-mid band's own output
         self.HIGHMID = pin[('IC2', '8')]  # the high-mid band's own output

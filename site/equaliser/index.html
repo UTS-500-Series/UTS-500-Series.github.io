@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html" class="on"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>Building it</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -35,16 +35,18 @@ try {
 <h1>The equaliser</h1>
 <p class="lede">A four-band equaliser: a low shelf, two fully parametric mid bands and a high
 shelf, between a balanced input receiver and a balanced line driver, with a hard bypass. The
-whole circuit is on one sheet with values, and the board is being laid out.</p>
+boards have been ordered and the module is being built.</p>
 
-<div class="note warn">
-  <h4>Work in progress</h4>
+<div class="note">
+  <h4>Ordered, and being built</h4>
   <p>Written from the <a href="https://github.com/UTS-500-Series/Equaliser">Equaliser repository</a> at commit
-  <code>10142c5</code> (7&nbsp;October). The schematic was finished on 5&nbsp;October; the board
-  has its parts being placed and no tracks yet. Every response figure on these pages is worked
-  out from the schematic itself. Nothing has been built or measured.</p>
-  <p><strong>One wiring fault stops it working as drawn:</strong> two of the four OPA1644s have
-  their positive supply pin on &minus;16&nbsp;V. See <a href="io.html#power">power</a>.</p>
+  <code>4d106d3</code> (11&nbsp;October). The team finished the layout and ordered the boards
+  on 8&nbsp;October (<code>4c10641</code>, &ldquo;finalised and ordered&rdquo;): a four-layer
+  main card, plus a small top board for the four dual frequency pots. The Gerbers that went to
+  the fab are in the repository as <code>500_Series_EQ.zip</code>. The supply fault the earlier
+  sheet had is fixed. Every response figure on these pages is worked out from the schematic;
+  nothing has been measured yet.</p>
+  <p>Build notes for the boards as ordered are on <a href="status.html">building it</a>.</p>
 </div>
 
 <dl class="spec">
@@ -54,8 +56,8 @@ whole circuit is on one sheet with values, and the board is being laid out.</p>
   <div><dt>Knobs</dt><dd>10, plus bypass</dd></div>
   <div><dt>Mid bands</dt><dd>&plusmn;9.5 dB</dd></div>
   <div><dt>Low shelf</dt><dd>&plusmn;9.8 dB</dd></div>
-  <div><dt>Op amps</dt><dd>4 &times; OPA1644</dd></div>
-  <div><dt>Components</dt><dd>129</dd></div>
+  <div><dt>Op amps</dt><dd>4 &times; OPA1644, OPA1641</dd></div>
+  <div><dt>Boards</dt><dd>2, ordered</dd></div>
 </dl>
 
 <figure>
@@ -72,13 +74,13 @@ whole circuit is on one sheet with values, and the board is being laid out.</p>
     <rect x="400" y="18" width="150" height="48" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="475.0" y="36.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">High-mid band</text><text x="475.0" y="52.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC2 &middot; 1.05&ndash;6.9 kHz</text>
     <polyline points="550,42 600,42 600,92 60,92 60,112" fill="none" stroke="var(--sig)" stroke-width="2" marker-end="url(#eah)"/>
     <text x="330" y="86" text-anchor="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="11">buffered by IC4B, then split three ways</text>
-    <rect x="20" y="114" width="170" height="44" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="105.0" y="130.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Dry</text><text x="105.0" y="146.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC5D, inverted</text>
-    <rect x="210" y="114" width="230" height="44" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="325.0" y="130.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Low shelf</text><text x="325.0" y="146.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC4D low-pass &rarr; IC5A level</text>
-    <rect x="460" y="114" width="240" height="44" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="580.0" y="130.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">High shelf</text><text x="580.0" y="146.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC4C high-pass &rarr; IC5B level</text>
+    <rect x="20" y="114" width="170" height="44" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="105.0" y="130.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Dry</text><text x="105.0" y="146.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC8D, inverted</text>
+    <rect x="210" y="114" width="230" height="44" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="325.0" y="130.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Low shelf</text><text x="325.0" y="146.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC4D low-pass &rarr; IC8A level</text>
+    <rect x="460" y="114" width="240" height="44" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="580.0" y="130.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">High shelf</text><text x="580.0" y="146.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC4C high-pass &rarr; IC8B level</text>
     <polyline points="105,158 105,190 330,190 330,202" fill="none" stroke="var(--sig)" stroke-width="2" marker-end="url(#eah)"/>
     <polyline points="325,158 325,172 340,172 340,202" fill="none" stroke="var(--sig)" stroke-width="2" marker-end="url(#eah)"/>
     <polyline points="580,158 580,190 350,190 350,202" fill="none" stroke="var(--sig)" stroke-width="2" marker-end="url(#eah)"/>
-    <rect x="250" y="204" width="180" height="40" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="340.0" y="218.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Summer</text><text x="340.0" y="234.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC5C</text>
+    <rect x="250" y="204" width="180" height="40" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="340.0" y="218.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Summer</text><text x="340.0" y="234.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC8C</text>
     <polyline points="430,224 468,224" fill="none" stroke="var(--sig)" stroke-width="2" marker-end="url(#eah)"/>
     <rect x="470" y="204" width="140" height="40" rx="6" fill="var(--surface)" stroke="var(--rule)"/><text x="540.0" y="218.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink)" font-family="var(--display)" font-size="13">Line driver</text><text x="540.0" y="234.0" text-anchor="middle" dominant-baseline="middle" fill="var(--ink-3)" font-family="var(--mono)" font-size="10">IC6 DRV134 &middot; +6 dB</text>
     <polyline points="610,224 628,224" fill="none" stroke="var(--sig)" stroke-width="2" marker-end="url(#eah)"/>
@@ -120,23 +122,22 @@ from 20&nbsp;Hz to 20&nbsp;kHz.</p>
 <p>The filters, buffers and summer all run on TI&rsquo;s OPA1644, a quad JFET-input op amp.
 Its input bias current is picoamps rather than the NE5532&rsquo;s hundreds of nanoamps, which
 matters when a pot wiper sits in the signal path: bias current through a pot is offset, and
-offset through a pot is a click every time the knob turns. Its footprint on the sheet is
-TSSOP-14, a 0.65&nbsp;mm-pitch surface-mount package: fine to hand-solder with flux and a fine
-tip, but worth knowing before ordering. The team&rsquo;s parts list has the TL084 in its place,
-which shares the pinout; see <a href="board.html">board &amp; parts</a>.</p>
+offset through a pot is a click every time the knob turns. The input buffer is its single
+sibling, the OPA1641. Both are in SOIC packages (1.27&nbsp;mm pitch), which hand-solder
+comfortably, and the parts list now orders exactly what the sheet says.</p>
 <p>The input and output use TI&rsquo;s matched pair for balanced lines, the INA137 receiver and
 the DRV134 driver. The receiver halves the level and the driver doubles it, so the module is
 unity gain overall with 6&nbsp;dB of extra headroom inside.</p>
 
 <h2>How the repository is laid out</h2>
-<div class="tw"><table><thead><tr><th class="r">Folder</th><th class="">What is in it</th></tr></thead><tbody><tr><td class="r"><code>Combined_EQ/</code></td><td class="">The design: the whole equaliser on one sheet, and its board</td></tr><tr><td class="r"><code>Components/</code></td><td class="">Vendor library files (symbols, footprints, 3D models) for the DRV134, INA137 and OPA1644, in every CAD format</td></tr><tr><td class="r"><code>BOM.xlsx</code>, <code>Capacitor BOM.xlsx</code></td><td class="">The team&rsquo;s parts list, with suppliers for the capacitors</td></tr><tr><td class="r"><code>Low_Bandpass_Filter/</code></td><td class="">The low-mid band on its own sheet and the team&rsquo;s LTspice model <code>LT_SPICE/BandA.asc</code> with its results</td></tr><tr><td class="r"><code>High_Bandpass_Filter/</code></td><td class="">The high-mid band on its own sheet, and <code>BandB.asc</code></td></tr><tr><td class="r"><code>High_Pass_filter/</code>, <code>Low_Pass_Filter/</code>, <code>Variable_Gain/</code></td><td class="">The first drafts of the shelves&rsquo; parts, each on its own sheet with an LTspice model</td></tr><tr><td class="r"><code>Combined Equaliser/</code></td><td class="">An empty KiCad project, a leftover from setting up <code>Combined_EQ/</code></td></tr><tr><td class="r"><code>EQ BOM.docx</code></td><td class="">An earlier bill-of-materials table, columns only</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="r">Folder</th><th class="">What is in it</th></tr></thead><tbody><tr><td class="r"><code>Combined_EQ/</code></td><td class="">The design: the whole equaliser on one sheet, and its board</td></tr><tr><td class="r"><code>500_Series_EQ.zip</code>, <code>500_Series_EQ/</code></td><td class="">The Gerbers and drill files that were ordered (8&nbsp;October)</td></tr><tr><td class="r"><code>Components/</code></td><td class="">Vendor library files (symbols, footprints, 3D models) for the DRV134, INA137, OPA1644 and OPA1641, in every CAD format</td></tr><tr><td class="r"><code>BOM.xlsx</code></td><td class="">The team&rsquo;s parts list, with suppliers and part numbers</td></tr><tr><td class="r"><code>Capacitor BOM.xlsx</code></td><td class="">An earlier list of just the capacitors</td></tr><tr><td class="r"><code>Low_Bandpass_Filter/</code></td><td class="">The low-mid band on its own sheet and the team&rsquo;s LTspice model <code>LT_SPICE/BandA.asc</code> with its results</td></tr><tr><td class="r"><code>High_Bandpass_Filter/</code></td><td class="">The high-mid band on its own sheet, and <code>BandB.asc</code></td></tr><tr><td class="r"><code>High_Pass_filter/</code>, <code>Low_Pass_Filter/</code>, <code>Variable_Gain/</code></td><td class="">The first drafts of the shelves&rsquo; parts, each on its own sheet with an LTspice model</td></tr><tr><td class="r"><code>Combined Equaliser/</code></td><td class="">An empty KiCad project, a leftover from setting up <code>Combined_EQ/</code></td></tr><tr><td class="r"><code>EQ BOM.docx</code></td><td class="">An earlier bill-of-materials table, columns only</td></tr></tbody></table></div>
 <p>The sheets in the section folders are earlier drafts. Two of them still have the faults this
 site pointed out (the low-pass sheet&rsquo;s missing capacitor, the gain sheet&rsquo;s swapped
 inputs); both are fixed on the main sheet, which is the one to keep editing.</p>
 
 <div class="next"><span></span><a href="schematic.html">The schematic &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4d106d3<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>
