@@ -19,6 +19,7 @@ from modules import MODULES, GUIDES
 
 BADGE = {'built':    ('Built',    'ok'),
          'designed': ('Designed', 'ok'),
+         'building': ('Being built', 'ok'),
          'progress': ('In progress', 'warn'),
          'planned':  ('Template', 'warn'),
          'guide':    ('Guide',    'ok')}
@@ -101,17 +102,16 @@ built that way.</p>
 <p>The compressor has been designed and its boards were ordered on 3 October: a main card
 and a front board behind the faceplate, joined by a ribbon. The whole circuit has been
 simulated in ngspice and its values corrected from that, it has a parts list drawn from
-Altronics' stock, and its faceplate can be 3D printed as well as machined. Nothing has been
-built yet. Its pages are generated from a netlist that the KiCad schematic is verified
+Altronics' stock, and its faceplate can be 3D printed as well as machined. Its parts have
+been ordered and it is being built. Its pages are generated from a netlist that the KiCad schematic is verified
 against, pin by pin, so the figures in it come from the design rather than from memory.</p>
-<p>The equaliser is <strong>in progress</strong>: its schematic was finished on 5 October,
-with a low shelf, two parametric mid bands and a high shelf between a balanced receiver and
-line driver, all on one sheet. Its response is worked out from that sheet and matches the
-team's LTspice run where they overlap. Its board has been started: parts are being placed and
-nothing is routed yet.</p>
-<p>The preamp is also <strong>in progress</strong>: its schematic is drawn and its board is
-placed and routed, but no component values have been chosen. Its pages are written from its
-KiCad sheet, with the schematic drawn from that file.</p>
+<p>The equaliser's boards were ordered on 8 October and it is <strong>being built</strong>:
+a low shelf, two parametric mid bands and a high shelf between a balanced receiver and line
+driver, on a four-layer main card with a small top board for the frequency pots. Its response
+is worked out from the schematic and matches the team's LTspice run where they overlap.</p>
+<p>The preamp's board has also been ordered and it is <strong>being built</strong>, with the
+component values of ESP Project 66 and 96, the published design its schematic redraws. Its
+pages are written from its KiCad sheet, with ESP's values on our part references.</p>
 
 <h2>The format</h2>
 <p>Every module shares the same constraints, which is most of what makes a rack of them

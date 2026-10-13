@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html" class="on"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html" class="on"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>Building it</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -99,10 +99,9 @@ input (pin 1) and its output (pin 3), and its wiper is what the filter listens t
   <p>If pin 3 is a pot&rsquo;s clockwise end, as is usual, then on both mid bands clockwise
   <strong>cuts</strong> (RV8, RV5), <strong>lowers</strong> the frequency (RV9, RV6) and
   <strong>widens</strong> the band (RV7, RV2). On both shelves clockwise boosts and raises the
-  corner. Most desks boost and raise the frequency clockwise on every band. Swapping the outer
-  pins of RV5 and RV8, and of both gangs of RV6 and RV9, brings the mid bands into line; the
-  board isn&rsquo;t routed yet, so now is the cheap time. Whether width should go wider or
-  narrower clockwise is a panel-legend decision either way.</p>
+  corner. Most desks boost and raise the frequency clockwise on every band. The ordered boards
+  keep the wiring as drawn, so this is now a job for the faceplate legend: mark the mid
+  bands&rsquo; boost, frequency and width the way they actually turn.</p>
 </div>
 
 <h2>Checked against the team&rsquo;s simulation</h2>
@@ -116,7 +115,7 @@ other ideal op amps, and they agree.</p>
 
 <div class="next"><a href="io.html">&larr; Input, output &amp; power</a><a href="filters.html">The shelves &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4d106d3<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

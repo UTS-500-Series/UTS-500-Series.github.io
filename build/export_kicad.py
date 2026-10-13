@@ -58,7 +58,7 @@ PROJECTS = {
                 ('gain', 'Variable_Gain/GAIN/variablegain/variablegain.kicad_sch',
                  'Variable gain stage on its own sheet (earlier draft)')],
         'pcb': [('combined', 'Combined_EQ/Combined_EQ.kicad_pcb',
-                 'The equaliser card: parts being placed, no tracks yet'),
+                 'Both equaliser boards as ordered: the main card, and the pot board drawn beside it'),
                 ('lbp', 'Low_Bandpass_Filter/LBP.kicad_pcb', 'Low-mid band board (earlier draft)')],
     }),
 }

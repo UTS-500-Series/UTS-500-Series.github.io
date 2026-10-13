@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The board, and what is left &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
+<title>The board and building it &middot; UTS Mini Mixing Desk &mdash; Preamp</title>
 <meta name="description" content="How the UTS Mini Mixing Desk microphone preamp works, from its KiCad schematic.">
 <link rel="icon" href="../brand/favicon.ico" sizes="48x48">
 <link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Preamp module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="input.html"><i>03</i><span>Input and phantom power</span></a><a href="gain.html"><i>04</i><span>Gain stage</span></a><a href="output.html"><i>05</i><span>Output stage</span></a><a href="power.html"><i>06</i><span>Power and J1</span></a><h4>Practical</h4><a href="board.html" class="on"><i>07</i><span>The board, and what is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="input.html"><i>03</i><span>Input and phantom power</span></a><a href="gain.html"><i>04</i><span>Gain stage</span></a><a href="output.html"><i>05</i><span>Output stage</span></a><a href="power.html"><i>06</i><span>Power and J1</span></a><h4>Practical</h4><a href="board.html" class="on"><i>07</i><span>The board and building it</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -32,34 +32,44 @@ try {
 <main class="main"><div class="wrap">
 
 <p class="eyebrow">Practical &mdash; 07</p>
-<h1>The board, and what is left</h1>
-<p class="lede">The layout is further along than the schematic: every part is placed and
-routed, but none of them has a value yet.</p>
+<h1>The board and building it</h1>
+<p class="lede">The board has been ordered from the layout in the repository and is being
+built with ESP&rsquo;s values. This page has the full value list and what to watch for on the
+bench.</p>
 
 <h2>The PCB</h2>
 <p>Read from <code>Series-500.kicad_pcb</code> at <code>5e6a308</code>:</p>
 <div class="tw"><table><thead><tr><th class="r"></th><th class="">State</th></tr></thead><tbody><tr><td class="r">Outline</td><td class="">152.35 &times; 105.0&nbsp;mm, from the card template</td></tr><tr><td class="r">Footprints</td><td class="">46 placed, one for every part on the sheet</td></tr><tr><td class="r">Tracks</td><td class="">156 segments: 128 on the front, 28 on the back, no vias</td></tr><tr><td class="r">Connectivity</td><td class="">Every net with two or more pads joined in copper, by our check</td></tr><tr><td class="r">Copper pours</td><td class="">None</td></tr><tr><td class="r">Parts</td><td class="">All through-hole: 0309 resistors at 12.7&nbsp;mm pitch, TO-92, DIP-8, radial capacitors</td></tr></tbody></table></div>
-<p>The connectivity row is our own check of track ends against pad positions, not KiCad's
-design-rule check. Run DRC in KiCad before ordering; it also catches clearance problems, which
-this check does not look for.</p>
 
-<h2>What is left</h2>
-<div class="tw"><table><thead><tr><th class="r">To do</th><th class="">Why</th></tr></thead><tbody><tr><td class="r">Choose and enter every component value</td><td class="">The sheet has none. Nothing can be simulated, ordered or checked until it does</td></tr><tr><td class="r">Pick the zener voltage for D1&ndash;D4</td><td class="">Above the largest input signal, below what the bases can take</td></tr><tr><td class="r">Match R1/R2, R9/R10 with R17/R14, and R11/R18</td><td class="">Phantom balance, CMRR and output balance all depend on matching</td></tr><tr><td class="r">Add U1 unit B and tie it off</td><td class="">Its pins currently float on the board</td></tr><tr><td class="r">Route the audio through J1</td><td class="">So the card works in a rack slot like the other modules</td></tr><tr><td class="r">Consider rail filtering</td><td class="">The rails are shared with the other modules</td></tr><tr><td class="r">Add a ground pour and run DRC</td><td class="">Neither has been done</td></tr></tbody></table></div>
+<h2>Values for the build</h2>
+<p>From ESP Project 66 (the preamp) and Project 96 (the phantom feed), on our references. Use
+1% metal film for every resistor, as ESP asks, and avoid bead tantalum capacitors.</p>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="n">Value</th><th class="">Notes</th></tr></thead><tbody><tr><td class="r">R1, R2</td><td class="n">6.8&nbsp;k&Omega;</td><td class="">Phantom feed. Matched to within 10&nbsp;&Omega;</td></tr><tr><td class="r">R3, R4</td><td class="n">10&nbsp;&Omega;</td><td class="">Zener current limit</td></tr><tr><td class="r">D1&ndash;D4</td><td class="n">1N4740A, 10&nbsp;V 1&nbsp;W zener</td><td class="">Two per input, back to back</td></tr><tr><td class="r">C2, C3</td><td class="n">22&nbsp;&micro;F 50&nbsp;V electrolytic</td><td class="">+ to the microphone side</td></tr><tr><td class="r">R12, R13</td><td class="n">3.3&nbsp;k&Omega;</td><td class="">Input bias and impedance</td></tr><tr><td class="r">Q1, Q2</td><td class="n">2N3906 as drawn</td><td class="">ESP uses the 2N4403, quieter; BC559/BC560 also work</td></tr><tr><td class="r">Q3, Q4</td><td class="n">BC549</td><td class="">As ESP</td></tr><tr><td class="r">R6, R7</td><td class="n">4.7&nbsp;k&Omega;</td><td class="">Stage current</td></tr><tr><td class="r">R15, R16</td><td class="n">680&nbsp;&Omega;</td><td class=""></td></tr><tr><td class="r">R19, R20</td><td class="n">2.2&nbsp;k&Omega;</td><td class=""></td></tr><tr><td class="r">R8</td><td class="n">22&nbsp;&Omega;</td><td class="">Sets maximum gain</td></tr><tr><td class="r">RV1</td><td class="n">10&nbsp;k&Omega; reverse log</td><td class="">Off board, on a 3-pin header</td></tr><tr><td class="r">R5</td><td class="n">100&nbsp;k&Omega;</td><td class="">Sets minimum gain</td></tr><tr><td class="r">C6</td><td class="n">1000&nbsp;&micro;F 16&nbsp;V electrolytic</td><td class="">13&nbsp;mm can</td></tr><tr><td class="r">C7, C8</td><td class="n">10&nbsp;&micro;F 16&nbsp;V or more</td><td class="">Not in ESP&rsquo;s text; + to the op amp side</td></tr><tr><td class="r">R10, R14</td><td class="n">22&nbsp;k&Omega;</td><td class="">Match the pair</td></tr><tr><td class="r">R9, R17</td><td class="n">100&nbsp;k&Omega;</td><td class="">Match the pair</td></tr><tr><td class="r">R11, R18</td><td class="n">100&nbsp;&Omega;</td><td class="">Output</td></tr><tr><td class="r">U1</td><td class="n">NE5532</td><td class="">Unit B to be tied off by hand</td></tr><tr><td class="r">C4</td><td class="n">100&nbsp;nF ceramic</td><td class="">Across the rails at U1</td></tr><tr><td class="r">C1</td><td class="n">Not given by ESP</td><td class="">On the 48&nbsp;V line: 63&nbsp;V or more</td></tr><tr><td class="r">C5, C9</td><td class="n">Not given by ESP</td><td class="">Rail reservoirs, 8&nbsp;mm can: 25&nbsp;V or more</td></tr></tbody></table></div>
+
+<h2>Things to fix on the bench</h2>
+<div class="tw"><table><thead><tr><th class="r">Item</th><th class="">Why</th><th class="">What to do</th></tr></thead><tbody><tr><td class="r">U1 unit B</td><td class="">Pins 5&ndash;7 connect to nothing on the board</td><td class="">Bridge pin 7 to pin 6, wire pin 5 to AGND (<a href="output.html">output stage</a>)</td></tr><tr><td class="r">Audio on flying leads</td><td class="">J2&ndash;J6 are single pins, not J1&rsquo;s audio pins</td><td class="">Wire the XLR and output to them for the bench; for the rack, wire them to J1 pins 10, 8, 2 and 4 by hand</td></tr><tr><td class="r">Polarised parts</td><td class="">C2, C3 face the microphone; C7, C8 face the op amp</td><td class="">Check before soldering; the 48&nbsp;V side is the more positive</td></tr><tr><td class="r">Matched pairs</td><td class="">R1/R2, R10/R14 with R9/R17, R11/R18</td><td class="">Sort with a meter; phantom balance and hum rejection depend on it</td></tr></tbody></table></div>
 
 <h2>Checking a built board</h2>
 <ol>
-  <li>Power up with no microphone, phantom off and gain at minimum. The emitter nodes of both
-  pairs should read the same, and so should both output nodes (the Q3 and Q4 emitters). A
-  mismatch between the halves costs hum rejection.</li>
-  <li>Turn the gain up with nothing plugged in. Some hiss is normal: it is the input bias
-  resistors' own noise, and it drops once a low-impedance microphone is connected.</li>
+  <li>Power up with no microphone, phantom off and gain at minimum. Both emitter nodes should
+  read about +0.65&nbsp;V and both output nodes (the Q3 and Q4 emitters) about
+  &minus;8.8&nbsp;V. ESP notes that a reading far from these means a construction mistake, and
+  a mismatch between the halves costs hum rejection.</li>
+  <li>Turn the gain up with nothing plugged in. Some hiss is normal: it is R12 and R13&rsquo;s
+  own noise, and it drops once a low-impedance microphone is connected.</li>
   <li>Plug in a dynamic microphone and check level and polarity at J5.</li>
   <li>Only then try phantom, with a condenser microphone and the output turned down.</li>
 </ol>
 
+<div class="note warn">
+  <h4>Never into a phantom-powered input</h4>
+  <p>ESP warns that 48&nbsp;V on the output destroys the op amp. When testing, plug the output
+  into a line input, never a microphone input with phantom on.</p>
+</div>
+
 <div class="next"><a href="power.html">&larr; Power and J1</a><a href="files.html">Design files &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Preamp &middot; written from the Pre-Amp repository at 5e6a308<br>
+  UTS Mini Mixing Desk &mdash; Preamp &middot; written from the Pre-Amp repository at 5e6a308, with ESP Project 66 values<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

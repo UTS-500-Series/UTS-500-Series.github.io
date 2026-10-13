@@ -1,13 +1,15 @@
 """Equaliser module - page content.
 
-Written from the Equaliser repository at commit 10142c5 (7 Oct 2026; the schematic was
-finalised in 8a0d895 on 5 Oct and the board started the same day):
+Written from the Equaliser repository at commit 4d106d3 (11 Oct 2026). The boards were
+finalised and ordered in 4c10641 on 8 Oct, and 4d106d3 updates the parts list:
 https://github.com/UTS-500-Series/Equaliser
 
 The whole equaliser is drawn on Combined_EQ/Combined_EQ.kicad_sch. That sheet's image and
 viewer data come from _kicad_sch.py, and every response figure on these pages comes from
 _eq_response.py, which solves the same netlist (ideal op amps, linear pots); the low-mid band
-is also checked against the team's own LTspice run. Rerun both when the repository changes:
+is also checked against the team's own LTspice run. The four dual frequency pots sit on a
+board of their own, wired pin for pin from J2 to J3, and the solver joins those headers.
+Rerun both when the repository changes:
 
     python3 build/_kicad_sch.py --module equaliser
     python3 build/_eq_response.py
@@ -17,7 +19,7 @@ import shell
 from shell import fig, pic, table
 
 SRC = 'https://github.com/UTS-500-Series/Equaliser'
-COMMIT = '10142c5'
+COMMIT = '4d106d3'
 SCH = 'Combined_EQ/Combined_EQ.kicad_sch'      # read by _kicad_sch.py, relative to the repository
 
 POWER = {'+16V', '-16V', 'VCC', 'VEE'}
@@ -48,10 +50,13 @@ NOTES = {
           '(-), supply on 12 and 14 through R6 and R5, ground on 5 and 13, chassis on 1.',
     'IC1': 'INA137 balanced line receiver. Turns the balanced input into one signal at half '
            'the level (-6 dB).',
-    'IC4': 'OPA1644 quad. A buffers the input, B buffers the bands\' output, D is the low '
-           'shelf\'s low-pass filter and C the high shelf\'s high-pass filter.',
-    'IC5': 'OPA1644 quad. A and B are the shelves\' level stages, D inverts the dry signal and '
-           'C sums everything into the output. Pin 4 (V+) is drawn on -16V: it should be +16V.',
+    'IC4': 'OPA1644 quad. B buffers the bands\' output, D is the low shelf\'s low-pass filter '
+           'and C the high shelf\'s high-pass filter. Unit A is unused: its pins 1-3 connect '
+           'to nothing.',
+    'IC8': 'OPA1644 quad. A and B are the shelves\' level stages, D inverts the dry signal and '
+           'C sums everything into the output. It was IC5 before the board was laid out.',
+    'U1': 'OPA1641 single op amp, wired as a follower: buffers the INA137\'s output into the '
+          'low-mid band. It took over this job from IC4A.',
     'IC6': 'DRV134 balanced line driver. Turns the summed signal back into a balanced output, '
            'at twice the level (+6 dB).',
     'SW1': 'Bypass. One position takes the outputs from the DRV134, the other joins them '
@@ -104,7 +109,7 @@ NOTES = {
     'R48': 'High shelf level stage, output end of RV10.',
     'C33': '220 pF across the high shelf level stage. Makes the flat response rise 0.5 dB '
            'around 12 kHz; 22 pF would not.',
-    'R44': 'Dry-signal inverter input (IC5D), 10k.',
+    'R44': 'Dry-signal inverter input (IC8D), 10k.',
     'R49': 'Dry-signal inverter feedback, 10k: gain -1.',
     'R50': 'Dry signal into the summer, 10k.',
     'R51': 'High shelf level stage into the summer, 16k.',
@@ -113,14 +118,15 @@ NOTES = {
     'R54': 'Low shelf filter straight into the summer, 16k.',
     'R55': 'Summer feedback, 10k.',
     'C28': '100 pF across the summer.',
-    'J2': '24-pin header with nothing connected and no footprint.',
-    'J3': '24-pin header with nothing connected and no footprint.',
+    'J2': '17-pin header on the pot board. Pins 1-14 carry the four dual frequency pots '
+          '(RV1, RV4, RV6, RV9) and their parts to J3, pin for pin; pin 15 is ground.',
+    'J3': '17-pin header on the main board, wired pin for pin to J2 on the pot board.',
 }
 for fb, what in (('FB1', 'cold input'), ('FB2', 'hot input'), ('FB3', 'hot output'),
                  ('FB4', 'cold output')):
     NOTES[fb] = 'Ferrite bead in the %s, at the card edge.' % what
 for c in ('C13', 'C14', 'C15', 'C16', 'C17', 'C19', 'C21', 'C22', 'C30', 'C31', 'C32', 'C34',
-          'C37', 'C38'):
+          'C37', 'C38', 'C45', 'C48'):
     NOTES[c] = '100 nF supply decoupling.'
 for h in ('H1', 'H2', 'H3', 'H4'):
     NOTES[h] = 'M3 mounting hole.'
@@ -128,8 +134,7 @@ for b in _BAND.values():
     n = b['name']
     NOTES.update({
         b['ic']: 'OPA1644 quad op amp: the whole %s band. Unit %s sums, %s and %s integrate, '
-                 '%s mixes the band back into the signal.' % (n, b['sum'], b['i1'], b['i2'], b['out'])
-                 + (' Pin 4 (V+) is drawn on -16V: it should be +16V.' if b['ic'] == 'IC2' else ''),
+                 '%s mixes the band back into the signal.' % (n, b['sum'], b['i1'], b['i2'], b['out']),
         b['fin']: 'Band input into the output stage\'s inverting input. With %s, gain of -1 for '
                   'the dry signal.' % b['fb'],
         b['fb']: 'Output-stage feedback. Sets the dry gain to -1 with %s.' % b['fin'],
@@ -285,13 +290,13 @@ def blocks():
     {box(400, 18, 150, 48, 'High-mid band', 'IC2 &middot; 1.05&ndash;6.9 kHz')}
     {line([(550, 42), (600, 42), (600, 92), (60, 92), (60, 112)])}
     {txt(330, 86, 'buffered by IC4B, then split three ways')}
-    {box(20, 114, 170, 44, 'Dry', 'IC5D, inverted')}
-    {box(210, 114, 230, 44, 'Low shelf', 'IC4D low-pass &rarr; IC5A level')}
-    {box(460, 114, 240, 44, 'High shelf', 'IC4C high-pass &rarr; IC5B level')}
+    {box(20, 114, 170, 44, 'Dry', 'IC8D, inverted')}
+    {box(210, 114, 230, 44, 'Low shelf', 'IC4D low-pass &rarr; IC8A level')}
+    {box(460, 114, 240, 44, 'High shelf', 'IC4C high-pass &rarr; IC8B level')}
     {line([(105, 158), (105, 190), (330, 190), (330, 202)])}
     {line([(325, 158), (325, 172), (340, 172), (340, 202)])}
     {line([(580, 158), (580, 190), (350, 190), (350, 202)])}
-    {box(250, 204, 180, 40, 'Summer', 'IC5C')}
+    {box(250, 204, 180, 40, 'Summer', 'IC8C')}
     {line([(430, 224), (468, 224)])}
     {box(470, 204, 140, 40, 'Line driver', 'IC6 DRV134 &middot; +6 dB')}
     {line([(610, 224), (628, 224)])}
@@ -323,7 +328,7 @@ NAV = [("Start here", [("index.html", "01", "Overview"),
                         ("filters.html", "05", "The shelves")]),
        ("Practical", [("board.html", "06", "Board &amp; parts"),
                       ("simulation.html", "07", "Simulating it"),
-                      ("status.html", "08", "What is left"),
+                      ("status.html", "08", "Building it"),
                       ("files.html", "09", "Design files")])]
 
 PAGES = {}
@@ -333,16 +338,18 @@ PAGES['index.html'] = ("Overview", f"""
 <h1>The equaliser</h1>
 <p class="lede">A four-band equaliser: a low shelf, two fully parametric mid bands and a high
 shelf, between a balanced input receiver and a balanced line driver, with a hard bypass. The
-whole circuit is on one sheet with values, and the board is being laid out.</p>
+boards have been ordered and the module is being built.</p>
 
-<div class="note warn">
-  <h4>Work in progress</h4>
+<div class="note">
+  <h4>Ordered, and being built</h4>
   <p>Written from the <a href="{SRC}">Equaliser repository</a> at commit
-  <code>{COMMIT}</code> (7&nbsp;October). The schematic was finished on 5&nbsp;October; the board
-  has its parts being placed and no tracks yet. Every response figure on these pages is worked
-  out from the schematic itself. Nothing has been built or measured.</p>
-  <p><strong>One wiring fault stops it working as drawn:</strong> two of the four OPA1644s have
-  their positive supply pin on &minus;16&nbsp;V. See <a href="io.html#power">power</a>.</p>
+  <code>{COMMIT}</code> (11&nbsp;October). The team finished the layout and ordered the boards
+  on 8&nbsp;October (<code>4c10641</code>, &ldquo;finalised and ordered&rdquo;): a four-layer
+  main card, plus a small top board for the four dual frequency pots. The Gerbers that went to
+  the fab are in the repository as <code>500_Series_EQ.zip</code>. The supply fault the earlier
+  sheet had is fixed. Every response figure on these pages is worked out from the schematic;
+  nothing has been measured yet.</p>
+  <p>Build notes for the boards as ordered are on <a href="status.html">building it</a>.</p>
 </div>
 
 <dl class="spec">
@@ -352,8 +359,8 @@ whole circuit is on one sheet with values, and the board is being laid out.</p>
   <div><dt>Knobs</dt><dd>10, plus bypass</dd></div>
   <div><dt>Mid bands</dt><dd>&plusmn;{LM['boost']:.1f} dB</dd></div>
   <div><dt>Low shelf</dt><dd>&plusmn;{LS['boost1']:.1f} dB</dd></div>
-  <div><dt>Op amps</dt><dd>4 &times; OPA1644</dd></div>
-  <div><dt>Components</dt><dd>129</dd></div>
+  <div><dt>Op amps</dt><dd>4 &times; OPA1644, OPA1641</dd></div>
+  <div><dt>Boards</dt><dd>2, ordered</dd></div>
 </dl>
 
 """ + blocks() + """
@@ -385,10 +392,9 @@ from 20&nbsp;Hz to 20&nbsp;kHz.</p>
 <p>The filters, buffers and summer all run on TI&rsquo;s OPA1644, a quad JFET-input op amp.
 Its input bias current is picoamps rather than the NE5532&rsquo;s hundreds of nanoamps, which
 matters when a pot wiper sits in the signal path: bias current through a pot is offset, and
-offset through a pot is a click every time the knob turns. Its footprint on the sheet is
-TSSOP-14, a 0.65&nbsp;mm-pitch surface-mount package: fine to hand-solder with flux and a fine
-tip, but worth knowing before ordering. The team&rsquo;s parts list has the TL084 in its place,
-which shares the pinout; see <a href="board.html">board &amp; parts</a>.</p>
+offset through a pot is a click every time the knob turns. The input buffer is its single
+sibling, the OPA1641. Both are in SOIC packages (1.27&nbsp;mm pitch), which hand-solder
+comfortably, and the parts list now orders exactly what the sheet says.</p>
 <p>The input and output use TI&rsquo;s matched pair for balanced lines, the INA137 receiver and
 the DRV134 driver. The receiver halves the level and the driver doubles it, so the module is
 unity gain overall with 6&nbsp;dB of extra headroom inside.</p>
@@ -396,8 +402,10 @@ unity gain overall with 6&nbsp;dB of extra headroom inside.</p>
 <h2>How the repository is laid out</h2>
 """ + table(["Folder", "What is in it"],
             [["<code>Combined_EQ/</code>", "The design: the whole equaliser on one sheet, and its board"],
-             ["<code>Components/</code>", "Vendor library files (symbols, footprints, 3D models) for the DRV134, INA137 and OPA1644, in every CAD format"],
-             ["<code>BOM.xlsx</code>, <code>Capacitor BOM.xlsx</code>", "The team&rsquo;s parts list, with suppliers for the capacitors"],
+             ["<code>500_Series_EQ.zip</code>, <code>500_Series_EQ/</code>", "The Gerbers and drill files that were ordered (8&nbsp;October)"],
+             ["<code>Components/</code>", "Vendor library files (symbols, footprints, 3D models) for the DRV134, INA137, OPA1644 and OPA1641, in every CAD format"],
+             ["<code>BOM.xlsx</code>", "The team&rsquo;s parts list, with suppliers and part numbers"],
+             ["<code>Capacitor BOM.xlsx</code>", "An earlier list of just the capacitors"],
              ["<code>Low_Bandpass_Filter/</code>", "The low-mid band on its own sheet and the team&rsquo;s LTspice model "
               "<code>LT_SPICE/BandA.asc</code> with its results"],
              ["<code>High_Bandpass_Filter/</code>", "The high-mid band on its own sheet, and <code>BandB.asc</code>"],
@@ -422,11 +430,11 @@ netlist as a graph.</p>
 
 <h2>Reading it</h2>
 """ + table(["Where", "What"],
-            [["Top row", "Balanced input receiver (IC1 and the input filtering), then the low-mid band (IC3) and the high-mid band (IC2), each drawn the same way."],
-             ["Middle", "The buffer (IC4B), the low-pass and high-pass filters (IC4D, IC4C), the variable gain stages (IC5A, IC5B) and the summer (IC5C, with the dry inverter IC5D)."],
+            [["Top left", "J2 (labelled TOP BOARD) and J3 (BOTTOM BOARD): the headers that carry the frequency pots between the two boards, pin for pin."],
+             ["Top row", "Balanced input receiver (IC1, the input filtering and the U1 buffer), then the low-mid band (IC3) and the high-mid band (IC2), each drawn the same way."],
+             ["Middle", "The buffer (IC4B), the low-pass and high-pass filters (IC4D, IC4C), the variable gain stages (IC8A, IC8B) and the summer (IC8C, with the dry inverter IC8D)."],
              ["Right", "The balanced line driver (IC6) and the bypass switch (SW1)."],
-             ["Bottom left", "J1, the card edge, and the rail filtering. J2 and J3 are 24-pin headers with nothing connected."],
-             ["Bottom", "IC5 drawn as one block with its supply pins."]],
+             ["Left and bottom", "IC4 and IC8 drawn as blocks with their supply pins, the mounting holes, J1 (the card edge) and the rail filtering."]],
             ["r", ""]) + """
 <p>Blocks talk through global labels named after the op amp unit they belong to: <code>A+</code>,
 <code>A-</code> and <code>Ao</code> are unit A&rsquo;s inputs and output, and so on through
@@ -462,21 +470,22 @@ ground.</p>
             ["n", "", ""]) + """
 <p>That is the standard pinout, the same as the
 <a href="../compressor/connector.html">compressor&rsquo;s</a> main input and output. One
-difference: pins 5 and 13 are both on the one ground net here, so the rack&rsquo;s supply
-return and audio ground are joined on the card wherever the layout puts them. The compressor
-keeps them apart and joins them at one point; worth deciding where that join is before the
-ground tracks go down.</p>
+difference: pins 5 and 13 are both on the one ground net here, and on the ordered board both
+go into the ground plane, so the rack&rsquo;s supply return and audio ground are joined across
+the whole card. The compressor keeps them apart and joins them at one point. It is unlikely to
+matter on the bench; if the module hums in the rack and the others don&rsquo;t, it is the
+first place to look.</p>
 
 <h2>Parts on this sheet</h2>
 """ + table(["Kind", "Parts", "Count"],
-            [["Op amps", "IC2&ndash;IC5 OPA1644 (quad, TSSOP-14)", "4"],
+            [["Op amps", "IC2, IC3, IC4, IC8 OPA1644 (quad, SOIC-14); U1 OPA1641 (single, SOIC-8)", "5"],
              ["Line receiver and driver", "IC1 INA137, IC6 DRV134 (DIP-8)", "2"],
              ["Resistors", "R1&ndash;R55, 0207 axial", "55"],
-             ["Capacitors", "C1&ndash;C47 (no C45)", "46"],
-             ["Pots", "RV1, RV4 100k dual; RV6, RV9 10k dual; RV2, RV3, RV5, RV7, RV8, RV10 10k. All Alps RK097 right-angle footprints", "10"],
+             ["Capacitors", "C1&ndash;C48", "48"],
+             ["Pots", "RV1, RV4 100k dual; RV6, RV9 10k dual; RV2, RV3, RV5, RV7, RV8, RV10 10k. Alps RK097 right-angle footprints; Bourns PTD901/PTD902 ordered", "10"],
              ["Ferrite beads", "FB1&ndash;FB4, one per audio pin", "4"],
              ["Switch", "SW1, DPDT slide", "1"],
-             ["Connectors", "J1 card edge; J2, J3 unconnected headers", "3"],
+             ["Connectors", "J1 card edge; J2, J3 17-pin headers between the boards", "3"],
              ["Mounting holes", "H1&ndash;H4, M3", "4"]],
             ["r", "", "n"]))
 
@@ -495,7 +504,8 @@ with 100k to ground after it (R4, R2) so the INA137&rsquo;s inputs have a DC pat
 <p><strong>IC1, the INA137,</strong> is a difference amplifier with laser-trimmed resistors
 inside. It subtracts the cold leg from the hot one, which cancels anything common to both
 (hum and noise picked up on the cable) and halves the result: &minus;6&nbsp;dB. Its output goes
-straight into IC4A, wired as a follower, which is what drives the first band.</p>
+straight into U1, an OPA1641 wired as a follower, which is what drives the first band. (On the
+earlier sheet that buffer was IC4A; unit A of IC4 is now unused.)</p>
 <div class="note">
   <h4>Matching the input capacitors</h4>
   <p>A balanced input rejects hum only as well as its two legs match. With 47&nbsp;&micro;F
@@ -519,29 +529,35 @@ and the driver does not invert. The output is in phase with the input.</p>
 outputs. In the other they are joined straight to the input legs, after the ferrite beads and
 before the 47&nbsp;&Omega; resistors: a hard bypass, which works with the module unpowered.
 Both poles are wired consistently (hot to hot, cold to cold in either position).</p>
-<p>On the board as placed so far, SW1 sits next to the card edge connector, at the back of the
-module. See <a href="board.html">board &amp; parts</a>.</p>
+<p>On the ordered board SW1 sits near the card edge connector, at the back of the module, so it
+is set before the module goes into the rack rather than from the panel. See
+<a href="board.html">board &amp; parts</a>.</p>
 
 <h2 id="power">Power</h2>
 <p>J1 pin 12 feeds <code>+16V</code> through R6 and pin 14 feeds <code>&minus;16V</code> through
 R5, both 10&nbsp;&Omega;. Each rail has a 100&nbsp;&micro;F reservoir (C20, C18), 1&nbsp;&micro;F
 (C12, C11) and 100&nbsp;nF next to every chip. The 10&nbsp;&Omega; resistors and the reservoirs
 form a filter against noise on the rack&rsquo;s rails, as on the compressor.</p>
-<p>From the datasheets&rsquo; typical figures, sixteen op amp channels at 1.8&nbsp;mA, the INA137
-at 2.4&nbsp;mA and the DRV134 at 5.2&nbsp;mA come to about 37&nbsp;mA per rail before any load,
-well inside the 130&nbsp;mA a 500-series slot allows.</p>
+<p>From the datasheets&rsquo; typical figures, seventeen op amp channels at 1.8&nbsp;mA (IC4A
+draws current even unused), the INA137 at 2.4&nbsp;mA and the DRV134 at 5.2&nbsp;mA come to
+about 38&nbsp;mA per rail before any load, well inside the 130&nbsp;mA a 500-series slot
+allows.</p>
+
+<div class="note">
+  <h4>The supply fault is fixed</h4>
+  <p>Until the board was laid out, IC2 and IC5 (now IC8) had a &minus;16&nbsp;V symbol on pin 4
+  (V+), which would have left the high-mid band, the shelves&rsquo; level stages and the summer
+  unpowered. On the ordered sheet every op amp has pin 4 on +16&nbsp;V and pin 11 on
+  &minus;16&nbsp;V, each with its own 100&nbsp;nF to ground.</p>
+</div>
 
 <div class="note warn">
-  <h4>IC2 and IC5 have no positive supply</h4>
-  <p>On the sheet, the symbol on <strong>pin 4 (V+)</strong> of both IC2 and IC5 is a
-  <code>&minus;16V</code> power symbol. Pin 11 (V&minus;) is on &minus;16&nbsp;V as well, so both
-  chips have &minus;16&nbsp;V on both supply pins and nothing across them. IC3 and IC4 are
-  wired correctly. KiCad&rsquo;s ERC doesn&rsquo;t flag it, because both pins are on a
-  legitimate power net.</p>
-  <p>As drawn, the high-mid band (IC2), both shelf level stages, the dry inverter and the summer
-  (all IC5) are dead, so nothing reaches the output. The fix is to change those two symbols to
-  <code>+16V</code>. Their 100&nbsp;nF decoupling capacitors then decouple +16&nbsp;V, as they
-  should. Do it before the board is routed, or the copper will carry the same mistake.</p>
+  <h4>IC4A is left floating</h4>
+  <p>With U1 doing the input buffering, IC4&rsquo;s unit A (pins 1&ndash;3) connects to nothing.
+  An unused op amp with open inputs can drift to a rail or oscillate, which adds supply current
+  and can couple noise into its neighbours in the same package. It is usually harmless, but if
+  the built module shows a whistle or a hot IC4, tie it off by hand: bridge pin 1 to pin 2, and
+  run a short wire from pin 3 to ground.</p>
 </div>
 """)
 
@@ -618,10 +634,9 @@ input (pin 1) and its output (pin 3), and its wiper is what the filter listens t
   <p>If pin 3 is a pot&rsquo;s clockwise end, as is usual, then on both mid bands clockwise
   <strong>cuts</strong> (RV8, RV5), <strong>lowers</strong> the frequency (RV9, RV6) and
   <strong>widens</strong> the band (RV7, RV2). On both shelves clockwise boosts and raises the
-  corner. Most desks boost and raise the frequency clockwise on every band. Swapping the outer
-  pins of RV5 and RV8, and of both gangs of RV6 and RV9, brings the mid bands into line; the
-  board isn&rsquo;t routed yet, so now is the cheap time. Whether width should go wider or
-  narrower clockwise is a panel-legend decision either way.</p>
+  corner. Most desks boost and raise the frequency clockwise on every band. The ordered boards
+  keep the wiring as drawn, so this is now a job for the faceplate legend: mark the mid
+  bands&rsquo; boost, frequency and width the way they actually turn.</p>
 </div>
 
 <h2>Checked against the team&rsquo;s simulation</h2>
@@ -647,14 +662,14 @@ takes it away.</p>
 <h2>How a shelf is made</h2>
 <p>After the two bands, buffer IC4B feeds three paths at once:</p>
 <ul>
-  <li><strong>Dry:</strong> IC5D inverts the signal (R44 and R49, both 10k).</li>
+  <li><strong>Dry:</strong> IC8D inverts the signal (R44 and R49, both 10k).</li>
   <li><strong>Low shelf:</strong> IC4D low-pass filters it. The filtered signal goes to the
-      summer directly through R54, and through the level stage IC5A, which inverts it, through
+      summer directly through R54, and through the level stage IC8A, which inverts it, through
       R52.</li>
   <li><strong>High shelf:</strong> the same, with IC4C high-pass filtering, the level stage
-      IC5B, and R53 and R51.</li>
+      IC8B, and R53 and R51.</li>
 </ul>
-<p>The summer, IC5C, adds the five inputs with its 10k feedback resistor R55. The dry signal
+<p>The summer, IC8C, adds the five inputs with its 10k feedback resistor R55. The dry signal
 comes in through 10k, so it reaches the output at unity, inverted back the right way up. Each
 filter comes in twice through 16k: once directly, and once through its level stage, inverted.
 With a level stage at a gain of exactly 1, those two copies are equal and opposite and cancel,
@@ -716,7 +731,8 @@ reads less there.</p>
         to +{FLATDB:.1f}&nbsp;dB around 12&nbsp;kHz. C33 (220&nbsp;pF across the high shelf&rsquo;s
         level stage) rolls off the inverted copy of the high-passed signal but not the direct
         one, so they stop cancelling at the top of the band. At 22&nbsp;pF the module is flat to
-        0.05&nbsp;dB. C29 on the low shelf does the same thing in principle, but there is almost
+        0.05&nbsp;dB. The board is ordered with 220&nbsp;pF, so fitting 22&nbsp;pF is a
+        build-time choice, not a board change. C29 on the low shelf does the same thing in principle, but there is almost
         no low-passed signal up where it acts.</li>
   </ul>
 </div>
@@ -725,80 +741,102 @@ reads less there.</p>
 PAGES['board.html'] = ("Board &amp; parts", """
 <p class="eyebrow">Practical &mdash; 06</p>
 <h1>Board and parts</h1>
-<p class="lede">The board was started on 5&nbsp;October: the outline, the card edge, the input
-section, part of the low-mid band and all ten pots are placed. Nothing is routed yet.</p>
+<p class="lede">Two boards, ordered on 8&nbsp;October: the four-layer main card, and a small top
+board that carries the four dual frequency pots. They are drawn side by side in one KiCad
+file.</p>
 
 <figure>
-  <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of the equaliser board as placed so far" loading="lazy"></div>
-  <figcaption><span>The board at <code>10142c5</code>, from above. Parts not yet placed sit around the outline. The pots are stand-in blocks: KiCad&rsquo;s library has no model for the RK097</span>
+  <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of both equaliser boards, the pot board on the left beside the main card" loading="lazy"></div>
+  <figcaption><span>Both boards at <code>4d106d3</code>, from above. The narrow strip on the left with the four large pots is the top board; the rest is the main card. The pots are stand-in blocks: KiCad&rsquo;s library has no model for the RK097</span>
   <a href="files/combined-3d-top.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
 </figure>
 
-<h2>Where it stands</h2>
-""" + table(["", "Now"],
-            [["Outline", "The 500-series card template with its edge-connector tab. KiCad reports it as not closed, so DRC can&rsquo;t check against it yet"],
-             ["Placed", "44 of the 127 footprints: J1, the input section and bypass switch at the back, IC1, IC3, IC4, all ten pots along the front edge, the four mounting holes"],
-             ["Not placed", "IC2, IC5, IC6 and most of the resistors and capacitors"],
-             ["Tracks", "None yet"],
-             ["Front panel", "Not drawn yet"]],
+<h2>What was ordered</h2>
+""" + table(["", "Main card", "Top board"],
+            [["Size", "136.85 &times; 105&nbsp;mm, plus the 8&nbsp;mm edge-connector tab", "22.5 &times; 105&nbsp;mm"],
+             ["Carries", "Everything else, including the six single pots along its front edge", "RV1, RV4, RV6, RV9 (the frequency pots), the low shelf&rsquo;s 20&nbsp;nF caps, and the resistors at the ends of the pot tracks"],
+             ["Joined by", "J3, 17-pin header", "J2, 17-pin header, wired pin for pin to J3"],
+             ["Mounting", "H2, H3 (M3)", "H1, H4 (M3)"]],
+            ["r", "", ""]) + """
+""" + table(["", "Both boards"],
+            [["Layers", "Four. Ground pour on In1 on each board; tracks on the front, back and In2"],
+             ["Tracks", "832 segments and 71 vias"],
+             ["Parts", "133 footprints. Through-hole except the five op amps (SOIC)"],
+             ["Gerbers", "<code>500_Series_EQ.zip</code> in the repository, exported 8&nbsp;October with KiCad 9.0.7"]],
             ["r", ""]) + """
 
-<div class="note warn">
-  <h4>Two placement questions to settle before routing</h4>
-  <p><strong>The knobs, as placed, are 7.5&nbsp;mm apart in a single line.</strong> The pots are
-  right-angle parts on the main card, in two rows along its front edge. A right-angle pot puts
-  its shaft at a fixed height above the board, so every shaft comes through the panel on the
-  same line, wherever the pot sits on the card. With the ten pots alternating between the rows,
-  their shafts are 7.5&nbsp;mm apart, centre to centre. That is too close for any knob larger
-  than about 7&nbsp;mm, and the back row&rsquo;s shafts have to pass between the front
-  row&rsquo;s bodies. Ten knobs in one line on a 133&nbsp;mm panel get about 12&nbsp;mm each
-  at best, once the mounting screws have their space. The
-  compressor solved the same problem with a <a href="../compressor/boards.html">front
-  board</a> behind the panel; the <a href="../faceplate/mounting.html">faceplate guide</a>
-  compares the options.</p>
-  <p><strong>The bypass switch is at the back.</strong> SW1 is placed beside J1, at the rack end
-  of the card, so it can&rsquo;t be reached once the module is in the rack. If bypass is a panel
-  control, it needs to move to the front, as a panel or right-angle toggle.</p>
-</div>
+<h2>How the two boards fit together</h2>
+<p>The repository doesn&rsquo;t say in words, but the drawing points one way. The top
+board&rsquo;s holes H1 and H4 sit exactly 22.5&nbsp;mm (its own width) from the main
+card&rsquo;s H2 and H3, and the parts list orders two 20&nbsp;mm M3 standoffs. So the top board
+appears to stack 20&nbsp;mm above the main card, holes over holes, with its front edge in line
+with the card&rsquo;s. That gives the panel two columns of knobs 20&nbsp;mm apart, which is what
+fixes the earlier layout&rsquo;s ten shafts crammed into one line:</p>
+""" + table(["Height on the card", "Main card column", "Top board column"],
+            [["64.5&nbsp;mm", "RV3, low shelf level", ""], ["72&nbsp;mm", "", "RV1, low shelf frequency"],
+             ["79.5&nbsp;mm", "RV7, low-mid width", ""], ["87&nbsp;mm", "", "RV9, low-mid frequency"],
+             ["94.5&nbsp;mm", "RV8, low-mid boost/cut", ""],
+             ["109&nbsp;mm", "RV2, high-mid width", ""], ["116.5&nbsp;mm", "", "RV6, high-mid frequency"],
+             ["124&nbsp;mm", "RV5, high-mid boost/cut", ""], ["131.5&nbsp;mm", "", "RV4, high shelf frequency"],
+             ["139&nbsp;mm", "RV10, high shelf level", ""]],
+            ["n", "", ""]) + """
+<p>Heights are the pot positions measured down the card in the board file, so they read in the
+board&rsquo;s own coordinates; the faceplate needs them measured from the panel&rsquo;s top
+edge. J2 runs along the top board and J3 across the main card, so the 17 links between them are
+wires or a ribbon rather than a plug-in header pair.</p>
 
-<h2>Footprints to check</h2>
+<h2>What KiCad&rsquo;s checks say</h2>
+<p>We ran KiCad 10&rsquo;s design-rule check on the board as ordered. Nothing in it stops the
+module working; three things are worth knowing:</p>
 <ul>
-  <li><strong>C18 and C20</strong> (100&nbsp;&micro;F) are on 5&nbsp;mm ceramic disc footprints.
-      The parts list has an 8&nbsp;mm electrolytic can (Jaycar RE6334), which needs a radial
-      footprint like C4&rsquo;s.</li>
-  <li><strong>C2 and C7</strong> (10&nbsp;&micro;F) are on a 4 &times; 2.5&nbsp;mm film-capacitor
-      footprint. The parts list has bipolar electrolytics (Jaycar RY6810), so these need radial
-      footprints too.</li>
-  <li><strong>J2 and J3</strong>, the two 24-pin headers, have no footprint and nothing
-      connected. If they are a leftover, delete them; if they are meant for a front board, they
-      need wiring.</li>
-  <li><strong>The pots</strong> use Alps RK097 footprints. The parts list&rsquo;s dual pot is a
-      Bourns PTD902; check its pins against the RK097 footprint before ordering.</li>
+  <li><strong>The card edge pads are wired on one face only.</strong> Each J1 pin has a pad on
+      both faces of the card, and the tracks reach one of them. The compressor joins both faces
+      with vias. In a rack whose connector touches both faces of each finger it makes no
+      difference; with a meter, check each used pin reaches the circuit from the slot.</li>
+  <li><strong>The top board&rsquo;s ground</strong> has no copper link to the main card&rsquo;s;
+      it arrives through J2/J3 pin 15, so that wire must be fitted.</li>
+  <li><strong>The outline</strong> is reported as malformed because the pot footprints draw
+      their own edge marks and the two boards share an edge. The boards were ordered from it
+      as it is; it only matters if the file is edited and re-checked.</li>
+</ul>
+
+<h2>Fit notes for the build</h2>
+<ul>
+  <li><strong>C18 and C20</strong> (100&nbsp;&micro;F) are on 5&nbsp;mm disc footprints and
+      the parts list has 8&nbsp;mm electrolytic cans (Jaycar RE6334): spread their 3.5&nbsp;mm
+      leads to the 5&nbsp;mm holes, minding the polarity, which the footprint
+      doesn&rsquo;t mark.</li>
+  <li><strong>C2 and C7</strong> (10&nbsp;&micro;F) are on a 2.5&nbsp;mm film footprint and
+      the parts list has bipolar electrolytics (Jaycar RY6810), so their leads need the same
+      treatment.</li>
+  <li><strong>IC1, the INA137,</strong> has a DIP-8 footprint, and the parts list orders the
+      SOIC version (INA137UA) with a SOIC-to-DIP adapter.</li>
+  <li><strong>The pots</strong> are Bourns PTD901 (single) and PTD902 (dual) on Alps RK097
+      footprints. Check one against its footprint before soldering all ten.</li>
 </ul>
 
 <h2>The parts list</h2>
-<p><code>BOM.xlsx</code> in the repository is the team&rsquo;s list so far. The capacitors are
-specified in detail; the rest is quantities.</p>
-""" + table(["Parts", "Specified as", "Supplier"],
-            [["Filter capacitors, 100&nbsp;pF to 10&nbsp;nF", "TDK FG28 C0G, 5% radial, 5&nbsp;mm pitch", "DigiKey / element14"],
+<p><code>BOM.xlsx</code> (updated 11&nbsp;October) has part numbers for everything that was
+ordered:</p>
+""" + table(["Parts", "Ordered as", "Supplier"],
+            [["Filter capacitors, 100&nbsp;pF to 10&nbsp;nF", "TDK FG28 C0G, 5% radial, 5&nbsp;mm pitch", "DigiKey"],
+             ["Op amps", "OPA1644AID &times; 4, OPA1641AID &times; 1", "DigiKey"],
+             ["Line receiver and driver", "INA137UA with a SOIC-to-DIP adapter, DRV134PA", "DigiKey"],
+             ["Dual pots", "Bourns PTD902: 100k log, 100k linear, 10k linear &times; 2", "DigiKey"],
+             ["Single pots", "Bourns PTD901 10k linear &times; 6", "DigiKey"],
+             ["Ferrite beads", "Laird 28C0236-0JW-10 &times; 4", "DigiKey"],
+             ["Standoffs", "M3 &times; 20&nbsp;mm aluminium hex &times; 2", "DigiKey"],
              ["100&nbsp;nF and 1&nbsp;&micro;F", "50&nbsp;V monolithic ceramic (RC5490, RC5499)", "Jaycar"],
              ["100&nbsp;&micro;F reservoirs", "35&nbsp;V low-ESR electrolytic (RE6334)", "Jaycar"],
              ["47&nbsp;&micro;F and 10&nbsp;&micro;F coupling", "Bipolar electrolytic (RY6820, RY6810)", "Jaycar"],
-             ["Resistors", "Quantities by value only", "&mdash;"],
-             ["Op amps", "TL084 &times; 4", "&mdash;"],
-             ["Dual pots", "Bourns PTD902-1015K-A104, 100k log", "DigiKey / element14"],
-             ["Standoffs", "M3 &times; 20&nbsp;mm aluminium hex", "DigiKey / element14"]],
+             ["Resistors", "0.5&nbsp;W metal film, packs of 8 (RR05xx)", "Jaycar"]],
             ["r", "", ""]) + """
 <div class="note">
-  <h4>TL084 or OPA1644</h4>
-  <p>The sheet says OPA1644 and the parts list says TL084. They share the quad pinout and both
-  have JFET inputs, so either works in the circuit, and the TL084 comes in TSSOP-14 to fit the
-  footprint. The OPA1644 is about three times quieter (5&nbsp;nV/&radic;Hz against the
-  TL084&rsquo;s 18) and drives the 10k loads here more comfortably. Settle on one so the sheet
-  and the order agree.</p>
-  <p>The dual pot is log taper, and these pages assume linear: on RV1 and RV4, wired as
-  variable resistors, a log track spreads the frequency sweep more evenly across the knob, but
-  it changes where on the travel each corner frequency sits.</p>
+  <h4>One log pot</h4>
+  <p>One of the two 100k duals is ordered log taper and the other linear; these pages assume
+  linear throughout. On RV1 or RV4, wired as variable resistors, a log track moves where on the
+  knob&rsquo;s travel each corner frequency falls, not the range itself. Whichever one gets the
+  log pot, its legend marks need to come from turning it, not from the linear figures here.</p>
 </div>
 """)
 
@@ -816,8 +854,8 @@ million, and solves the circuit at 401 frequencies from 10&nbsp;Hz to 100&nbsp;k
 same nodal analysis SPICE does for an AC run. It starts at the INA137&rsquo;s output and ends at
 the DRV134&rsquo;s input; the receiver&rsquo;s &minus;6&nbsp;dB and the driver&rsquo;s +6&nbsp;dB
 cancel, so that is also the module&rsquo;s response from input to output.</p>
-<p>It solves the circuit as it should be powered: the two op amps with their supply pin on the
-wrong rail are treated as working (see <a href="io.html#power">power</a>).</p>
+<p>The four frequency pots are on the top board, connected through J2 and J3; the solver joins
+the two headers pin for pin, as the wiring between the boards does.</p>
 <p>Ideal op amps are a fair assumption here. The OPA1644 has 11&nbsp;MHz of gain-bandwidth; at
 20&nbsp;kHz that still leaves it hundreds of times more gain than any stage asks for. What it
 cannot show is noise, headroom or the op amps&rsquo; own distortion &mdash; those need the real
@@ -850,32 +888,48 @@ defined&rdquo;. A copy of the library is already committed beside the schematic,
 will run anywhere.</p>
 """)
 
-PAGES['status.html'] = ("What is left", """
+PAGES['status.html'] = ("Building it", """
 <p class="eyebrow">Practical &mdash; 08</p>
-<h1>What is left</h1>
-<p class="lede">The circuit is complete. What remains is one wiring fix, some decisions that
-are cheap now and dear after routing, and the board.</p>
-""" + table(["Step", "Why it comes here"],
-            [["Put IC2 and IC5 on +16&nbsp;V",
-              "Their V+ pins are on &minus;16&nbsp;V, so as drawn the module has no output. Two symbols to change (<a href=\"io.html#power\">power</a>)."],
-             ["Decide the knob directions",
-              "The mid bands cut and lower their frequency clockwise, the shelves boost and raise it. Swapping pot pins is free before routing (<a href=\"bands.html\">bands</a>)."],
-             ["Settle the panel",
-              "As placed, ten shafts come through the panel in one line, 7.5&nbsp;mm apart. A front board, or a different arrangement, changes the placement (<a href=\"board.html\">board</a>)."],
-             ["Move the bypass switch",
-              "If bypass is a panel control, SW1 has to be at the front of the card, not by J1."],
-             ["Fix the footprints",
-              "Radial footprints for the 100&nbsp;&micro;F and 10&nbsp;&micro;F electrolytics; delete or wire J2 and J3."],
-             ["Decide where the grounds join",
-              "Pins 5 and 13 are on one net. Choose the single point where supply return meets audio ground."],
-             ["Consider C33 and the high shelf&rsquo;s divider",
-              "22&nbsp;pF for C33 makes the module flat; the R12/R13 divider is why the high shelf is weaker (<a href=\"filters.html\">shelves</a>). Both optional."],
-             ["Finish placement, close the outline and route", "Then DRC can check the board against the sheet."],
-             ["Finish the parts list",
-              "Part numbers for the resistors, the 10k pots, the switch and the chips, and one op amp on both the sheet and the order."],
-             ["Draw the faceplate",
-              "From the board&rsquo;s shaft positions, as the compressor&rsquo;s is drawn from its front board."]],
+<h1>Building it</h1>
+<p class="lede">The boards are ordered and the module is being built. Most of the questions
+this page used to list were settled before ordering; what is left is for the bench and the
+faceplate.</p>
+
+<h2>Settled before ordering</h2>
+""" + table(["Was", "Now"],
+            [["IC2 and IC5 had V+ on &minus;16&nbsp;V", "Fixed: every op amp is powered from both rails"],
+             ["Ten shafts in one line, 7.5&nbsp;mm apart", "The frequency pots moved to a top board, giving two columns of knobs (<a href=\"board.html\">board</a>)"],
+             ["J2 and J3 unconnected, no footprint", "17-pin headers joining the two boards"],
+             ["Parts list said TL084", "OPA1644 ordered, matching the sheet"],
+             ["Board not routed", "Routed on four layers and ordered"]],
             ["r", ""]) + """
+
+<h2>On the bench</h2>
+""" + table(["Item", "What to do"],
+            [["Wire J2 to J3", "All 17 pins, pin for pin, including pin 15 (the top board&rsquo;s only ground)"],
+             ["C18, C20, C2, C7", "Electrolytics on footprints drawn for other parts: bend the leads, and fit C18/C20 the right way round (<a href=\"board.html\">fit notes</a>)"],
+             ["Card edge", "Each J1 pin is wired on one face only: check continuity from the rack slot"],
+             ["IC4A", "Unused, inputs open. Tie it off if the module whistles (<a href=\"io.html#power\">power</a>)"],
+             ["C33", "Optional: 22&nbsp;pF instead of 220&nbsp;pF flattens the 12&nbsp;kHz rise (<a href=\"filters.html\">shelves</a>)"],
+             ["Bypass", "SW1 is at the rack end of the card, so set it before the module goes in"]],
+            ["r", ""]) + """
+
+<h2>Bringing it up</h2>
+<ol>
+  <li>Before soldering the five op amps, power the board from a bench supply through the card
+  edge and check the rails at their pads: +16&nbsp;V on pin 4 and &minus;16&nbsp;V on pin 11 of
+  each OPA1644, pin 7 and pin 4 on U1.</li>
+  <li>Fit everything, power up with every knob centred and SW1 on the EQ side, and feed a
+  1&nbsp;kHz tone. The output should match the input level to within half a dB.</li>
+  <li>Sweep each boost/cut knob and check its band moves. If pin 3 of each pot is its
+  clockwise end, the mid bands boost anticlockwise (<a href="bands.html">bands</a>).</li>
+  <li>Flip SW1 to bypass: the output should equal the input exactly, powered or not.</li>
+</ol>
+
+<h2>Still to draw</h2>
+<p>The faceplate: ten knob holes in two columns from the pot positions above, plus the legend,
+which has to follow the mid bands&rsquo; reversed directions. The compressor&rsquo;s
+<a href="../compressor/printed.html">printed faceplate</a> is the pattern to copy.</p>
 """)
 
 import content_files

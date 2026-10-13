@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html" class="on"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html" class="on"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>Building it</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -55,14 +55,14 @@ takes it away.</p>
 <h2>How a shelf is made</h2>
 <p>After the two bands, buffer IC4B feeds three paths at once:</p>
 <ul>
-  <li><strong>Dry:</strong> IC5D inverts the signal (R44 and R49, both 10k).</li>
+  <li><strong>Dry:</strong> IC8D inverts the signal (R44 and R49, both 10k).</li>
   <li><strong>Low shelf:</strong> IC4D low-pass filters it. The filtered signal goes to the
-      summer directly through R54, and through the level stage IC5A, which inverts it, through
+      summer directly through R54, and through the level stage IC8A, which inverts it, through
       R52.</li>
   <li><strong>High shelf:</strong> the same, with IC4C high-pass filtering, the level stage
-      IC5B, and R53 and R51.</li>
+      IC8B, and R53 and R51.</li>
 </ul>
-<p>The summer, IC5C, adds the five inputs with its 10k feedback resistor R55. The dry signal
+<p>The summer, IC8C, adds the five inputs with its 10k feedback resistor R55. The dry signal
 comes in through 10k, so it reaches the output at unity, inverted back the right way up. Each
 filter comes in twice through 16k: once directly, and once through its level stage, inverted.
 With a level stage at a gain of exactly 1, those two copies are equal and opposite and cancel,
@@ -110,14 +110,15 @@ reads less there.</p>
         to +0.5&nbsp;dB around 12&nbsp;kHz. C33 (220&nbsp;pF across the high shelf&rsquo;s
         level stage) rolls off the inverted copy of the high-passed signal but not the direct
         one, so they stop cancelling at the top of the band. At 22&nbsp;pF the module is flat to
-        0.05&nbsp;dB. C29 on the low shelf does the same thing in principle, but there is almost
+        0.05&nbsp;dB. The board is ordered with 220&nbsp;pF, so fitting 22&nbsp;pF is a
+        build-time choice, not a board change. C29 on the low shelf does the same thing in principle, but there is almost
         no low-passed signal up where it acts.</li>
   </ul>
 </div>
 
 <div class="next"><a href="bands.html">&larr; Parametric bands</a><a href="board.html">Board &amp; parts &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4d106d3<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

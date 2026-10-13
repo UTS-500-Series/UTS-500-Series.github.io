@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Preamp module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="input.html" class="on"><i>03</i><span>Input and phantom power</span></a><a href="gain.html"><i>04</i><span>Gain stage</span></a><a href="output.html"><i>05</i><span>Output stage</span></a><a href="power.html"><i>06</i><span>Power and J1</span></a><h4>Practical</h4><a href="board.html"><i>07</i><span>The board, and what is left</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="input.html" class="on"><i>03</i><span>Input and phantom power</span></a><a href="gain.html"><i>04</i><span>Gain stage</span></a><a href="output.html"><i>05</i><span>Output stage</span></a><a href="power.html"><i>06</i><span>Power and J1</span></a><h4>Practical</h4><a href="board.html"><i>07</i><span>The board and building it</span></a><a href="files.html"><i>08</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -47,14 +47,19 @@ connector.</p>
 <p>Condenser microphones take their power down the same two wires as the audio. The same DC
 voltage is put on both legs through a pair of equal resistors, so it is common-mode: invisible
 to a balanced input, but available to the microphone.</p>
-<div class="tw"><table><thead><tr><th class="r">Part</th><th class="">Connected</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">SW1</td><td class="">J1 pin 15 (+48&nbsp;V) to the feed node</td><td class="">Phantom on/off, on a 2-pin header for a panel switch</td></tr><tr><td class="r">C1</td><td class="">Feed node to AGND</td><td class="">Decouples the switched 48&nbsp;V</td></tr><tr><td class="r">R1</td><td class="">Feed node to <code>+MicIN</code></td><td class="">Feed resistor, hot leg</td></tr><tr><td class="r">R2</td><td class="">Feed node to <code>-MicIN</code></td><td class="">Feed resistor, cold leg</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="r">Part</th><th class="">Connected</th><th class="n">Value</th><th class="">Job</th></tr></thead><tbody><tr><td class="r">SW1</td><td class="">J1 pin 15 (+48&nbsp;V) to the feed node</td><td class="n">&mdash;</td><td class="">Phantom on/off, on a 2-pin header for a panel switch</td></tr><tr><td class="r">C1</td><td class="">Feed node to AGND</td><td class="n">Not given by ESP; 63&nbsp;V or more</td><td class="">Decouples the switched 48&nbsp;V</td></tr><tr><td class="r">R1</td><td class="">Feed node to <code>+MicIN</code></td><td class="n">6.8&nbsp;k&Omega;</td><td class="">Feed resistor, hot leg</td></tr><tr><td class="r">R2</td><td class="">Feed node to <code>-MicIN</code></td><td class="n">6.8&nbsp;k&Omega;</td><td class="">Feed resistor, cold leg</td></tr></tbody></table></div>
 <p>R1 and R2 must match closely. If they differ, the phantom voltage is no longer equal on both
-legs, and the difference appears as signal.</p>
+legs, and the difference appears as signal. ESP's point in Project 96: two 0.1% 6.81&nbsp;k&Omega;
+resistors at opposite ends of their tolerance can differ by 13.6&nbsp;&Omega;, so sorting
+ordinary 1% 6.8&nbsp;k&Omega; resistors with a meter to within 10&nbsp;&Omega; does better for
+less. Into a short circuit the pair passes 48&nbsp;V / 3.4&nbsp;k&Omega; = 14&nbsp;mA.</p>
 
 <h2>Keeping 48&nbsp;V off the transistors</h2>
-<p>C2 and C3 sit in series with each leg and block the phantom DC. The microphone side of each
-sits at 48&nbsp;V whenever SW1 is on, so they need at least a 50&nbsp;V rating, and if they are
-electrolytics, their positive ends go to the microphone side. After them, R3 and R4 lead to
+<p>C2 and C3, 22&nbsp;&micro;F, sit in series with each leg and block the phantom DC. The
+microphone side of each sits at 48&nbsp;V whenever SW1 is on, so ESP calls for 50&nbsp;V or
+more, with the positive ends to the microphone side. Into the 3.3&nbsp;k&Omega; bias resistors
+they roll off at about 2&nbsp;Hz. ESP suggests 10&nbsp;&micro;F/50&nbsp;V polyester instead for
+a cost-no-object build. After them, R3 and R4, 10&nbsp;&Omega; each, lead to
 <code>+PreIN</code> and <code>-PreIN</code>.</p>
 
 <h2>The clamps</h2>
@@ -64,14 +69,21 @@ zeners back to back to ground: D1 and D4 on <code>+PreIN</code>, D2 and D3 on
 <code>-PreIN</code>. Whichever way the surge goes, one zener conducts forward and the other at
 its zener voltage, so the base can never swing further than that. R3 and R4 limit the peak
 current through them.</p>
-<p>The zeners are drawn as <code>1N47xxA</code>, the 1&nbsp;W family, with the voltage not yet
-chosen. It has to sit above the largest signal the input will ever see and well below what the
-transistors' bases can take.</p>
+<p>The zeners are 10&nbsp;V, 1&nbsp;W (1N4740A, from the <code>1N47xxA</code> family the sheet
+draws). ESP chose 10&nbsp;V because no microphone gets near it, and 1&nbsp;W because the surge
+through them is brief but large. Back to back, each pair clamps its input at about
+&plusmn;10.7&nbsp;V.</p>
 
 <h2>Biasing the bases</h2>
-<p>R13 (<code>+PreIN</code>) and R12 (<code>-PreIN</code>) run from each base to AGND. With C2
-and C3 blocking DC from the microphone, these are what hold the bases at 0&nbsp;V, and with the
-feed resistors they set the input impedance the microphone sees.</p>
+<p>R13 (<code>+PreIN</code>) and R12 (<code>-PreIN</code>), 3.3&nbsp;k&Omega; each, run from
+each base to AGND. With C2 and C3 blocking DC from the microphone, these are what hold the bases
+at 0&nbsp;V. Together they load the microphone with 6.6&nbsp;k&Omega;; the two feed resistors,
+13.6&nbsp;k&Omega; across the pair, sit in parallel with that, so the microphone sees about
+4.4&nbsp;k&Omega;. ESP set the input high on purpose: professional preamps sit at
+2.2&nbsp;k&Omega; or more, and matching a 150&ndash;600&nbsp;&Omega; microphone would throw
+away 6&nbsp;dB of signal without lowering the noise.</p>
+<p>With nothing plugged in and the gain up, the preamp hisses. That is the 3.3&nbsp;k&Omega;
+resistors' own thermal noise; a microphone's low impedance shorts most of it out.</p>
 
 <div class="note warn">
   <h4>Switching phantom</h4>
@@ -82,7 +94,7 @@ feed resistors they set the input impedance the microphone sees.</p>
 
 <div class="next"><a href="schematic.html">&larr; The schematic</a><a href="gain.html">Gain stage &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Preamp &middot; written from the Pre-Amp repository at 5e6a308<br>
+  UTS Mini Mixing Desk &mdash; Preamp &middot; written from the Pre-Amp repository at 5e6a308, with ESP Project 66 values<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>

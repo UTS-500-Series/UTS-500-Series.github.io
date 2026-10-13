@@ -1370,8 +1370,11 @@ _BOM = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'site', 'c
 
 
 def _bom_rows():
+    """The CSV's rows as dicts keyed by its own header, so added columns don't shift anything."""
     rows = list(csv.reader(open(_BOM, newline='')))
-    head, body = rows[0], [r for r in rows[1:] if r and r[0]]
+    head = rows[0]
+    stock = next(h for h in head if h.startswith('Stock'))
+    body = [dict(zip(head, r), Stock=r[head.index(stock)]) for r in rows[1:] if r and r[0]]
     total = next(r for r in rows[1:] if r and not r[0] and 'total' in ' '.join(r))
     return head, body, total
 
@@ -1380,16 +1383,19 @@ def _bom_table(body, board):
     e = lambda s: html.escape(s, quote=False)
     out = []
     for r in body:
-        if r[0] != board:
+        if r['Board'] != board:
             continue
-        refs, value, qty, code, desc, _, packs, _, line, stock, notes, alt = r[1:13]
+        refs, value, code, desc = r['References'], r['Value'], r['Altronics code'], r['Altronics description']
+        packs, line, notes, alt = r['Order (packs)'], r['Line total inc GST'], r['Notes'], r['If not at Altronics']
+        link = r.get('Altronics link', '')
         if code == 'NOT STOCKED':
             part = '<em>not stocked</em>'
             notes = ' '.join(x for x in (notes, alt and 'Instead: ' + alt) if x)
         else:
+            c = '<a href="%s"><code>%s</code></a>' % (e(link), e(code)) if link else '<code>%s</code>' % e(code)
             # the pack count, or "see C36" where another line already orders this part
-            part = '<code>%s</code> &times;&nbsp;%s' % (e(code), e(packs)) if packs[:1].isdigit() \
-                else '<code>%s</code>, %s' % (e(code), e(packs))
+            part = '%s &times;&nbsp;%s' % (c, e(packs)) if packs[:1].isdigit() \
+                else '%s, %s' % (c, e(packs))
             if board == 'hardware':
                 notes = ' '.join(x for x in (desc + '.', notes) if x)
         out.append([e(refs.replace(' ', ', ')) or e(desc), e(value), part,
@@ -1400,8 +1406,8 @@ def _bom_table(body, board):
 
 def _parts_page():
     head, body, total = _bom_rows()
-    stock_date = head[10].rsplit(' on ', 1)[-1]
-    alt = sum(float(r[9]) for r in body if r[9])
+    stock_date = next(h for h in head if h.startswith('Stock')).rsplit(' on ', 1)[-1]
+    alt = sum(float(r['Line total inc GST']) for r in body if r['Line total inc GST'])
     return ("Parts list", """
 <p class="eyebrow">Practical</p>
 <h1>Parts list</h1>

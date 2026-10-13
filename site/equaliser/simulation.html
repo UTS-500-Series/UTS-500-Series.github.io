@@ -22,7 +22,7 @@ try {
 <aside class="side">
   <a class="brand" href="../index.html"><img src="../brand/mark.svg" width="40" height="40" alt=""><div><b>UTS Mini Mixing Desk</b><span>Equaliser module</span></div></a>
   <button class="menu" onclick="document.querySelector('nav').classList.toggle('open')">Contents</button>
-  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html" class="on"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>What is left</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
+  <nav><h4>Start here</h4><a href="index.html"><i>01</i><span>Overview</span></a><a href="schematic.html"><i>02</i><span>The schematic</span></a><h4>The circuit</h4><a href="io.html"><i>03</i><span>Input, output &amp; power</span></a><a href="bands.html"><i>04</i><span>Parametric bands</span></a><a href="filters.html"><i>05</i><span>The shelves</span></a><h4>Practical</h4><a href="board.html"><i>06</i><span>Board &amp; parts</span></a><a href="simulation.html" class="on"><i>07</i><span>Simulating it</span></a><a href="status.html"><i>08</i><span>Building it</span></a><a href="files.html"><i>09</i><span>Design files</span></a></nav>
   <div class="side-foot">
     <button class="wbtn" id="wbtn" type="button" aria-pressed="false">
       <span class="wbtn-ico" aria-hidden="true"></span><span class="wbtn-txt">Wide layout</span>
@@ -44,8 +44,8 @@ million, and solves the circuit at 401 frequencies from 10&nbsp;Hz to 100&nbsp;k
 same nodal analysis SPICE does for an AC run. It starts at the INA137&rsquo;s output and ends at
 the DRV134&rsquo;s input; the receiver&rsquo;s &minus;6&nbsp;dB and the driver&rsquo;s +6&nbsp;dB
 cancel, so that is also the module&rsquo;s response from input to output.</p>
-<p>It solves the circuit as it should be powered: the two op amps with their supply pin on the
-wrong rail are treated as working (see <a href="io.html#power">power</a>).</p>
+<p>The four frequency pots are on the top board, connected through J2 and J3; the solver joins
+the two headers pin for pin, as the wiring between the boards does.</p>
 <p>Ideal op amps are a fair assumption here. The OPA1644 has 11&nbsp;MHz of gain-bandwidth; at
 20&nbsp;kHz that still leaves it hundreds of times more gain than any stage asks for. What it
 cannot show is noise, headroom or the op amps&rsquo; own distortion &mdash; those need the real
@@ -83,9 +83,9 @@ defined&rdquo;. A copy of the library is already committed beside the schematic,
 <code>LT_SPICE/BandA/OPA164x.LIB</code>. Point the model at that with a relative path and it
 will run anywhere.</p>
 
-<div class="next"><a href="board.html">&larr; Board &amp; parts</a><a href="status.html">What is left &rarr;</a></div>
+<div class="next"><a href="board.html">&larr; Board &amp; parts</a><a href="status.html">Building it &rarr;</a></div>
 <footer>
-  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 10142c5<br>
+  UTS Mini Mixing Desk &mdash; Equaliser &middot; written from the Equaliser repository at 4d106d3<br>
   <a href="../index.html">All modules</a>
 </footer>
 </div></main>
