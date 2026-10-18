@@ -14,7 +14,7 @@ also render correctly if this is ever demoted to an ordinary project site.
 
 | Module | Status | Source |
 |---|---|---|
-| Compressor | **Being built** — schematic complete, verified and simulated, main and front boards ordered (3 Oct), parts ordered from Altronics and element14, printable faceplate | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
+| Compressor | **Being built** — schematic complete, verified and simulated, main and front boards ordered (3 Oct), parts bought from Altronics, DigiKey and Jaycar, printable faceplate | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
 | Preamp | **Being built** — board ordered from the routed layout; values from ESP Projects 66 and 96, since the sheet has none | [`UTS-500-Series/Pre-Amp`](https://github.com/UTS-500-Series/Pre-Amp) |
 | Equaliser | **Being built** — whole circuit on one sheet with values (low and high shelves, two parametric bands, balanced in and out); four-layer main card and a pot board ordered (8 Oct) | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
 
