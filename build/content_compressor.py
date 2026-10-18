@@ -108,7 +108,7 @@ is far more forgiving of component tolerance. Most classic bus compressors work 
   <a class="card" href="printed.html"><b>Printing the faceplate</b><span>A faceplate for an ordinary 3D printer, in one colour or two, with a fit test to print first.</span></a>
   <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both routed, and ordered on 3 October.</span></a>
   <a class="card" href="simulation.html"><b>The simulation</b><span>What ngspice found when the schematic was simulated, and the fourteen values that changed because of it.</span></a>
-  <a class="card" href="parts.html"><b>Parts list</b><span>Every part, ordered from Altronics where they stock it, with the rest from element14.</span></a>
+  <a class="card" href="parts.html"><b>Parts list</b><span>Every part, and whether it came from Altronics, DigiKey or Jaycar.</span></a>
 </div>
 
 <div class="note warn">
@@ -1366,17 +1366,15 @@ from the command line, in about an hour.</p>
 # ============================================================ 12 PARTS
 import csv, html, os
 _BOM = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'site', 'compressor',
-                    'parts', 'altronics.csv')
+                    'parts', 'ordered.csv')
+# What each order came to, inc GST, before postage. Jaycar is the $48.75 cart plus the two
+# RY6804s added at checkout for C14/C35.
+_SPENT = [("Altronics", "$99.05"), ("DigiKey", "AU$62.47"), ("Jaycar", "$49.85")]
 
 
 def _bom_rows():
-    """The CSV's rows as dicts keyed by its own header, so added columns don't shift anything."""
-    rows = list(csv.reader(open(_BOM, newline='')))
-    head = rows[0]
-    stock = next(h for h in head if h.startswith('Stock'))
-    body = [dict(zip(head, r), Stock=r[head.index(stock)]) for r in rows[1:] if r and r[0]]
-    total = next(r for r in rows[1:] if r and not r[0] and 'total' in ' '.join(r))
-    return head, body, total
+    """bom/ordered.csv as dicts keyed by its own header, so added columns don't shift anything."""
+    return [r for r in csv.DictReader(open(_BOM, newline='')) if r['Board']]
 
 
 def _bom_table(body, board):
@@ -1385,62 +1383,61 @@ def _bom_table(body, board):
     for r in body:
         if r['Board'] != board:
             continue
-        refs, value, code, desc = r['References'], r['Value'], r['Altronics code'], r['Altronics description']
-        packs, line, notes, alt = r['Order (packs)'], r['Line total inc GST'], r['Notes'], r['If not at Altronics']
-        link = r.get('Altronics link', '')
-        if code == 'NOT STOCKED':
-            part = '<em>not stocked</em>'
-            notes = ' '.join(x for x in (notes, alt and 'Instead: ' + alt) if x)
+        refs, value, sup, code = r['References'], r['Value'], r['Supplier'], r['Order code']
+        part, qty, link, notes = r['Part'], r['Qty ordered'], r['Link'], r['Notes']
+        if sup == 'none':
+            sup, got = '&mdash;', ''
+        elif sup == 'NOT ORDERED':
+            sup, got = '<em>not bought yet</em>', code and '<code>%s</code>' % e(code)
         else:
             c = '<a href="%s"><code>%s</code></a>' % (e(link), e(code)) if link else '<code>%s</code>' % e(code)
-            # the pack count, or "see C36" where another line already orders this part
-            part = '%s &times;&nbsp;%s' % (c, e(packs)) if packs[:1].isdigit() \
-                else '%s, %s' % (c, e(packs))
-            if board == 'hardware':
-                notes = ' '.join(x for x in (desc + '.', notes) if x)
-        out.append([e(refs.replace(' ', ', ')) or e(desc), e(value), part,
-                    line and '$' + line, e(notes)])
-    return table(["Parts", "Value", "Altronics &times; packs", "Line", "Notes"], out,
-                 ["", "", "", "n", ""])
+            # the quantity, or "see C5" where another line already bought this part
+            got = '%s &times;&nbsp;%s' % (c, e(qty)) if qty[:1].isdigit() else '%s, %s' % (c, e(qty))
+        if board == 'hardware' or sup.startswith('<em>'):
+            notes = ' '.join(x for x in (part and part + '.', notes) if x)
+        out.append([e(refs.replace(' ', ', ')), e(value), sup, got, e(notes)])
+    return table(["Parts", "Value", "Bought from", "Code &times; qty", "Notes"], out)
 
 
 def _parts_page():
-    head, body, total = _bom_rows()
-    stock_date = next(h for h in head if h.startswith('Stock')).rsplit(' on ', 1)[-1]
-    alt = sum(float(r['Line total inc GST']) for r in body if r['Line total inc GST'])
+    body = _bom_rows()
+    spent = '\n'.join('  <div><dt>%s</dt><dd>%s</dd></div>' % st for st in _SPENT)
     return ("Parts list", """
 <p class="eyebrow">Practical</p>
 <h1>Parts list</h1>
-<p class="lede">Every part for both boards, chosen from what Altronics had in stock where it
-could be. What Altronics doesn't sell comes from element14.</p>
+<p class="lede">Every part for both boards, and where it was bought for the first build:
+Altronics, DigiKey and Jaycar.</p>
 
 <dl class="spec">
-  <div><dt>Altronics</dt><dd>$%.2f</dd></div>
-  <div><dt>element14 film caps</dt><dd>~$64.63</dd></div>
+%s
   <div><dt>Prices</dt><dd>inc GST, no postage</dd></div>
-  <div><dt>Stock checked</dt><dd>%s</dd></div>
 </dl>
 
-<p>The Altronics column gives the catalogue code and how many packs to order, so parts sold
-in tens are already covered. The whole list is
-also a spreadsheet: <a href="parts/altronics.csv">altronics.csv</a>, built from the board files by
-<code>tools/bom_altronics.py</code> in the compressor repository.</p>
+<p>Each row gives the shop, its order code (linked to the product page) and how many were
+bought, so parts sold in packs show the packs. The whole list is also a spreadsheet:
+<a href="parts/ordered.csv">ordered.csv</a>, the same file as <code>bom/ordered.csv</code> in
+the compressor repository.</p>
+
+<p>Altronics came first, for everything it had in stock. DigiKey covered the parts no shop in
+Sydney sells: the 10&nbsp;&micro;F and 4.7&nbsp;&micro;F film capacitors, <code>R61</code> and
+<code>R62</code> at 0.1%%, and the 22&nbsp;&micro;F bipolars that fit the 6.3&nbsp;mm outline.
+The op amps, transistors, zener and 100&nbsp;nF capacitors went on the same order to reach free
+shipping. Jaycar supplied the rest.</p>
 
 <div class="note warn">
-  <h4>Not from Altronics</h4>
+  <h4>Different from the drawing</h4>
   <ul>
-    <li><strong>Film capacitors.</strong> Altronics' film range stops at 1 &micro;F on a 5 mm
-        pitch. <code>C5</code>, <code>C8</code>, <code>C15</code>, <code>C9</code>,
-        <code>C10</code>, <code>C14</code> and <code>C35</code> are drawn for the TDK and KEMET
-        parts named below, about $64.63 from element14. <code>C15</code> must be film: an
-        electrolytic leaks and shortens the release.</li>
-    <li><strong><code>R61</code> and <code>R62</code></strong> are 0.1%% parts in values
-        Altronics doesn't stock.</li>
-    <li><strong>The twenty 2 mm meter LEDs.</strong> Altronics has no 2 mm LEDs, and its 3 mm
-        flangeless ones don't fit the meters' 3.0 mm pitch. Buy 2 mm round flat-tops from
-        element14 or DigiKey.</li>
-    <li><strong>The LM3914</strong> is at Altronics but low stock, and both meters use it now
-        that the LM3915 can't be had; see <a href="meters.html">the meters</a>.</li>
+    <li><strong>The meter LEDs</strong> are Jaycar's 2&nbsp;mm tower LEDs, orange in the amber
+        positions. Check that one LED's base is under 3&nbsp;mm thick before fitting all
+        twenty.</li>
+    <li><strong><code>C14</code> and <code>C35</code></strong> are 2.2&nbsp;&micro;F bipolar
+        electrolytics (Jaycar <code>RY6804</code>), because the 2.2&nbsp;&micro;F film part was
+        out of stock everywhere we looked. Neither is in the audio path. They are 5&nbsp;mm cans
+        on 2.0&nbsp;mm leads, so spread the leads to the 5&nbsp;mm holes.</li>
+    <li><strong>The Jaycar resistors</strong> are 0.5&nbsp;W mini metal film, the same size as
+        the 0.25&nbsp;W parts the board is drawn for.</li>
+    <li><strong><code>C1</code> and <code>C2</code></strong> are 35&nbsp;V; the 50&nbsp;V parts
+        don't fit the 6.3&nbsp;mm outline.</li>
   </ul>
 </div>
 
@@ -1452,7 +1449,7 @@ also a spreadsheet: <a href="parts/altronics.csv">altronics.csv</a>, built from 
 
 <h2>Hardware</h2>
 %s
-""" % (alt, stock_date, _bom_table(body, 'main'), _bom_table(body, 'front'),
+""" % (spent, _bom_table(body, 'main'), _bom_table(body, 'front'),
        _bom_table(body, 'hardware')))
 
 
@@ -1542,7 +1539,9 @@ ever goes near a rack.</p>
   <li><code>tools/design.py</code> &mdash; the authoritative netlist as data.
       The schematic is generated and verified against it.</li>
   <li><code>panel/</code> &mdash; the faceplate generator: mockups, a 1:1 drawing and DXF.</li>
-  <li><code>bom/altronics.csv</code> &mdash; the <a href="parts.html">parts list</a>, built by
+  <li><code>bom/ordered.csv</code> &mdash; the <a href="parts.html">parts list</a>: what was
+      bought for the first build, and where.</li>
+  <li><code>bom/altronics.csv</code> &mdash; the Altronics shopping list, built by
       <code>tools/bom_altronics.py</code>.</li>
   <li>This site lives in its own repository,
       <a href="https://github.com/UTS-500-Series/UTS-500-Series.github.io">UTS-500-Series.github.io</a>,
