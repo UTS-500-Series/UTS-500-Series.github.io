@@ -2,7 +2,7 @@
  "repo": "https://github.com/UTS-500-Series/Equaliser",
  "commit": "4d106d3",
  "date": "2026-10-11",
- "kicad": "10.0.6",
+ "kicad": "10.0.7",
  "schematics": [
   {
    "name": "combined",

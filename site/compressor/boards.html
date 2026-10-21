@@ -147,8 +147,13 @@ module.</p>
 <p>Every part has a 3D model, so KiCad's 3D viewer and a STEP export for the Fusion 360
 assembly show both boards complete. The pots use Alps' own RK09K model, which is not kept in
 the repository: run <code>sh tools/get_3d_models.sh</code> once to download it. The toggles use
-simple models of the Salecom parts. The renders on this site stand a plain block and shaft in
-for the pots, because Alps' download is out of reach where they are made.</p>
+simple models of the Salecom parts.</p>
+<p>The renders on this site use more detailed models of the parts as built, made for the site
+by <code>build/3dmodels/make_models.py</code> in the site repository: the 9&nbsp;mm pots with
+their knurled split shafts and no bushing, the toggles with threaded bushings, nuts and bat
+levers, and the meter LEDs as Jaycar&rsquo;s 2&nbsp;mm towers in their real colours, standing
+where the faceplate holds them. They are STEP files drawn in each footprint&rsquo;s own frame,
+so they can be used in KiCad too, with no offset or rotation.</p>
 
 <h2>Ordering them</h2>
 <p>Each board&rsquo;s fab files are zipped ready to upload, in its <code>Gerbs/</code> folder:</p>
