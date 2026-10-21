@@ -33,82 +33,119 @@ try {
 
 <p class="eyebrow">Practical</p>
 <h1>Printing the faceplate</h1>
-<p class="lede">A faceplate for an ordinary FDM printer, for when there is no laser cutter, CNC
-or panel shop to hand. It has the same holes and legend as the <code>toggle</code> layout, so it
-fits the front board as drawn.</p>
+<p class="lede">The built compressor wears a 3D-printed faceplate, made on an ordinary FDM
+printer with no laser cutter, CNC or panel shop. It has the same holes and legend as the
+<code>toggle</code> layout, so it fits the front board as drawn, and it carries the main
+board&rsquo;s bracket and the meter LEDs too.</p>
 
 <figure>
   <div class="pane tall"><img src="img/faceplate-print.png" alt="The printed faceplate, front, in dark grey with a light legend" loading="lazy" style="max-height:520px;width:auto"></div>
-  <figcaption><span>The printed faceplate, rendered from its STL with the legend in a second colour</span>
+  <figcaption><span>The faceplate, rendered from its STL with the legend in a second colour. GR and LVL sit above the meters</span>
   <a href="https://github.com/UTS-500-Series/Compressor/tree/main/panel/print">The files &rarr;</a></figcaption>
 </figure>
 
 <h2>The files</h2>
-<p>Everything is in <a href="https://github.com/UTS-500-Series/Compressor/tree/main/panel/print"><code>panel/print/</code></a> in the compressor repository.</p>
-<div class="tw"><table><thead><tr><th class="r">File</th><th class="">What it is</th></tr></thead><tbody><tr><td class="r"><code>faceplate-multicolor.3mf</code></td><td class="">Panel and legend as one object with two parts, for a two-colour print in Bambu Studio or OrcaSlicer</td></tr><tr><td class="r"><code>faceplate-multicolor-prusaslicer.3mf</code></td><td class="">The same for PrusaSlicer, which keeps its part table in a different place</td></tr><tr><td class="r"><code>faceplate.stl</code></td><td class="">The faceplate on its own, already face down for printing</td></tr><tr><td class="r"><code>faceplate-legend.stl</code></td><td class="">The engraved legend and pot ticks as their own body, for a second colour</td></tr><tr><td class="r"><code>faceplate-fit-test.stl</code> and its 3MFs</td><td class="">A 27&nbsp;mm strip across THRESHOLD, HPF, KEY and the bottom of both meters, to print first</td></tr><tr><td class="r"><code>faceplate.scad</code></td><td class="">The OpenSCAD model. Every print setting is a parameter at the top</td></tr><tr><td class="r"><code>panel_data.scad</code></td><td class="">Hole positions and legend text, written by <code>panel/make_panel.py</code> from the same source as the DXF. Don&rsquo;t edit it by hand</td></tr><tr><td class="r"><code>build.sh</code></td><td class="">Rebuilds the STLs and 3MFs from the model (a few minutes)</td></tr></tbody></table></div>
+<p>Everything is in <a href="https://github.com/UTS-500-Series/Compressor/tree/main/panel/print"><code>panel/print/</code></a> in the compressor repository,
+whose README has every parameter.</p>
+<div class="tw"><table><thead><tr><th class="r">File</th><th class="">What it is</th></tr></thead><tbody><tr><td class="r"><code>faceplate-multicolor.3mf</code></td><td class="">Panel and legend as one object with two parts, for a two-colour print in Bambu Studio or OrcaSlicer</td></tr><tr><td class="r"><code>faceplate-multicolor-prusaslicer.3mf</code></td><td class="">The same for PrusaSlicer, which keeps its part table in a different place</td></tr><tr><td class="r"><code>faceplate.stl</code></td><td class="">The faceplate on its own, face down for printing, with the main-board bracket standing up off its back</td></tr><tr><td class="r"><code>faceplate-legend.stl</code></td><td class="">The engraved legend and pot ticks as their own body, for a second colour</td></tr><tr><td class="r"><code>faceplate-led-retainer.stl</code></td><td class="">A thin plate that holds the twenty meter LEDs in from the back</td></tr><tr><td class="r"><code>faceplate-fit-test.stl</code> and its 3MFs</td><td class="">A 27&nbsp;mm strip across THRESHOLD, HPF, KEY and the bottom of both meters, to print first</td></tr><tr><td class="r"><code>faceplate.step</code>, <code>faceplate-blank.step</code>, <code>faceplate-led-retainer.step</code></td><td class="">Solid models for Fusion and other CAD: with the legend as a second body, with no legend, and the retainer in place</td></tr><tr><td class="r"><code>faceplate-legend.dxf</code></td><td class="">The legend as outlines, one layer per label, for drawing your own on the blank</td></tr><tr><td class="r"><code>faceplate.scad</code></td><td class="">The OpenSCAD model. Every print setting is a parameter at the top</td></tr><tr><td class="r"><code>panel_data.scad</code></td><td class="">Hole positions and legend text, written by <code>panel/make_panel.py</code> from the same source as the DXF. Don&rsquo;t edit it by hand</td></tr><tr><td class="r"><code>build.sh</code></td><td class="">Rebuilds the STLs, 3MFs and (with CadQuery) the STEPs from the model</td></tr></tbody></table></div>
 
 <h2>How it differs from the metal panel</h2>
 <ul>
   <li><strong>3.2&nbsp;mm thick</strong>, the same as a 1/8&Prime; metal panel, so the rack screws
-      and everything behind the panel sit where the front board expects. The back is flat.</li>
-  <li><strong>Pot wells.</strong> Each pot hole has a 12.5&nbsp;mm counterbore on the front,
-      1.2&nbsp;mm deep, leaving 2.0&nbsp;mm of plastic under the nut. That gives the 9&nbsp;mm
-      pots&rsquo; short bushing about 3&nbsp;mm of thread, which the metal panel only gets by
-      being thinned round the pots. The 11&nbsp;mm knobs sit over the wells.</li>
+      and everything behind the panel sit where the front board expects.</li>
+  <li><strong>Flat round the pots.</strong> The Altronics 9&nbsp;mm pots have no threaded
+      bushing or nut. They are held by the front board, and the board by the four toggle nuts,
+      so the pot holes are only clearance for the shafts and the knobs sit close to the panel.</li>
+  <li><strong>Meter LEDs held in the panel.</strong> The holes suit Jaycar&rsquo;s 2&nbsp;mm
+      tower LEDs (ZD0060 orange, ZD0070 green, ZD0040 red), as measured: a 2.0&nbsp;mm tower,
+      1.5&nbsp;mm tall, on a 3.25 &times; 2.5&nbsp;mm base. Each tower pushes into a 2.2&nbsp;mm
+      hole from the back and its base sits in a 3.55&nbsp;mm slot, 2.3&nbsp;mm deep, down the back
+      of each meter column. The <a href="#retainer">retainer</a> holds them there.</li>
   <li><strong>Holes print oversize on purpose.</strong> Pot, toggle and screw holes come out
-      0.2&nbsp;mm larger than drawn (<code>hole_comp</code>), because FDM holes shrink. The meter
-      holes stay 2.2&nbsp;mm: they only let light out, and keeping them small leaves 0.8&nbsp;mm
-      of plastic between neighbours.</li>
+      0.2&nbsp;mm larger than drawn (<code>hole_comp</code>), because FDM holes shrink.</li>
   <li><strong>37.8 &times; 132.6&nbsp;mm</strong> rather than the nominal 38.10 &times;
       133.35, so it slides in beside the next module. The front edge has a 0.4&nbsp;mm chamfer so
       first-layer squish doesn&rsquo;t flare it.</li>
-  <li><strong>The legend is engraved</strong> 0.4&nbsp;mm deep and drawn 30% larger than on the
-      mockup, whose 1.4&ndash;1.7&nbsp;mm capitals are too fine for a 0.4&nbsp;mm nozzle. Each pot
-      gets three ticks: start, middle and end of travel.</li>
+  <li><strong>The legend is engraved</strong> 0.6&nbsp;mm deep, drawn 30% larger than on the
+      mockup and with every stroke thickened so none is thinner than about 0.5&nbsp;mm, more than
+      one line of a 0.4&nbsp;mm nozzle. Each pot gets three ticks: start, middle and end of
+      travel.</li>
 </ul>
+
+<h2 id="bracket">The main-board bracket</h2>
+<figure>
+  <div class="pane"><img src="img/faceplate-bracket.png" alt="The back of the faceplate, with the bracket wall standing up along one edge and two ears with nut slots" loading="lazy"></div>
+  <figcaption><span>The back of the faceplate: the bracket wall, its two ears for H1 and H2, and the LED slots</span></figcaption>
+</figure>
+<p>The bracket is printed in one piece with the faceplate. A wall stands off the back along
+the panel&rsquo;s left edge (seen from the front) and runs the whole length of the main board,
+stopping 2&nbsp;mm short of the edge connector, so it also covers the board&rsquo;s solder side.
+It is 0.8&nbsp;mm thick beside the front board and 2.0&nbsp;mm behind it, with a 1.6&nbsp;mm
+flange along its top and bottom edges to stiffen it. Two ears reach in to the main
+board&rsquo;s M3 holes <code>H1</code> and <code>H2</code>, each with a slot for an M3 nut.</p>
+<p>To fit the main board, drop an M3 nut into each ear and put an <strong>M3 &times; 6</strong>
+screw through <code>H1</code> and <code>H2</code> from the component side, with no washer. An
+M3 &times; 10 pokes out through the side of the wall. The screw holes are slotted &plusmn;1.5&nbsp;mm,
+so the board can sit a little nearer the panel or further back. Trim the leads on the back of
+the front board flush where the ears pass behind it.</p>
+<p>The board&rsquo;s position is drawn from the 500-series spec and the board files: 11.12&nbsp;mm
+left of the panel&rsquo;s centreline, its front edge 24&nbsp;mm behind the panel, and centred
+vertically. All three are parameters at the top of <code>faceplate.scad</code>. Set
+<code>bracket = false</code> for a plain panel to use with a metal angle instead.</p>
+
+<h2 id="retainer">The LED retainer</h2>
+<figure>
+  <div class="pane"><img src="img/faceplate-led-retainer.png" alt="The LED retainer plate, with a rib down each meter column, two pins and the lead holes" loading="lazy"></div>
+  <figcaption><span>The retainer: a rib per meter column, two locating pins, and a pair of lead holes per LED</span></figcaption>
+</figure>
+<p><code>faceplate-led-retainer.stl</code> is a 16.5 &times; 32.8&nbsp;mm plate, 1.2&nbsp;mm thick,
+over the back of both meters. A rib goes into each LED slot and presses on the backs of the LED
+bases, leaving each tip about 0.2&nbsp;mm proud of the front. Two 2&nbsp;mm pins press into
+holes in the back of the panel, and each LED&rsquo;s leads pass through their own pair of
+1.3&nbsp;mm holes on the front board&rsquo;s 2.54&nbsp;mm pitch. Print it flat, ribs and pins up.</p>
+<ol>
+  <li>Push all twenty LEDs into the panel from the back, flat (cathode) side as the front
+      board&rsquo;s silkscreen shows. The two columns face opposite ways.</li>
+  <li>Thread the leads through the retainer and press it on until its pins are home. A drop of
+      glue on each pin makes it permanent.</li>
+  <li>Fit the front board over the leads, tighten the toggle nuts, and solder the LEDs last.</li>
+</ol>
 
 <h2>Printing it</h2>
 <ol>
   <li><strong>Print the fit test first.</strong> Check that a pot and a toggle drop through their
-      holes, the pot nut sits inside its well, and the LEDs line up behind the meter holes. If a
+      holes and an LED tower pushes into its hole from the back with the base in the slot. If a
       hole is tight or loose, change <code>hole_comp</code> in <code>faceplate.scad</code> and
       rebuild (or use OpenSCAD&rsquo;s Customizer).</li>
-  <li><strong>Material:</strong> PETG in black or dark grey. A light colour lets each meter LED
-      glow through the thin walls beside its hole, and PLA slowly gives way under a tightened nut
-      in a warm rack.</li>
-  <li><strong>Settings:</strong> 0.4&nbsp;mm nozzle, 0.2&nbsp;mm layers, 4 walls, 100% infill, no
-      supports. Print it as exported, face down; a textured PEI sheet gives the front a good
-      finish.</li>
-  <li><strong>Two colours (optional):</strong> in Bambu Studio or OrcaSlicer, import
+  <li><strong>Material:</strong> the repository suggests PETG in black or dark grey: a light
+      colour lets each meter LED glow through the thin walls beside its hole, and PLA softens
+      sooner in a warm rack. The built module&rsquo;s faceplate is light lilac matte PLA with a
+      black PLA legend, printed at 0.08&nbsp;mm layers.</li>
+  <li><strong>Settings:</strong> 0.4&nbsp;mm nozzle, 0.2&nbsp;mm layers or finer, 4 walls, 100%
+      infill, no supports. Print it as exported, face down: the LED slots end up on top and the
+      bracket stands straight up with 45&deg; undersides on its ears, so nothing needs
+      supports. The wall makes the print 146&nbsp;mm tall; if its top wobbles, slow the outer
+      walls for the upper layers.</li>
+  <li><strong>Two colours:</strong> in Bambu Studio or OrcaSlicer, import
       <code>faceplate-multicolor.3mf</code> with File, Import (Cmd/Ctrl+I); in PrusaSlicer use the
       <code>-prusaslicer</code> version. It loads as one object with two parts already lined up,
-      the panel on filament 1 and the legend on filament 2. The file has no print settings in it,
-      so Bambu Studio says it is loading geometry only; that is expected. The colours only swap
-      on the first two layers, but it still needs a multicolour unit (AMS, MMU) or a second
-      nozzle.</li>
+      the panel on filament 1 and the legend on filament 2. The colours only swap over the first
+      0.6&nbsp;mm, but it still needs a multicolour unit (AMS, MMU) or a second nozzle.</li>
+  <li><strong>If the letters lift:</strong> use a brim and glue stick, slow the first layer, set
+      Z-hop to 0.4&nbsp;mm and avoid crossing walls. Don&rsquo;t use a raft, which spoils the face.</li>
   <li><strong>One colour:</strong> print <code>faceplate.stl</code> and fill the engraving
       afterwards with paint, or a white wax crayon rubbed in and wiped off.</li>
 </ol>
 
 <h2>Fitting it</h2>
 <ul>
-  <li>Snap the small anti-rotation tab off the front of each pot, as you would for a metal panel,
-      or it holds the pot off the back of the panel.</li>
-  <li>Tighten the nuts gently. Plastic creeps, and the nuts only need to hold the board.</li>
+  <li>Snap the small anti-rotation tab off the front of each pot, or it holds the pot off the
+      back of the panel.</li>
+  <li>Tighten the toggle nuts gently. Plastic creeps, and the nuts only need to hold the board.</li>
+  <li><strong>Grounding.</strong> A plastic panel and bracket don&rsquo;t tie the toggle bushings
+      to <code>CHASSIS</code> the way a metal panel on <code>H2</code> does. If touching a toggle
+      adds hum, run a wire from a solder tag under one toggle&rsquo;s nut to <code>H2</code>.</li>
 </ul>
-
-<div class="note warn">
-  <h4>Not solved yet</h4>
-  <ul>
-    <li><strong>Grounding.</strong> A plastic panel doesn&rsquo;t ground the pot and toggle
-        bushings the way a metal panel tied to <code>CHASSIS</code> does. If touching a knob adds
-        hum, run a wire from a solder tag under one toggle&rsquo;s nut to the main board&rsquo;s
-        <code>H2</code>.</li>
-    <li><strong>The main board&rsquo;s bracket.</strong> The L-bracket that holds the main board
-        (see <a href="boards.html">the boards</a>) is meant to bolt to a metal panel. How it fixes
-        to a printed one, and whether the plastic holds up, hasn&rsquo;t been modelled or tried.</li>
-  </ul>
-</div>
 
 <div class="next"><a href="panel.html">&larr; The front panel</a><a href="boards.html">The boards &rarr;</a></div>
 <footer>

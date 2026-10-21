@@ -6,7 +6,8 @@ https://github.com/UTS-500-Series/Pre-Amp
 The repository is one KiCad 10 sheet (Series-500.kicad_sch) and its board, built on Tormy Van
 Cool's 500-series card template. The schematic image and the viewer data are generated from
 that sheet by _kicad_sch.py, and every statement about connections here was read from its
-netlist. The board has been ordered and is being built (Oct 2026).
+netlist. The board is built and working (21 Oct 2026); main is now 34efc53, which only
+adds the licence, so the KiCad files are the ones it was built from.
 
 The sheet itself carries no component values (every resistor is just "R"). The team's
 instruction is that the build uses the values of the published design the sheet redraws:
@@ -103,8 +104,8 @@ def source():
     return f"""<div class="note">
   <h4>Where this comes from</h4>
   <p>The circuit, the board and every connection on these pages are read from the team's own
-  KiCad project in <a href="{SRC}">UTS-500-Series/Pre-Amp</a> at <code>{COMMIT}</code>. That
-  board has been ordered and is being built.</p>
+  KiCad project in <a href="{SRC}">UTS-500-Series/Pre-Amp</a> at <code>{COMMIT}</code>, the
+  layout the board was made from. The module is <strong>built and working</strong>.</p>
   <p>The sheet itself has no component values. The build uses the values of the design it
   redraws, Rod Elliott's <a href="{P66}">ESP Project 66</a> with the phantom feed from
   <a href="{P96}">Project 96</a>, so these pages give those values on our reference
@@ -172,7 +173,7 @@ PAGES['index.html'] = ("Overview", f"""
 <h1>The microphone preamp</h1>
 <p class="lede">A discrete, balanced microphone preamp: two transistor pairs doing the gain,
 one op amp turning it into a line output, switchable 48&nbsp;V phantom power, and a single gain
-control between the two halves. The board has been ordered and is being built.</p>
+control between the two halves. The module is built and working.</p>
 
 {source()}
 
@@ -200,8 +201,8 @@ them. An NE5532 then takes the difference of the two pair outputs and drives the
 """ + table(["", "State"],
             [["Schematic", "Complete as a circuit: one sheet, 46 parts, every part connected"],
              ["Component values", "ESP's Project 66 and 96 values, on our references (the sheet itself still reads R and C)"],
-             ["PCB", "Ordered: all 46 footprints placed and every net routed on two layers"],
-             ["Build", "In progress"],
+             ["PCB", "Made from the repository: all 46 footprints placed and every net routed on two layers"],
+             ["Build", "Built and working"],
              ["Edge connector", "Power, ground and +48&nbsp;V only; audio goes in and out on flying leads"]],
             ["r", ""]) + f"""
 <p>Build notes, and the full value list, are on <a href="board.html">The board and building
@@ -484,7 +485,7 @@ rows in bold connect to anything; the rest carry no-connect flags.</p>
             ["r", "", "", ""]) + """
 <p>There is no series resistor or filter on either rail. ESP recommends a post-filter of
 10&nbsp;&Omega; and 470&nbsp;&micro;F per rail, and in a rack, where the rails are shared with
-every other module, that matters more, not less. The board as ordered has no place for the
+every other module, that matters more, not less. The board as built has no place for the
 resistor, so the 8&nbsp;mm footprints of C5 and C9 are the reservoir; the rack&rsquo;s own
 filtering has to do the rest.</p>
 
@@ -498,9 +499,9 @@ count against it; each condenser microphone draws up to about 10&nbsp;mA from it
 PAGES['board.html'] = ("The board and building it", f"""
 <p class="eyebrow">Practical &mdash; 07</p>
 <h1>The board and building it</h1>
-<p class="lede">The board has been ordered from the layout in the repository and is being
-built with ESP&rsquo;s values. This page has the full value list and what to watch for on the
-bench.</p>
+<p class="lede">The board was made from the layout in the repository and the module is built
+and working, with ESP&rsquo;s values. This page has the full value list and what to watch for
+on the bench.</p>
 
 <h2>The PCB</h2>
 <p>Read from <code>Series-500.kicad_pcb</code> at <code>{COMMIT}</code>:</p>
@@ -569,4 +570,4 @@ bench.</p>
 """)
 
 import content_files
-PAGES['files.html'] = content_files.page('preamp', '08')
+PAGES['files.html'] = content_files.page('preamp', '08', latest=('34efc53', '2026-10-01'))

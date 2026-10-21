@@ -33,14 +33,13 @@ try {
 
 <p class="eyebrow">Practical &mdash; 08</p>
 <h1>Building it</h1>
-<p class="lede">The boards are ordered and the module is being built. Most of the questions
-this page used to list were settled before ordering; what is left is for the bench and the
-faceplate.</p>
+<p class="lede">The module is built and working. Most of the questions this page used to list
+were settled before ordering; the rest are notes for anyone building another one.</p>
 
 <h2>Settled before ordering</h2>
 <div class="tw"><table><thead><tr><th class="r">Was</th><th class="">Now</th></tr></thead><tbody><tr><td class="r">IC2 and IC5 had V+ on &minus;16&nbsp;V</td><td class="">Fixed: every op amp is powered from both rails</td></tr><tr><td class="r">Ten shafts in one line, 7.5&nbsp;mm apart</td><td class="">The frequency pots moved to a top board, giving two columns of knobs (<a href="board.html">board</a>)</td></tr><tr><td class="r">J2 and J3 unconnected, no footprint</td><td class="">17-pin headers joining the two boards</td></tr><tr><td class="r">Parts list said TL084</td><td class="">OPA1644 ordered, matching the sheet</td></tr><tr><td class="r">Board not routed</td><td class="">Routed on four layers and ordered</td></tr></tbody></table></div>
 
-<h2>On the bench</h2>
+<h2>Notes for the bench</h2>
 <div class="tw"><table><thead><tr><th class="r">Item</th><th class="">What to do</th></tr></thead><tbody><tr><td class="r">Wire J2 to J3</td><td class="">All 17 pins, pin for pin, including pin 15 (the top board&rsquo;s only ground)</td></tr><tr><td class="r">C18, C20, C2, C7</td><td class="">Electrolytics on footprints drawn for other parts: bend the leads, and fit C18/C20 the right way round (<a href="board.html">fit notes</a>)</td></tr><tr><td class="r">Card edge</td><td class="">Each J1 pin is wired on one face only: check continuity from the rack slot</td></tr><tr><td class="r">IC4A</td><td class="">Unused, inputs open. Tie it off if the module whistles (<a href="io.html#power">power</a>)</td></tr><tr><td class="r">C33</td><td class="">Optional: 22&nbsp;pF instead of 220&nbsp;pF flattens the 12&nbsp;kHz rise (<a href="filters.html">shelves</a>)</td></tr><tr><td class="r">Bypass</td><td class="">SW1 is at the rack end of the card, so set it before the module goes in</td></tr></tbody></table></div>
 
 <h2>Bringing it up</h2>
@@ -55,10 +54,11 @@ faceplate.</p>
   <li>Flip SW1 to bypass: the output should equal the input exactly, powered or not.</li>
 </ol>
 
-<h2>Still to draw</h2>
-<p>The faceplate: ten knob holes in two columns from the pot positions above, plus the legend,
-which has to follow the mid bands&rsquo; reversed directions. The compressor&rsquo;s
-<a href="../compressor/printed.html">printed faceplate</a> is the pattern to copy.</p>
+<h2>The faceplate</h2>
+<p>The faceplate isn&rsquo;t in the repository yet. It needs ten knob holes in two columns from
+the pot positions above, plus a legend that follows the mid bands&rsquo; reversed directions.
+The compressor&rsquo;s <a href="../compressor/printed.html">printed faceplate</a> is the pattern
+to copy.</p>
 
 <div class="next"><a href="simulation.html">&larr; Simulating it</a><a href="files.html">Design files &rarr;</a></div>
 <footer>

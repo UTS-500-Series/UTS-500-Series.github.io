@@ -99,19 +99,23 @@ built that way.</p>
 </div>
 
 <h2>How far along each module is</h2>
-<p>The compressor has been designed and its boards were ordered on 3 October: a main card
-and a front board behind the faceplate, joined by a ribbon. The whole circuit has been
-simulated in ngspice and its values corrected from that, it has a parts list drawn from
-Altronics' stock, and its faceplate can be 3D printed as well as machined. Its parts have
-been ordered and it is being built. Its pages are generated from a netlist that the KiCad schematic is verified
-against, pin by pin, so the figures in it come from the design rather than from memory.</p>
-<p>The equaliser's boards were ordered on 8 October and it is <strong>being built</strong>:
-a low shelf, two parametric mid bands and a high shelf between a balanced receiver and line
-driver, on a four-layer main card with a small top board for the frequency pots. Its response
-is worked out from the schematic and matches the team's LTspice run where they overlap.</p>
-<p>The preamp's board has also been ordered and it is <strong>being built</strong>, with the
-component values of ESP Project 66 and 96, the published design its schematic redraws. Its
-pages are written from its KiCad sheet, with ESP's values on our part references.</p>
+<p>All three modules are <strong>built and working</strong> (October 2026). The schematics
+and boards on each module&rsquo;s design files page are the ones the built modules were made
+from.</p>
+<p>The compressor is a main card and a front board behind the faceplate, joined by a ribbon,
+with boards ordered on 3 October. The whole circuit was simulated in ngspice and its values
+corrected from that before ordering, its parts came from Altronics, DigiKey and Jaycar, its
+faceplate is 3D printed with the main board&rsquo;s bracket built in, and its two LED meters
+were set with a calibration script driving an audio interface. Its pages are generated from a
+netlist that the KiCad schematic is verified against, pin by pin, so the figures in it come
+from the design rather than from memory.</p>
+<p>The equaliser is a low shelf, two parametric mid bands and a high shelf between a balanced
+receiver and line driver, on a four-layer main card with a small top board for the frequency
+pots, ordered on 8 October. Its response is worked out from the schematic and matches the
+team&rsquo;s LTspice run where they overlap.</p>
+<p>The preamp is built with the component values of ESP Projects 66 and 96, the published
+design its schematic redraws. Its pages are written from its KiCad sheet, with ESP&rsquo;s
+values on our part references.</p>
 
 <h2>The format</h2>
 <p>Every module shares the same constraints, which is most of what makes a rack of them
@@ -127,7 +131,8 @@ work together.</p>
 
 <footer>
   {shell.SUITE} &middot; documentation site &middot; one section per module<br>
-  Performance figures are calculated or simulated from the designs, not measured on hardware.
+  All three modules are built and working. Performance figures are calculated or simulated
+  from the designs, not measured on the built modules.
 </footer>
 </div></main>
 </div></body></html>

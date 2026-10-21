@@ -54,7 +54,7 @@ schematic: what it does, how it does it, and why it was built that way.</p>
   <div><dt>Release</dt><dd>49 ms&ndash;3.5 s</dd></div>
   <div><dt>Components</dt><dd>166</dd></div>
   <div><dt>Nets</dt><dd>110</dd></div>
-  <div><dt>Boards</dt><dd>2, ordered</dd></div>
+  <div><dt>Boards</dt><dd>2, built</dd></div>
 </dl>
 
 <h2>What a compressor actually does</h2>
@@ -100,20 +100,23 @@ is far more forgiving of component tolerance. Most classic bus compressors work 
   <a class="card" href="sidechain.html"><b>The sidechain</b><span>Measuring loudness and turning it into a control voltage, with attack and release.</span></a>
   <a class="card" href="power.html"><b>Power &amp; references</b><span>Rails, the &minus;5.1 V reference, and the bias voltages everything else depends on.</span></a>
   <a class="card" href="panel.html"><b>The front panel</b><span>Nine functions in 38 mm, three ways to arrange them, and why each one is a compromise.</span></a>
-  <a class="card" href="printed.html"><b>Printing the faceplate</b><span>A faceplate for an ordinary 3D printer, in one colour or two, with a fit test to print first.</span></a>
-  <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both routed, and ordered on 3 October.</span></a>
+  <a class="card" href="printed.html"><b>Printing the faceplate</b><span>The faceplate on the built module: printed in two colours, with the main board&rsquo;s bracket and an LED retainer.</span></a>
+  <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both built and working.</span></a>
   <a class="card" href="simulation.html"><b>The simulation</b><span>What ngspice found when the schematic was simulated, and the fourteen values that changed because of it.</span></a>
   <a class="card" href="parts.html"><b>Parts list</b><span>Every part, and whether it came from Altronics, DigiKey or Jaycar.</span></a>
 </div>
 
-<div class="note warn">
-  <h4>Read this before building</h4>
-  <p>Both boards are routed and were ordered on 3 October, and the circuit has been
-  <a href="simulation.html">simulated</a>, but nothing has been built yet. Every
-  performance figure on this site is <strong>calculated or simulated from the design</strong>,
-  not measured. The netlist has been verified against the schematic automatically, ERC passes
-  with no errors, and ngspice runs the schematic as drawn, but a simulation is only as good as
-  its models &mdash; measure the real module before trusting any of it.</p>
+<div class="note">
+  <h4>Built and working</h4>
+  <p>Both boards were ordered on 3 October and the module is now <strong>built and
+  working</strong> (October 2026), with its <a href="printed.html">printed faceplate</a> and
+  both meters set by the <a href="meters.html#trimmers">calibration script</a>. The
+  schematics and boards on these pages, and on the <a href="files.html">design files</a> page,
+  are the ones it was built from.</p>
+  <p>The performance figures on this site are still <strong>calculated or simulated from the
+  design</strong>, not measured on the built module. The netlist has been verified against the
+  schematic automatically, ERC passes with no errors, and ngspice runs the schematic as drawn,
+  but a simulation is only as good as its models.</p>
 </div>
 
 <div class="next"><span></span><a href="connector.html">500-series interface &rarr;</a></div>

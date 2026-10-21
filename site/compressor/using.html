@@ -74,6 +74,10 @@ ever goes near a rack.</p>
   <li><strong>Link check.</strong> With two modules and <code>SW4</code> closed on both,
       driving one channel only should pull <em>both</em> down by about half as much as that
       channel alone would move. That halving is the averaging bus working.</li>
+  <li><strong>Meters.</strong> Set <code>RV8</code> and <code>RV7</code> with
+      <code>tools/calibrate_meters.py</code> and an audio interface, as the
+      <a href="meters.html#trimmers">meters page</a> describes. That is how the built module
+      was set.</li>
 </ol>
 
 <h2>If something is wrong</h2>
@@ -91,6 +95,10 @@ ever goes near a rack.</p>
   <li><code>tools/design.py</code> &mdash; the authoritative netlist as data.
       The schematic is generated and verified against it.</li>
   <li><code>panel/</code> &mdash; the faceplate generator: mockups, a 1:1 drawing and DXF.</li>
+  <li><code>panel/print/</code> &mdash; the <a href="printed.html">printed faceplate</a> the
+      module was built with, its bracket and LED retainer, as STL, 3MF and STEP.</li>
+  <li><code>tools/calibrate_meters.py</code> &mdash; sets the two meter trimmers with an audio
+      interface.</li>
   <li><code>bom/ordered.csv</code> &mdash; the <a href="parts.html">parts list</a>: what was
       bought for the first build, and where.</li>
   <li><code>bom/altronics.csv</code> &mdash; the Altronics shopping list, built by
