@@ -746,10 +746,15 @@ PAGES['board.html'] = ("Board &amp; parts", """
 and a small top board that carries the four dual frequency pots. They are drawn side by side in
 one KiCad file and split apart at the front, then stacked on standoffs.</p>
 
+<script type="importmap">{"imports": {"three": "../vendor/three/three.module.min.js"}}</script>
+<script type="module" src="../view3d.js"></script>
 <figure>
-  <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of both equaliser boards, the pot board on the left beside the main card" loading="lazy"></div>
-  <figcaption><span>Both boards at <code>4d106d3</code>, from above. The narrow strip on the left with the four large pots is the top board; the rest is the main card. The pots are stand-in blocks: KiCad&rsquo;s library has no model for the RK097</span>
-  <a href="files/combined-3d-top.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+  <div class="pane v3"><div class="view3d" data-src="files/stack.glb">
+    <img src="files/stack-3d-angle.png" alt="KiCad 3D render of the built equaliser: the top board stacked over the front of the main card on two standoffs, with two rows of pot shafts pointing out of the front" loading="lazy">
+    <button class="v3-open" type="button">Turn it in 3D</button>
+  </div></div>
+  <figcaption><span>The two boards as built: the top board split off and stacked over the main card on its standoffs. In 3D, drag to turn, scroll to zoom and right-drag to pan (about 2&nbsp;MB)</span>
+  <a href="files/stack-3d-angle.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
 </figure>
 
 <figure>
@@ -790,6 +795,25 @@ layout&rsquo;s ten shafts crammed into one line:</p>
 board&rsquo;s own coordinates; the faceplate needs them measured from the panel&rsquo;s top
 edge. J2 runs along the top board and J3 across the main card, so the 17 links between them are
 wires or a ribbon rather than a plug-in header pair.</p>
+<p>The photo of the built module shows the top board&rsquo;s four pots soldered to its
+<em>underside</em>, so they hang down between the two boards beside the main card&rsquo;s six,
+while the rest of the top board&rsquo;s parts face up. Seen from the front, the two rows of
+shafts sit 7.5&nbsp;mm apart in height and, going by the 3D model, about 8.5&nbsp;mm apart
+across the panel. The 3D view
+above is built that way by <code>build/eq_stack.py</code>, which cuts the KiCad file in two at
+the boards&rsquo; shared edge.</p>
+
+<figure>
+  <div class="pane"><img src="files/stack-3d-front.png" alt="The two equaliser boards seen from the front edge: the main card at the bottom with six pots, the top board 20 mm above with four pots hanging beneath it, two standoffs at the ends" loading="lazy"></div>
+  <figcaption><span>From the front edge, as in the photo: the main card&rsquo;s six pots below, the top board&rsquo;s four hanging from its underside, and the standoffs at each end</span>
+  <a href="files/stack-3d-front.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<figure>
+  <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of both equaliser boards as ordered, the pot board on the left beside the main card" loading="lazy"></div>
+  <figcaption><span>Both boards as ordered, still joined: the narrow strip on the left with the four dual pots is the top board</span>
+  <a href="files/combined-3d-top.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
 
 <h2>What KiCad&rsquo;s checks say</h2>
 <p>We ran KiCad 10&rsquo;s design-rule check on the board as ordered. Nothing in it stopped the

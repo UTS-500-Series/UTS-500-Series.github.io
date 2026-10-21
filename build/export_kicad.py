@@ -24,8 +24,25 @@ KICAD_CLI = next((p for p in [shutil.which('kicad-cli'),
                               '/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli']
                   if p and os.path.exists(p)), None)
 
+# Our own 3D models, made by 3dmodels/make_models.py, for parts KiCad's library has no model
+# for (or whose maker's model can't be downloaded where the site is built), and for parts drawn
+# as they were actually bought. Each is drawn in its footprint's frame: offset and rotation 0.
+MODELS3D = os.path.join(HERE, '3dmodels')
+
+
+def _meter_led(ref):
+    """Jaycar 2 mm tower LEDs as fitted to the compressor's meters: GR all orange; LVL green,
+    then orange, then red at the top (as in tools/calibrate_meters.py)."""
+    n = int(ref[1:])
+    colour = 'green' if 30 <= n <= 34 else 'red' if n >= 38 else 'orange'
+    return 'LED_Jaycar_2mm_Tower_%s.step' % colour
+
+
 # slug -> GitHub repository, then (name, path) for each schematic and board to export.
-# `name` becomes the file stem on the site; paths are relative to the repository.
+# `name` becomes the file stem on the site; paths are relative to the repository. `models`
+# swaps a footprint's 3D model, keyed by footprint name or by the model's file name; the value
+# is a file in MODELS3D, a path from the board's folder starting ${KIPRJMOD}, or a function of
+# the reference giving either.
 PROJECTS = {
     'compressor': ('Compressor', {
         'sch': [('compressor', 'kicad_withpcb/compressor_with_pcb/compressor_with_pcb.kicad_sch',
@@ -43,6 +60,10 @@ PROJECTS = {
                  'Front board: sits behind the faceplate, joined to the main board by a ribbon',
                  {'top': {'rotate': '0,0,90'}, 'bottom': {'rotate': '0,0,90'},
                   'angle': {'rotate': '-40,0,120'}})],
+        'models': {'Potentiometer_Alps_RK09K_Single_Vertical': 'Alps_RK09K_Vertical_6mm_Knurled.step',
+                   'SW_Toggle_Mini_SPDT_Salecom_S1315': 'SW_Toggle_Mini_SPDT_Salecom_S1315.step',
+                   'SW_Toggle_Mini_DPDT_Salecom_S1350': 'SW_Toggle_Mini_DPDT_Salecom_S1350.step',
+                   'LED_D2.0mm_W4.0mm_H2.8mm_FlatTop': _meter_led},
     }),
     'preamp': ('Pre-Amp', {
         'sch': [('preamp', 'Series-500.kicad_sch', 'The preamp schematic')],
@@ -60,6 +81,12 @@ PROJECTS = {
         'pcb': [('combined', 'Combined_EQ/Combined_EQ.kicad_pcb',
                  'Both equaliser boards as ordered: the main card, and the pot board drawn beside it'),
                 ('lbp', 'Low_Bandpass_Filter/LBP.kicad_pcb', 'Low-mid band board (earlier draft)')],
+        'models': {'Potentiometer_Alps_RK097_Single_Horizontal': 'Alps_RK097_Single_Horizontal.step',
+                   'Potentiometer_Alps_RK097_Dual_Horizontal': 'Alps_RK097_Dual_Horizontal.step',
+                   # the chips' models sit in the vendor folders, not beside the board
+                   'INA137PA.stp': '${KIPRJMOD}/../Components/LIB_INA137PA/INA137PA/3D/INA137PA.stp',
+                   'OPA1641AID.stp': '${KIPRJMOD}/../Components/LIB_OPA1641AID/OPA1641AID/3D/OPA1641AID.stp',
+                   'OPA1644AID.stp': '${KIPRJMOD}/../Components/LIB_OPA1644AID/OPA1644AID/3D/OPA1644AID.stp'},
     }),
 }
 
@@ -106,6 +133,68 @@ def board_stats(src):
     n = lambda tag: len(re.findall(r'^\s*\(%s\b' % tag, text, re.M))
     return {'footprints': n('footprint'), 'segments': n('segment'), 'vias': n('via'),
             'zones': n('zone'), 'outline': text.count('(layer "Edge.Cuts")')}
+
+
+def _blocks(text, head):
+    """(start, end) of each top-level `(head ...` block in a KiCad S-expression file."""
+    spans, i = [], 0
+    while True:
+        i = text.find('\n\t(' + head, i)
+        if i < 0:
+            return spans
+        if not text[i + 3 + len(head)].isspace():      # gr_line, not gr_line_style
+            i += 1
+            continue
+        depth, j, quoted = 0, i + 1, False
+        while True:
+            c = text[j]
+            if quoted:
+                quoted = not (c == '"' and text[j - 1] != '\\')
+            elif c == '"':
+                quoted = True
+            elif c == '(':
+                depth += 1
+            elif c == ')':
+                depth -= 1
+                if depth == 0:
+                    break
+            j += 1
+        spans.append((i + 2, j + 1))
+        i = j
+
+
+MODEL = '(model "%s"\n\t\t\t(offset (xyz 0 0 0))\n\t\t\t(scale (xyz 1 1 1))\n\t\t\t(rotate (xyz 0 0 0))\n\t\t)'
+MODEL_RE = re.compile(r'\(model "([^"]*)"\s*\(offset[^)]*\)\s*\)\s*\(scale[^)]*\)\s*\)\s*'
+                      r'\(rotate[^)]*\)\s*\)\s*\)')
+
+
+def with_models(src, models):
+    """A copy of board `src`, beside it so ${KIPRJMOD} still resolves, with 3D models swapped
+    as `models` says. Returns the copy's path, or `src` itself if nothing needs swapping."""
+    if not models:
+        return src
+    text = open(src).read()
+    out, last, swapped = [], 0, 0
+    for s, e in _blocks(text, 'footprint'):
+        fp = text[s:e]
+        lib = re.match(r'\(footprint "(?:[^":]*:)?([^"]*)"', fp).group(1)
+        ref = re.search(r'\(property "Reference" "([^"]*)"', fp).group(1)
+
+        def swap(m):
+            nonlocal swapped
+            new = models.get(lib) or models.get(os.path.basename(m.group(1)))
+            if new is None:
+                return m.group(0)
+            new = new(ref) if callable(new) else new
+            swapped += 1
+            return MODEL % (new if new.startswith('$') else os.path.join(MODELS3D, new))
+        out += [text[last:s], MODEL_RE.sub(swap, fp)]
+        last = e
+    out.append(text[last:])
+    dst = os.path.join(os.path.dirname(src), '.site-' + os.path.basename(src))
+    open(dst, 'w').write(''.join(out))
+    print('    %d 3D models swapped' % swapped)
+    return dst
 
 
 def export_pcb(src, name, out, views=None):
@@ -155,7 +244,14 @@ def export_module(slug, repos):
         # Footprints with no outline have only been dropped in from the schematic, and
         # KiCad renders them against a default slab the size of the drawing sheet.
         laid_out = stats['footprints'] and stats['outline']
-        files = export_pcb(src, name, out, *views) if laid_out else []
+        files = []
+        if laid_out:
+            board = with_models(src, spec.get('models'))
+            try:
+                files = export_pcb(board, name, out, *views)
+            finally:
+                if board != src:
+                    os.remove(board)
         manifest['boards'].append({'name': name, 'source': path, 'label': label,
                                    'stats': stats, 'files': files})
         print('    %-22s board, %s' % (name, 'exported' if files else 'not laid out, skipped'))
