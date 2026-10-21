@@ -33,16 +33,17 @@ try {
 
 <p class="eyebrow">Finish</p>
 <h1>Compressor notes</h1>
-<p class="lede">How the <a href="https://github.com/UTS-500-Series/Compressor">compressor</a> followed this guide, as of
-2 October 2026. Its <a href="../compressor/boards.html">boards page</a> has the full
-description.</p>
+<p class="lede">How the <a href="https://github.com/UTS-500-Series/Compressor">compressor</a> followed this guide. It is now
+built and working, with a 3D-printed faceplate. Its <a href="../compressor/boards.html">boards
+page</a> has the full description.</p>
 
 <ul>
   <li><strong>Layout:</strong> the <code>toggle</code> layout, five single RK09K pots with four
   toggles beside them. The dual-concentric and pull-switch layouts were dropped.</li>
   <li><strong>Front board:</strong> 35 &times; 110 mm, carrying the pots, the Salecom S1315 and
   S1350 toggles, both meters and their two LM3914 drivers. It sits about 10.6 mm behind the
-  panel with the pot bodies resting on it, held only by the bushing nuts.</li>
+  panel with the pot bodies resting on it, held only by the four toggle nuts: the pots as
+  built have no bushing or nut.</li>
   <li><strong>Master:</strong> the panel and its holes are drawn on the front board's
   User.Drawings layer with the origin on the panel's top-left corner, and
   <code>panel/make_panel.py</code> takes its positions from there. The meter columns ended up
@@ -50,10 +51,12 @@ description.</p>
   <li><strong>Connector:</strong> the old 1.00 mm switch sockets are gone. A 30-way ribbon runs
   from a shrouded 2 &times; 15 header on the main board to a plain one on the front board, so
   put the stripe on pin 1 at both ends.</li>
-  <li><strong>Main board:</strong> front edge set back 24 mm, fixed to the panel with an L-bracket
-  on two M3 holes. One of them is plated to CHASSIS, which grounds the panel.</li>
-  <li><strong>Still open:</strong> the panel thickness for the pots' short bushings and the
-  ribbon length in a real rack.</li>
+  <li><strong>Main board:</strong> front edge set back 24 mm, fixed to the panel on two M3 holes.
+  On the built module that is a bracket printed into the faceplate
+  (<a href="../compressor/printed.html#bracket">printed faceplate</a>); with a metal panel it is an
+  L-bracket, and the hole plated to CHASSIS then grounds the panel.</li>
+  <li><strong>Panel thickness:</strong> settled by the pots having no bushing, so the printed
+  faceplate is a flat 3.2 mm with clearance holes for the shafts.</li>
 </ul>
 
 <div class="next"><a href="make.html">&larr; Make the panel</a><a href="checklist.html">Before ordering &rarr;</a></div>

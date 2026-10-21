@@ -144,8 +144,10 @@ and the LED current sinks, so every LED's current is a result rather than an ass
 catches up, and the gain-reduction meter climbs to <code>D26</code> and steps back down over
 the release. The <a href="simulation.html">simulation page</a> has the method.</p>
 
-<h2>Setting the two trimmers</h2>
-<p>Both meters have a trimmer, and both want a signal generator and a voltmeter.</p>
+<h2 id="trimmers">Setting the two trimmers</h2>
+<p>Both meters have a trimmer, and both want a signal source and a voltmeter. On the built
+module both were set with <code>tools/calibrate_meters.py</code> in the repository, which
+uses an audio interface as the signal source and the meter (see below). By hand:</p>
 <ul>
   <li><strong><code>RV8</code>, level.</strong> Feed the module a steady tone at whatever level
   you want the top LED to mean &mdash; +18 dBu is the usual choice, leaving a few dB before the
@@ -157,6 +159,31 @@ the release. The <a href="simulation.html">simulation page</a> has the method.</
   <code>D29</code> at 30 dB puts the rest where the table above says. Set it against a measured
   <code>CTRL-B</code>, not the design's &minus;10 V.</li>
 </ul>
+
+<h3>With the calibration script</h3>
+<p><code>tools/calibrate_meters.py</code> (Python with <code>numpy</code> and
+<code>sounddevice</code>) plays a sine from one output of an audio interface and measures one
+input, with a loopback cable and a multimeter on AC volts. It walks through four steps:</p>
+<ol>
+  <li><strong>Output level.</strong> You read the tone&rsquo;s AC volts across the output with
+  the multimeter, which ties the interface&rsquo;s dBFS to dBu.</li>
+  <li><strong>Input level.</strong> With the loopback cable, it learns the input&rsquo;s dBu at
+  full scale. The input gain stays put from here on.</li>
+  <li><strong>Level meter, <code>RV8</code>.</strong> With the module in circuit, it holds the
+  output at +12.0&nbsp;dBu, where <code>D34</code>, the top green LED, should just light, and you
+  turn <code>RV8</code> until it does. The scale is linear in volts, so one LED sets them all.
+  If the interface&rsquo;s input can&rsquo;t take +12&nbsp;dBu with headroom, it picks a lower
+  LED.</li>
+  <li><strong>Gain-reduction meter, <code>RV7</code>.</strong> It shows the live gain reduction
+  while you turn THRESHOLD anticlockwise to 16.7&nbsp;dB, then you turn <code>RV7</code> until
+  <code>D26</code>, the seventh LED from the top, just lights.</li>
+</ol>
+<p>The targets are the simulated thresholds in the table above, and after each trim it can
+sweep the meter to check every LED. Use an interface whose line outputs go well past
++12&nbsp;dBu (the Audient iD44 used on the built module reaches +18&nbsp;dBu); one that tops out
+near 0&nbsp;dBu can&rsquo;t drive the level meter high enough. THRESHOLD turns <em>clockwise for a higher threshold</em>, so fully
+clockwise means no compression at all; if <code>RV7</code> seems to run out of range, check
+that first.</p>
 
 <h2>What this costs the supply</h2>
 <div class="tw"><table><thead><tr><th class="r">Draw</th><th class="n">+16 V</th><th class="n">&minus;16 V</th></tr></thead><tbody><tr><td class="r"><code>U7</code> NE5532</td><td class="n">8 mA</td><td class="n">8 mA</td></tr><tr><td class="r"><code>U9</code> + <code>U10</code> quiescent</td><td class="n">~12 mA</td><td class="n">&mdash;</td></tr><tr><td class="r">One lit LED per meter</td><td class="n">~22 mA</td><td class="n">&mdash;</td></tr><tr><td class="r"><strong>Module total</strong>, simulated at rest plus one LED per meter</td><td class="n"><strong>~94 mA</strong></td><td class="n"><strong>~62 mA</strong></td></tr></tbody></table></div>
@@ -181,12 +208,12 @@ this is still the one number in the project worth measuring on the bench.</p>
   thresholds and extra steering if dot mode is to be kept. Only this sheet is affected.</p>
 </div>
 
-<div class="note warn">
-  <h4>Still open</h4>
-  <p>Nothing here has been built. The gain-reduction scale comes from a model of the steering
-  pair, not from measurement &mdash; the shape is right, but expect to move <code>RV7</code> and
-  to redraw the panel legend once a real one exists. <code>LED1</code> on sheet 6 is superseded
-  by this sheet and has no hole in the panel.</p>
+<div class="note">
+  <h4>On the built module</h4>
+  <p>Both meters work and were set with the script above, against the simulated scale. The
+  gain-reduction scale comes from a model of the steering pair, so the LEDs other than the one
+  <code>RV7</code> is set on are only as right as that model. <code>LED1</code> on sheet 6 is
+  superseded by this sheet and has no hole in the panel.</p>
 </div>
 
 <div class="next"><a href="power.html">&larr; Power &amp; references</a><a href="panel.html">The front panel &rarr;</a></div>

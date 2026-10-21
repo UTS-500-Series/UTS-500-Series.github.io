@@ -59,7 +59,7 @@ schematic: what it does, how it does it, and why it was built that way.</p>
   <div><dt>Release</dt><dd>49 ms&ndash;3.5 s</dd></div>
   <div><dt>Components</dt><dd>166</dd></div>
   <div><dt>Nets</dt><dd>110</dd></div>
-  <div><dt>Boards</dt><dd>2, ordered</dd></div>
+  <div><dt>Boards</dt><dd>2, built</dd></div>
 </dl>
 
 <h2>What a compressor actually does</h2>
@@ -105,20 +105,23 @@ is far more forgiving of component tolerance. Most classic bus compressors work 
   <a class="card" href="sidechain.html"><b>The sidechain</b><span>Measuring loudness and turning it into a control voltage, with attack and release.</span></a>
   <a class="card" href="power.html"><b>Power &amp; references</b><span>Rails, the &minus;5.1 V reference, and the bias voltages everything else depends on.</span></a>
   <a class="card" href="panel.html"><b>The front panel</b><span>Nine functions in 38 mm, three ways to arrange them, and why each one is a compromise.</span></a>
-  <a class="card" href="printed.html"><b>Printing the faceplate</b><span>A faceplate for an ordinary 3D printer, in one colour or two, with a fit test to print first.</span></a>
-  <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both routed, and ordered on 3 October.</span></a>
+  <a class="card" href="printed.html"><b>Printing the faceplate</b><span>The faceplate on the built module: printed in two colours, with the main board&rsquo;s bracket and an LED retainer.</span></a>
+  <a class="card" href="boards.html"><b>The boards</b><span>A main card in the rack and a front board behind the panel, joined by a ribbon. Both built and working.</span></a>
   <a class="card" href="simulation.html"><b>The simulation</b><span>What ngspice found when the schematic was simulated, and the fourteen values that changed because of it.</span></a>
   <a class="card" href="parts.html"><b>Parts list</b><span>Every part, and whether it came from Altronics, DigiKey or Jaycar.</span></a>
 </div>
 
-<div class="note warn">
-  <h4>Read this before building</h4>
-  <p>Both boards are routed and were ordered on 3 October, and the circuit has been
-  <a href="simulation.html">simulated</a>, but nothing has been built yet. Every
-  performance figure on this site is <strong>calculated or simulated from the design</strong>,
-  not measured. The netlist has been verified against the schematic automatically, ERC passes
-  with no errors, and ngspice runs the schematic as drawn, but a simulation is only as good as
-  its models &mdash; measure the real module before trusting any of it.</p>
+<div class="note">
+  <h4>Built and working</h4>
+  <p>Both boards were ordered on 3 October and the module is now <strong>built and
+  working</strong> (October 2026), with its <a href="printed.html">printed faceplate</a> and
+  both meters set by the <a href="meters.html#trimmers">calibration script</a>. The
+  schematics and boards on these pages, and on the <a href="files.html">design files</a> page,
+  are the ones it was built from.</p>
+  <p>The performance figures on this site are still <strong>calculated or simulated from the
+  design</strong>, not measured on the built module. The netlist has been verified against the
+  schematic automatically, ERC passes with no errors, and ngspice runs the schematic as drawn,
+  but a simulation is only as good as its models.</p>
 </div>
 """)
 
@@ -794,8 +797,10 @@ and the LED current sinks, so every LED's current is a result rather than an ass
 catches up, and the gain-reduction meter climbs to <code>D26</code> and steps back down over
 the release. The <a href="simulation.html">simulation page</a> has the method.</p>
 
-<h2>Setting the two trimmers</h2>
-<p>Both meters have a trimmer, and both want a signal generator and a voltmeter.</p>
+<h2 id="trimmers">Setting the two trimmers</h2>
+<p>Both meters have a trimmer, and both want a signal source and a voltmeter. On the built
+module both were set with <code>tools/calibrate_meters.py</code> in the repository, which
+uses an audio interface as the signal source and the meter (see below). By hand:</p>
 <ul>
   <li><strong><code>RV8</code>, level.</strong> Feed the module a steady tone at whatever level
   you want the top LED to mean &mdash; +18 dBu is the usual choice, leaving a few dB before the
@@ -807,6 +812,31 @@ the release. The <a href="simulation.html">simulation page</a> has the method.</
   <code>D29</code> at 30 dB puts the rest where the table above says. Set it against a measured
   <code>CTRL-B</code>, not the design's &minus;10 V.</li>
 </ul>
+
+<h3>With the calibration script</h3>
+<p><code>tools/calibrate_meters.py</code> (Python with <code>numpy</code> and
+<code>sounddevice</code>) plays a sine from one output of an audio interface and measures one
+input, with a loopback cable and a multimeter on AC volts. It walks through four steps:</p>
+<ol>
+  <li><strong>Output level.</strong> You read the tone&rsquo;s AC volts across the output with
+  the multimeter, which ties the interface&rsquo;s dBFS to dBu.</li>
+  <li><strong>Input level.</strong> With the loopback cable, it learns the input&rsquo;s dBu at
+  full scale. The input gain stays put from here on.</li>
+  <li><strong>Level meter, <code>RV8</code>.</strong> With the module in circuit, it holds the
+  output at +12.0&nbsp;dBu, where <code>D34</code>, the top green LED, should just light, and you
+  turn <code>RV8</code> until it does. The scale is linear in volts, so one LED sets them all.
+  If the interface&rsquo;s input can&rsquo;t take +12&nbsp;dBu with headroom, it picks a lower
+  LED.</li>
+  <li><strong>Gain-reduction meter, <code>RV7</code>.</strong> It shows the live gain reduction
+  while you turn THRESHOLD anticlockwise to 16.7&nbsp;dB, then you turn <code>RV7</code> until
+  <code>D26</code>, the seventh LED from the top, just lights.</li>
+</ol>
+<p>The targets are the simulated thresholds in the table above, and after each trim it can
+sweep the meter to check every LED. Use an interface whose line outputs go well past
++12&nbsp;dBu (the Audient iD44 used on the built module reaches +18&nbsp;dBu); one that tops out
+near 0&nbsp;dBu can&rsquo;t drive the level meter high enough. THRESHOLD turns <em>clockwise for a higher threshold</em>, so fully
+clockwise means no compression at all; if <code>RV7</code> seems to run out of range, check
+that first.</p>
 
 <h2>What this costs the supply</h2>
 """ + table(
@@ -837,12 +867,12 @@ this is still the one number in the project worth measuring on the bench.</p>
   thresholds and extra steering if dot mode is to be kept. Only this sheet is affected.</p>
 </div>
 
-<div class="note warn">
-  <h4>Still open</h4>
-  <p>Nothing here has been built. The gain-reduction scale comes from a model of the steering
-  pair, not from measurement &mdash; the shape is right, but expect to move <code>RV7</code> and
-  to redraw the panel legend once a real one exists. <code>LED1</code> on sheet 6 is superseded
-  by this sheet and has no hole in the panel.</p>
+<div class="note">
+  <h4>On the built module</h4>
+  <p>Both meters work and were set with the script above, against the simulated scale. The
+  gain-reduction scale comes from a model of the steering pair, so the LEDs other than the one
+  <code>RV7</code> is set on are only as right as that model. <code>LED1</code> on sheet 6 is
+  superseded by this sheet and has no hole in the panel.</p>
 </div>
 """)
 
@@ -964,9 +994,12 @@ the repository, alongside the DXF.</p>
   against the parts you actually buy &mdash; half a millimetre is the difference between a push
   fit and a rattle.</p>
   <p>The toggles' 8.9 mm bushing leaves about 5.5 mm of thread through a standard 3.18 mm panel,
-  plenty for the nut. The pots' 5 mm bushing leaves under 2 mm, so either counterbore the back
-  of the panel to about 2 mm round the five pot holes, or use a 1.6 to 2 mm panel. Depth is
-  covered on <a href="boards.html">the boards</a> page.</p>
+  plenty for the nut. The Altronics 9 mm pots the module was built with have no threaded
+  bushing or nut: they are held by the front board, and the board by the four toggle nuts, so
+  the pot holes are only clearance for the shafts and the panel can be the full 3.18 mm. A pot
+  with a bushing would get under 2 mm of thread through it, so counterbore the back round the
+  pot holes or use a thinner panel. Depth is covered on <a href="boards.html">the boards</a>
+  page.</p>
 </div>
 """)
 
@@ -976,91 +1009,131 @@ PRINT = 'https://github.com/UTS-500-Series/Compressor/tree/main/panel/print'
 PAGES['printed.html'] = ("Printing the faceplate", f"""
 <p class="eyebrow">Practical</p>
 <h1>Printing the faceplate</h1>
-<p class="lede">A faceplate for an ordinary FDM printer, for when there is no laser cutter, CNC
-or panel shop to hand. It has the same holes and legend as the <code>toggle</code> layout, so it
-fits the front board as drawn.</p>
+<p class="lede">The built compressor wears a 3D-printed faceplate, made on an ordinary FDM
+printer with no laser cutter, CNC or panel shop. It has the same holes and legend as the
+<code>toggle</code> layout, so it fits the front board as drawn, and it carries the main
+board&rsquo;s bracket and the meter LEDs too.</p>
 
 <figure>
   <div class="pane tall"><img src="img/faceplate-print.png" alt="The printed faceplate, front, in dark grey with a light legend" loading="lazy" style="max-height:520px;width:auto"></div>
-  <figcaption><span>The printed faceplate, rendered from its STL with the legend in a second colour</span>
+  <figcaption><span>The faceplate, rendered from its STL with the legend in a second colour. GR and LVL sit above the meters</span>
   <a href="{PRINT}">The files &rarr;</a></figcaption>
 </figure>
 
 <h2>The files</h2>
-<p>Everything is in <a href="{PRINT}"><code>panel/print/</code></a> in the compressor repository.</p>
+<p>Everything is in <a href="{PRINT}"><code>panel/print/</code></a> in the compressor repository,
+whose README has every parameter.</p>
 """ + table(["File", "What it is"],
             [["<code>faceplate-multicolor.3mf</code>", "Panel and legend as one object with two parts, for a two-colour print in Bambu Studio or OrcaSlicer"],
              ["<code>faceplate-multicolor-prusaslicer.3mf</code>", "The same for PrusaSlicer, which keeps its part table in a different place"],
-             ["<code>faceplate.stl</code>", "The faceplate on its own, already face down for printing"],
+             ["<code>faceplate.stl</code>", "The faceplate on its own, face down for printing, with the main-board bracket standing up off its back"],
              ["<code>faceplate-legend.stl</code>", "The engraved legend and pot ticks as their own body, for a second colour"],
+             ["<code>faceplate-led-retainer.stl</code>", "A thin plate that holds the twenty meter LEDs in from the back"],
              ["<code>faceplate-fit-test.stl</code> and its 3MFs", "A 27&nbsp;mm strip across THRESHOLD, HPF, KEY and the bottom of both meters, to print first"],
+             ["<code>faceplate.step</code>, <code>faceplate-blank.step</code>, <code>faceplate-led-retainer.step</code>", "Solid models for Fusion and other CAD: with the legend as a second body, with no legend, and the retainer in place"],
+             ["<code>faceplate-legend.dxf</code>", "The legend as outlines, one layer per label, for drawing your own on the blank"],
              ["<code>faceplate.scad</code>", "The OpenSCAD model. Every print setting is a parameter at the top"],
              ["<code>panel_data.scad</code>", "Hole positions and legend text, written by <code>panel/make_panel.py</code> from the same source as the DXF. Don&rsquo;t edit it by hand"],
-             ["<code>build.sh</code>", "Rebuilds the STLs and 3MFs from the model (a few minutes)"]],
+             ["<code>build.sh</code>", "Rebuilds the STLs, 3MFs and (with CadQuery) the STEPs from the model"]],
             ["r", ""]) + """
 
 <h2>How it differs from the metal panel</h2>
 <ul>
   <li><strong>3.2&nbsp;mm thick</strong>, the same as a 1/8&Prime; metal panel, so the rack screws
-      and everything behind the panel sit where the front board expects. The back is flat.</li>
-  <li><strong>Pot wells.</strong> Each pot hole has a 12.5&nbsp;mm counterbore on the front,
-      1.2&nbsp;mm deep, leaving 2.0&nbsp;mm of plastic under the nut. That gives the 9&nbsp;mm
-      pots&rsquo; short bushing about 3&nbsp;mm of thread, which the metal panel only gets by
-      being thinned round the pots. The 11&nbsp;mm knobs sit over the wells.</li>
+      and everything behind the panel sit where the front board expects.</li>
+  <li><strong>Flat round the pots.</strong> The Altronics 9&nbsp;mm pots have no threaded
+      bushing or nut. They are held by the front board, and the board by the four toggle nuts,
+      so the pot holes are only clearance for the shafts and the knobs sit close to the panel.</li>
+  <li><strong>Meter LEDs held in the panel.</strong> The holes suit Jaycar&rsquo;s 2&nbsp;mm
+      tower LEDs (ZD0060 orange, ZD0070 green, ZD0040 red), as measured: a 2.0&nbsp;mm tower,
+      1.5&nbsp;mm tall, on a 3.25 &times; 2.5&nbsp;mm base. Each tower pushes into a 2.2&nbsp;mm
+      hole from the back and its base sits in a 3.55&nbsp;mm slot, 2.3&nbsp;mm deep, down the back
+      of each meter column. The <a href="#retainer">retainer</a> holds them there.</li>
   <li><strong>Holes print oversize on purpose.</strong> Pot, toggle and screw holes come out
-      0.2&nbsp;mm larger than drawn (<code>hole_comp</code>), because FDM holes shrink. The meter
-      holes stay 2.2&nbsp;mm: they only let light out, and keeping them small leaves 0.8&nbsp;mm
-      of plastic between neighbours.</li>
+      0.2&nbsp;mm larger than drawn (<code>hole_comp</code>), because FDM holes shrink.</li>
   <li><strong>37.8 &times; 132.6&nbsp;mm</strong> rather than the nominal 38.10 &times;
       133.35, so it slides in beside the next module. The front edge has a 0.4&nbsp;mm chamfer so
       first-layer squish doesn&rsquo;t flare it.</li>
-  <li><strong>The legend is engraved</strong> 0.4&nbsp;mm deep and drawn 30% larger than on the
-      mockup, whose 1.4&ndash;1.7&nbsp;mm capitals are too fine for a 0.4&nbsp;mm nozzle. Each pot
-      gets three ticks: start, middle and end of travel.</li>
+  <li><strong>The legend is engraved</strong> 0.6&nbsp;mm deep, drawn 30% larger than on the
+      mockup and with every stroke thickened so none is thinner than about 0.5&nbsp;mm, more than
+      one line of a 0.4&nbsp;mm nozzle. Each pot gets three ticks: start, middle and end of
+      travel.</li>
 </ul>
+
+<h2 id="bracket">The main-board bracket</h2>
+<figure>
+  <div class="pane"><img src="img/faceplate-bracket.png" alt="The back of the faceplate, with the bracket wall standing up along one edge and two ears with nut slots" loading="lazy"></div>
+  <figcaption><span>The back of the faceplate: the bracket wall, its two ears for H1 and H2, and the LED slots</span></figcaption>
+</figure>
+<p>The bracket is printed in one piece with the faceplate. A wall stands off the back along
+the panel&rsquo;s left edge (seen from the front) and runs the whole length of the main board,
+stopping 2&nbsp;mm short of the edge connector, so it also covers the board&rsquo;s solder side.
+It is 0.8&nbsp;mm thick beside the front board and 2.0&nbsp;mm behind it, with a 1.6&nbsp;mm
+flange along its top and bottom edges to stiffen it. Two ears reach in to the main
+board&rsquo;s M3 holes <code>H1</code> and <code>H2</code>, each with a slot for an M3 nut.</p>
+<p>To fit the main board, drop an M3 nut into each ear and put an <strong>M3 &times; 6</strong>
+screw through <code>H1</code> and <code>H2</code> from the component side, with no washer. An
+M3 &times; 10 pokes out through the side of the wall. The screw holes are slotted &plusmn;1.5&nbsp;mm,
+so the board can sit a little nearer the panel or further back. Trim the leads on the back of
+the front board flush where the ears pass behind it.</p>
+<p>The board&rsquo;s position is drawn from the 500-series spec and the board files: 11.12&nbsp;mm
+left of the panel&rsquo;s centreline, its front edge 24&nbsp;mm behind the panel, and centred
+vertically. All three are parameters at the top of <code>faceplate.scad</code>. Set
+<code>bracket = false</code> for a plain panel to use with a metal angle instead.</p>
+
+<h2 id="retainer">The LED retainer</h2>
+<figure>
+  <div class="pane"><img src="img/faceplate-led-retainer.png" alt="The LED retainer plate, with a rib down each meter column, two pins and the lead holes" loading="lazy"></div>
+  <figcaption><span>The retainer: a rib per meter column, two locating pins, and a pair of lead holes per LED</span></figcaption>
+</figure>
+<p><code>faceplate-led-retainer.stl</code> is a 16.5 &times; 32.8&nbsp;mm plate, 1.2&nbsp;mm thick,
+over the back of both meters. A rib goes into each LED slot and presses on the backs of the LED
+bases, leaving each tip about 0.2&nbsp;mm proud of the front. Two 2&nbsp;mm pins press into
+holes in the back of the panel, and each LED&rsquo;s leads pass through their own pair of
+1.3&nbsp;mm holes on the front board&rsquo;s 2.54&nbsp;mm pitch. Print it flat, ribs and pins up.</p>
+<ol>
+  <li>Push all twenty LEDs into the panel from the back, flat (cathode) side as the front
+      board&rsquo;s silkscreen shows. The two columns face opposite ways.</li>
+  <li>Thread the leads through the retainer and press it on until its pins are home. A drop of
+      glue on each pin makes it permanent.</li>
+  <li>Fit the front board over the leads, tighten the toggle nuts, and solder the LEDs last.</li>
+</ol>
 
 <h2>Printing it</h2>
 <ol>
   <li><strong>Print the fit test first.</strong> Check that a pot and a toggle drop through their
-      holes, the pot nut sits inside its well, and the LEDs line up behind the meter holes. If a
+      holes and an LED tower pushes into its hole from the back with the base in the slot. If a
       hole is tight or loose, change <code>hole_comp</code> in <code>faceplate.scad</code> and
       rebuild (or use OpenSCAD&rsquo;s Customizer).</li>
-  <li><strong>Material:</strong> PETG in black or dark grey. A light colour lets each meter LED
-      glow through the thin walls beside its hole, and PLA slowly gives way under a tightened nut
-      in a warm rack.</li>
-  <li><strong>Settings:</strong> 0.4&nbsp;mm nozzle, 0.2&nbsp;mm layers, 4 walls, 100% infill, no
-      supports. Print it as exported, face down; a textured PEI sheet gives the front a good
-      finish.</li>
-  <li><strong>Two colours (optional):</strong> in Bambu Studio or OrcaSlicer, import
+  <li><strong>Material:</strong> the repository suggests PETG in black or dark grey: a light
+      colour lets each meter LED glow through the thin walls beside its hole, and PLA softens
+      sooner in a warm rack. The built module&rsquo;s faceplate is light lilac matte PLA with a
+      black PLA legend, printed at 0.08&nbsp;mm layers.</li>
+  <li><strong>Settings:</strong> 0.4&nbsp;mm nozzle, 0.2&nbsp;mm layers or finer, 4 walls, 100%
+      infill, no supports. Print it as exported, face down: the LED slots end up on top and the
+      bracket stands straight up with 45&deg; undersides on its ears, so nothing needs
+      supports. The wall makes the print 146&nbsp;mm tall; if its top wobbles, slow the outer
+      walls for the upper layers.</li>
+  <li><strong>Two colours:</strong> in Bambu Studio or OrcaSlicer, import
       <code>faceplate-multicolor.3mf</code> with File, Import (Cmd/Ctrl+I); in PrusaSlicer use the
       <code>-prusaslicer</code> version. It loads as one object with two parts already lined up,
-      the panel on filament 1 and the legend on filament 2. The file has no print settings in it,
-      so Bambu Studio says it is loading geometry only; that is expected. The colours only swap
-      on the first two layers, but it still needs a multicolour unit (AMS, MMU) or a second
-      nozzle.</li>
+      the panel on filament 1 and the legend on filament 2. The colours only swap over the first
+      0.6&nbsp;mm, but it still needs a multicolour unit (AMS, MMU) or a second nozzle.</li>
+  <li><strong>If the letters lift:</strong> use a brim and glue stick, slow the first layer, set
+      Z-hop to 0.4&nbsp;mm and avoid crossing walls. Don&rsquo;t use a raft, which spoils the face.</li>
   <li><strong>One colour:</strong> print <code>faceplate.stl</code> and fill the engraving
       afterwards with paint, or a white wax crayon rubbed in and wiped off.</li>
 </ol>
 
 <h2>Fitting it</h2>
 <ul>
-  <li>Snap the small anti-rotation tab off the front of each pot, as you would for a metal panel,
-      or it holds the pot off the back of the panel.</li>
-  <li>Tighten the nuts gently. Plastic creeps, and the nuts only need to hold the board.</li>
+  <li>Snap the small anti-rotation tab off the front of each pot, or it holds the pot off the
+      back of the panel.</li>
+  <li>Tighten the toggle nuts gently. Plastic creeps, and the nuts only need to hold the board.</li>
+  <li><strong>Grounding.</strong> A plastic panel and bracket don&rsquo;t tie the toggle bushings
+      to <code>CHASSIS</code> the way a metal panel on <code>H2</code> does. If touching a toggle
+      adds hum, run a wire from a solder tag under one toggle&rsquo;s nut to <code>H2</code>.</li>
 </ul>
-
-<div class="note warn">
-  <h4>Not solved yet</h4>
-  <ul>
-    <li><strong>Grounding.</strong> A plastic panel doesn&rsquo;t ground the pot and toggle
-        bushings the way a metal panel tied to <code>CHASSIS</code> does. If touching a knob adds
-        hum, run a wire from a solder tag under one toggle&rsquo;s nut to the main board&rsquo;s
-        <code>H2</code>.</li>
-    <li><strong>The main board&rsquo;s bracket.</strong> The L-bracket that holds the main board
-        (see <a href="boards.html">the boards</a>) is meant to bolt to a metal panel. How it fixes
-        to a printed one, and whether the plastic holds up, hasn&rsquo;t been modelled or tried.</li>
-  </ul>
-</div>
 """)
 
 # ============================================================ 11 BOARDS
@@ -1069,8 +1142,9 @@ PAGES['boards.html'] = ("The boards", """
 <h1>The boards</h1>
 <p class="lede">The compressor is two boards. The main board is the card that plugs into the
 rack; a small front board sits behind the faceplate and carries everything you touch or read.
-A 30-way ribbon joins them. Both are routed and pass DRC, and both were ordered on
-3 October from the Gerbers in the repository.</p>
+A 30-way ribbon joins them. Both pass DRC, were ordered on 3 October from the Gerbers in
+the repository, and are now built and working. The renders and plots here are of those
+boards.</p>
 
 """ + render("main-board-3d-angle.png", "Main board, KiCad 3D render") + """
 """ + render("front-board-3d-angle.png", "Front board, KiCad 3D render. The side shown faces the panel") + """
@@ -1082,7 +1156,7 @@ A 30-way ribbon joins them. Both are routed and pass DRC, and both were ordered 
      ["Carries", "The whole audio path, sidechain, power, references and trimmers",
       "Five pots, four toggles, both LED meters and their drivers"],
      ["Copper", "Two layers, AGND poured on the bottom", "Two layers"],
-     ["Held by", "An L-bracket from the back of the panel", "The nuts on the pot and toggle bushings"]],
+     ["Held by", "Two M3 screws into the printed faceplate&rsquo;s bracket (or a metal L-bracket)", "The four toggle nuts"]],
     ["r", "", ""]) + """
 
 <p>Track counts, layer plots and the PDFs of every layer are on the
@@ -1151,8 +1225,10 @@ reference netlist, <code>tools/design.py</code>. That comparison caught a wire j
       which is too tall for the panel side.</li>
 </ul>
 <p>The pot bodies stand 10.6 mm off the board and the toggles 10.4 mm, so the board sits
-<strong>about 10.6 mm behind the panel</strong>, with the pots resting against it. The LEDs
-need spacers of about 8 mm to reach their holes.</p>
+<strong>about 10.6 mm behind the panel</strong>, with the pots resting against it. On the built
+module the meter LEDs sit in the printed faceplate itself, held by a
+<a href="printed.html#retainer">retainer plate</a>, and their leads run back to the board; fit
+them last, with the faceplate on.</p>
 
 <h2>Joining and fixing them</h2>
 <ul>
@@ -1164,12 +1240,14 @@ need spacers of about 8 mm to reach their holes.</p>
       crimping.</li>
   <li><strong>Ribbon length.</strong> About 150 mm, folded once. It depends on where the board
       sits in your rack, so lay the boards out before crimping.</li>
-  <li><strong>Front board to panel:</strong> just the nine bushing nuts.</li>
-  <li><strong>Main board to panel:</strong> an L-bracket (25 &times; 25 mm aluminium angle, or a
-      short angle on standoffs) from the back of the panel to the two M3 holes
-      <code>H1</code> and <code>H2</code> near the board's front edge. <code>H2</code> is plated
-      and tied to <code>CHASSIS</code>, so the bracket also grounds the panel. Mask the anodise
-      where the bracket touches it.</li>
+  <li><strong>Front board to panel:</strong> the four toggle nuts. The pots have no bushing or
+      nut of their own.</li>
+  <li><strong>Main board to panel:</strong> on the built module, the
+      <a href="printed.html#bracket">bracket printed into the faceplate</a>, with M3 &times; 6
+      screws through the two holes <code>H1</code> and <code>H2</code> near the board's front
+      edge. With a metal panel, use an L-bracket (25 &times; 25 mm aluminium angle) instead:
+      <code>H2</code> is plated and tied to <code>CHASSIS</code>, so a metal bracket also grounds
+      the panel. Mask the anodise where the bracket touches it.</li>
 </ul>
 <p>The <a href="../faceplate/index.html">faceplate fit guide</a> covers the same joint for every
 module.</p>
@@ -1199,23 +1277,22 @@ fine for a prototype but wears with repeated insertion.</p>
 layout: the first set committed was plotted before the main board was last re-routed, and
 would have built the old copper.</p>
 
-<div class="note warn">
-  <h4>Check when the boards arrive</h4>
+<div class="note">
+  <h4>From the build</h4>
   <ul>
-    <li><strong>The main board was routed by script.</strong> IN&plusmn; and OUT&plusmn; run as
-        pairs on the top layer and the ground pour on the bottom is one piece. It passes DRC
-        with nothing unconnected, but no one reviewed the routing by eye before it was ordered,
-        so check continuity on the audio path before powering it.</li>
-    <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the pots under 2 mm of
-        thread: counterbore the pot holes or use a thinner panel
-        (<a href="panel.html">front panel</a>). The <a href="printed.html">printed
-        faceplate</a> has the counterbores built in.</li>
-    <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, as is usual, RATIO
-        turns clockwise for a harder ratio (its outer pins are swapped for that) and THRESHOLD
-        turns clockwise for a higher threshold (see <a href="simulation.html">the
-        simulation</a>).</li>
-    <li><strong>Ribbon length</strong> is an estimate until the boards are in a rack.</li>
+    <li><strong>The boards work as ordered.</strong> The main board was routed by script and
+        passed DRC with nothing unconnected, and the module built from it works.</li>
+    <li><strong>Pot direction.</strong> RATIO turns clockwise for a harder ratio (its outer pins
+        are swapped for that), and THRESHOLD turns clockwise for a <em>higher</em> threshold, so
+        fully clockwise means no compression. That catches people out at bring-up.</li>
+    <li><strong>Trimpots.</strong> The 3296W footprints for <code>RV1</code>, <code>RV7</code>
+        and <code>RV8</code> have no screw mark and all-round pads, so the silkscreen
+        doesn&rsquo;t show which way round they go. Either way works; it only reverses the
+        adjustment direction.</li>
   </ul>
+  <p>Changes for the next revision, such as more mounting holes on the main board and a screw
+  mark on the trimpots, are collected in
+  <a href="https://github.com/UTS-500-Series/Compressor/issues/15">issue #15</a>.</p>
 </div>
 """)
 
@@ -1512,6 +1589,10 @@ ever goes near a rack.</p>
   <li><strong>Link check.</strong> With two modules and <code>SW4</code> closed on both,
       driving one channel only should pull <em>both</em> down by about half as much as that
       channel alone would move. That halving is the averaging bus working.</li>
+  <li><strong>Meters.</strong> Set <code>RV8</code> and <code>RV7</code> with
+      <code>tools/calibrate_meters.py</code> and an audio interface, as the
+      <a href="meters.html#trimmers">meters page</a> describes. That is how the built module
+      was set.</li>
 </ol>
 
 <h2>If something is wrong</h2>
@@ -1539,6 +1620,10 @@ ever goes near a rack.</p>
   <li><code>tools/design.py</code> &mdash; the authoritative netlist as data.
       The schematic is generated and verified against it.</li>
   <li><code>panel/</code> &mdash; the faceplate generator: mockups, a 1:1 drawing and DXF.</li>
+  <li><code>panel/print/</code> &mdash; the <a href="printed.html">printed faceplate</a> the
+      module was built with, its bracket and LED retainer, as STL, 3MF and STEP.</li>
+  <li><code>tools/calibrate_meters.py</code> &mdash; sets the two meter trimmers with an audio
+      interface.</li>
   <li><code>bom/ordered.csv</code> &mdash; the <a href="parts.html">parts list</a>: what was
       bought for the first build, and where.</li>
   <li><code>bom/altronics.csv</code> &mdash; the Altronics shopping list, built by
@@ -1551,4 +1636,4 @@ ever goes near a rack.</p>
 
 
 import content_files
-PAGES['files.html'] = content_files.page('compressor', '15')
+PAGES['files.html'] = content_files.page('compressor', '15', latest=('8214cb2', '2026-10-21'))

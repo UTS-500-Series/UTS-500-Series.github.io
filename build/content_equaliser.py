@@ -1,7 +1,8 @@
 """Equaliser module - page content.
 
 Written from the Equaliser repository at commit 4d106d3 (11 Oct 2026). The boards were
-finalised and ordered in 4c10641 on 8 Oct, and 4d106d3 updates the parts list:
+finalised and ordered in 4c10641 on 8 Oct, and 4d106d3 updates the parts list. The module
+is built and working (21 Oct 2026), and 4d106d3 is still the latest commit:
 https://github.com/UTS-500-Series/Equaliser
 
 The whole equaliser is drawn on Combined_EQ/Combined_EQ.kicad_sch. That sheet's image and
@@ -338,18 +339,18 @@ PAGES['index.html'] = ("Overview", f"""
 <h1>The equaliser</h1>
 <p class="lede">A four-band equaliser: a low shelf, two fully parametric mid bands and a high
 shelf, between a balanced input receiver and a balanced line driver, with a hard bypass. The
-boards have been ordered and the module is being built.</p>
+module is built and working.</p>
 
 <div class="note">
-  <h4>Ordered, and being built</h4>
+  <h4>Built and working</h4>
   <p>Written from the <a href="{SRC}">Equaliser repository</a> at commit
   <code>{COMMIT}</code> (11&nbsp;October). The team finished the layout and ordered the boards
   on 8&nbsp;October (<code>4c10641</code>, &ldquo;finalised and ordered&rdquo;): a four-layer
   main card, plus a small top board for the four dual frequency pots. The Gerbers that went to
   the fab are in the repository as <code>500_Series_EQ.zip</code>. The supply fault the earlier
-  sheet had is fixed. Every response figure on these pages is worked out from the schematic;
-  nothing has been measured yet.</p>
-  <p>Build notes for the boards as ordered are on <a href="status.html">building it</a>.</p>
+  sheet had is fixed. The module was built from those boards and works. Every response figure
+  on these pages is worked out from the schematic, not measured on the built module.</p>
+  <p>Build notes are on <a href="status.html">building it</a>.</p>
 </div>
 
 <dl class="spec">
@@ -360,7 +361,7 @@ boards have been ordered and the module is being built.</p>
   <div><dt>Mid bands</dt><dd>&plusmn;{LM['boost']:.1f} dB</dd></div>
   <div><dt>Low shelf</dt><dd>&plusmn;{LS['boost1']:.1f} dB</dd></div>
   <div><dt>Op amps</dt><dd>4 &times; OPA1644, OPA1641</dd></div>
-  <div><dt>Boards</dt><dd>2, ordered</dd></div>
+  <div><dt>Boards</dt><dd>2, built</dd></div>
 </dl>
 
 """ + blocks() + """
@@ -741,14 +742,19 @@ reads less there.</p>
 PAGES['board.html'] = ("Board &amp; parts", """
 <p class="eyebrow">Practical &mdash; 06</p>
 <h1>Board and parts</h1>
-<p class="lede">Two boards, ordered on 8&nbsp;October: the four-layer main card, and a small top
-board that carries the four dual frequency pots. They are drawn side by side in one KiCad
-file.</p>
+<p class="lede">Two boards, ordered on 8&nbsp;October and now built: the four-layer main card,
+and a small top board that carries the four dual frequency pots. They are drawn side by side in
+one KiCad file and split apart at the front, then stacked on standoffs.</p>
 
 <figure>
   <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of both equaliser boards, the pot board on the left beside the main card" loading="lazy"></div>
   <figcaption><span>Both boards at <code>4d106d3</code>, from above. The narrow strip on the left with the four large pots is the top board; the rest is the main card. The pots are stand-in blocks: KiCad&rsquo;s library has no model for the RK097</span>
   <a href="files/combined-3d-top.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
+</figure>
+
+<figure>
+  <div class="pane tall"><img src="img/built-boards.jpg" alt="The built equaliser in a 500-series rack, seen from the front: two boards side by side on standoffs, with a column of pots on each" loading="lazy" style="max-height:620px;width:auto"></div>
+  <figcaption><span>The built module in the rack, from the front, without its faceplate: the main card and the top board stacked on standoffs, each with a column of pots</span></figcaption>
 </figure>
 
 <h2>What was ordered</h2>
@@ -766,12 +772,12 @@ file.</p>
             ["r", ""]) + """
 
 <h2>How the two boards fit together</h2>
-<p>The repository doesn&rsquo;t say in words, but the drawing points one way. The top
-board&rsquo;s holes H1 and H4 sit exactly 22.5&nbsp;mm (its own width) from the main
-card&rsquo;s H2 and H3, and the parts list orders two 20&nbsp;mm M3 standoffs. So the top board
-appears to stack 20&nbsp;mm above the main card, holes over holes, with its front edge in line
-with the card&rsquo;s. That gives the panel two columns of knobs 20&nbsp;mm apart, which is what
-fixes the earlier layout&rsquo;s ten shafts crammed into one line:</p>
+<p>The top board is drawn beside the main card in the KiCad file and split off its front. On
+the built module it stacks above the main card on two 20&nbsp;mm M3 standoffs (the ones in the
+parts list), holes over holes: the top board&rsquo;s H1 and H4 sit exactly 22.5&nbsp;mm, its
+own width, from the main card&rsquo;s H2 and H3, with its front edge in line with the
+card&rsquo;s. That gives the panel two columns of knobs, which is what fixes the earlier
+layout&rsquo;s ten shafts crammed into one line:</p>
 """ + table(["Height on the card", "Main card column", "Top board column"],
             [["64.5&nbsp;mm", "RV3, low shelf level", ""], ["72&nbsp;mm", "", "RV1, low shelf frequency"],
              ["79.5&nbsp;mm", "RV7, low-mid width", ""], ["87&nbsp;mm", "", "RV9, low-mid frequency"],
@@ -786,7 +792,7 @@ edge. J2 runs along the top board and J3 across the main card, so the 17 links b
 wires or a ribbon rather than a plug-in header pair.</p>
 
 <h2>What KiCad&rsquo;s checks say</h2>
-<p>We ran KiCad 10&rsquo;s design-rule check on the board as ordered. Nothing in it stops the
+<p>We ran KiCad 10&rsquo;s design-rule check on the board as ordered. Nothing in it stopped the
 module working; three things are worth knowing:</p>
 <ul>
   <li><strong>The card edge pads are wired on one face only.</strong> Each J1 pin has a pad on
@@ -891,9 +897,8 @@ will run anywhere.</p>
 PAGES['status.html'] = ("Building it", """
 <p class="eyebrow">Practical &mdash; 08</p>
 <h1>Building it</h1>
-<p class="lede">The boards are ordered and the module is being built. Most of the questions
-this page used to list were settled before ordering; what is left is for the bench and the
-faceplate.</p>
+<p class="lede">The module is built and working. Most of the questions this page used to list
+were settled before ordering; the rest are notes for anyone building another one.</p>
 
 <h2>Settled before ordering</h2>
 """ + table(["Was", "Now"],
@@ -904,7 +909,7 @@ faceplate.</p>
              ["Board not routed", "Routed on four layers and ordered"]],
             ["r", ""]) + """
 
-<h2>On the bench</h2>
+<h2>Notes for the bench</h2>
 """ + table(["Item", "What to do"],
             [["Wire J2 to J3", "All 17 pins, pin for pin, including pin 15 (the top board&rsquo;s only ground)"],
              ["C18, C20, C2, C7", "Electrolytics on footprints drawn for other parts: bend the leads, and fit C18/C20 the right way round (<a href=\"board.html\">fit notes</a>)"],
@@ -926,11 +931,12 @@ faceplate.</p>
   <li>Flip SW1 to bypass: the output should equal the input exactly, powered or not.</li>
 </ol>
 
-<h2>Still to draw</h2>
-<p>The faceplate: ten knob holes in two columns from the pot positions above, plus the legend,
-which has to follow the mid bands&rsquo; reversed directions. The compressor&rsquo;s
-<a href="../compressor/printed.html">printed faceplate</a> is the pattern to copy.</p>
+<h2>The faceplate</h2>
+<p>The faceplate isn&rsquo;t in the repository yet. It needs ten knob holes in two columns from
+the pot positions above, plus a legend that follows the mid bands&rsquo; reversed directions.
+The compressor&rsquo;s <a href="../compressor/printed.html">printed faceplate</a> is the pattern
+to copy.</p>
 """)
 
 import content_files
-PAGES['files.html'] = content_files.page('equaliser', '09')
+PAGES['files.html'] = content_files.page('equaliser', '09', latest=('4d106d3', '2026-10-11'))

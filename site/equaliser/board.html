@@ -33,9 +33,9 @@ try {
 
 <p class="eyebrow">Practical &mdash; 06</p>
 <h1>Board and parts</h1>
-<p class="lede">Two boards, ordered on 8&nbsp;October: the four-layer main card, and a small top
-board that carries the four dual frequency pots. They are drawn side by side in one KiCad
-file.</p>
+<p class="lede">Two boards, ordered on 8&nbsp;October and now built: the four-layer main card,
+and a small top board that carries the four dual frequency pots. They are drawn side by side in
+one KiCad file and split apart at the front, then stacked on standoffs.</p>
 
 <figure>
   <div class="pane"><img src="files/combined-3d-top.png" alt="KiCad 3D render of both equaliser boards, the pot board on the left beside the main card" loading="lazy"></div>
@@ -43,17 +43,22 @@ file.</p>
   <a href="files/combined-3d-top.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
 </figure>
 
+<figure>
+  <div class="pane tall"><img src="img/built-boards.jpg" alt="The built equaliser in a 500-series rack, seen from the front: two boards side by side on standoffs, with a column of pots on each" loading="lazy" style="max-height:620px;width:auto"></div>
+  <figcaption><span>The built module in the rack, from the front, without its faceplate: the main card and the top board stacked on standoffs, each with a column of pots</span></figcaption>
+</figure>
+
 <h2>What was ordered</h2>
 <div class="tw"><table><thead><tr><th class="r"></th><th class="">Main card</th><th class="">Top board</th></tr></thead><tbody><tr><td class="r">Size</td><td class="">136.85 &times; 105&nbsp;mm, plus the 8&nbsp;mm edge-connector tab</td><td class="">22.5 &times; 105&nbsp;mm</td></tr><tr><td class="r">Carries</td><td class="">Everything else, including the six single pots along its front edge</td><td class="">RV1, RV4, RV6, RV9 (the frequency pots), the low shelf&rsquo;s 20&nbsp;nF caps, and the resistors at the ends of the pot tracks</td></tr><tr><td class="r">Joined by</td><td class="">J3, 17-pin header</td><td class="">J2, 17-pin header, wired pin for pin to J3</td></tr><tr><td class="r">Mounting</td><td class="">H2, H3 (M3)</td><td class="">H1, H4 (M3)</td></tr></tbody></table></div>
 <div class="tw"><table><thead><tr><th class="r"></th><th class="">Both boards</th></tr></thead><tbody><tr><td class="r">Layers</td><td class="">Four. Ground pour on In1 on each board; tracks on the front, back and In2</td></tr><tr><td class="r">Tracks</td><td class="">832 segments and 71 vias</td></tr><tr><td class="r">Parts</td><td class="">133 footprints. Through-hole except the five op amps (SOIC)</td></tr><tr><td class="r">Gerbers</td><td class=""><code>500_Series_EQ.zip</code> in the repository, exported 8&nbsp;October with KiCad 9.0.7</td></tr></tbody></table></div>
 
 <h2>How the two boards fit together</h2>
-<p>The repository doesn&rsquo;t say in words, but the drawing points one way. The top
-board&rsquo;s holes H1 and H4 sit exactly 22.5&nbsp;mm (its own width) from the main
-card&rsquo;s H2 and H3, and the parts list orders two 20&nbsp;mm M3 standoffs. So the top board
-appears to stack 20&nbsp;mm above the main card, holes over holes, with its front edge in line
-with the card&rsquo;s. That gives the panel two columns of knobs 20&nbsp;mm apart, which is what
-fixes the earlier layout&rsquo;s ten shafts crammed into one line:</p>
+<p>The top board is drawn beside the main card in the KiCad file and split off its front. On
+the built module it stacks above the main card on two 20&nbsp;mm M3 standoffs (the ones in the
+parts list), holes over holes: the top board&rsquo;s H1 and H4 sit exactly 22.5&nbsp;mm, its
+own width, from the main card&rsquo;s H2 and H3, with its front edge in line with the
+card&rsquo;s. That gives the panel two columns of knobs, which is what fixes the earlier
+layout&rsquo;s ten shafts crammed into one line:</p>
 <div class="tw"><table><thead><tr><th class="n">Height on the card</th><th class="">Main card column</th><th class="">Top board column</th></tr></thead><tbody><tr><td class="n">64.5&nbsp;mm</td><td class="">RV3, low shelf level</td><td class=""></td></tr><tr><td class="n">72&nbsp;mm</td><td class=""></td><td class="">RV1, low shelf frequency</td></tr><tr><td class="n">79.5&nbsp;mm</td><td class="">RV7, low-mid width</td><td class=""></td></tr><tr><td class="n">87&nbsp;mm</td><td class=""></td><td class="">RV9, low-mid frequency</td></tr><tr><td class="n">94.5&nbsp;mm</td><td class="">RV8, low-mid boost/cut</td><td class=""></td></tr><tr><td class="n">109&nbsp;mm</td><td class="">RV2, high-mid width</td><td class=""></td></tr><tr><td class="n">116.5&nbsp;mm</td><td class=""></td><td class="">RV6, high-mid frequency</td></tr><tr><td class="n">124&nbsp;mm</td><td class="">RV5, high-mid boost/cut</td><td class=""></td></tr><tr><td class="n">131.5&nbsp;mm</td><td class=""></td><td class="">RV4, high shelf frequency</td></tr><tr><td class="n">139&nbsp;mm</td><td class="">RV10, high shelf level</td><td class=""></td></tr></tbody></table></div>
 <p>Heights are the pot positions measured down the card in the board file, so they read in the
 board&rsquo;s own coordinates; the faceplate needs them measured from the panel&rsquo;s top
@@ -61,7 +66,7 @@ edge. J2 runs along the top board and J3 across the main card, so the 17 links b
 wires or a ribbon rather than a plug-in header pair.</p>
 
 <h2>What KiCad&rsquo;s checks say</h2>
-<p>We ran KiCad 10&rsquo;s design-rule check on the board as ordered. Nothing in it stops the
+<p>We ran KiCad 10&rsquo;s design-rule check on the board as ordered. Nothing in it stopped the
 module working; three things are worth knowing:</p>
 <ul>
   <li><strong>The card edge pads are wired on one face only.</strong> Each J1 pin has a pad on

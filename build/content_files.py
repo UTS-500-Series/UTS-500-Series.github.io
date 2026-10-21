@@ -55,8 +55,9 @@ def _board(b, m):
                       % (name, name)])
 
 
-def page(slug, number):
-    """(title, body) for site/<slug>/files.html."""
+def page(slug, number, latest=None):
+    """(title, body) for site/<slug>/files.html. `latest` is (commit, date) of the module's
+    main branch once it is built, checked to change none of the exported KiCad files."""
     here = os.path.dirname(os.path.abspath(__file__))
     m = json.load(open(os.path.join(here, '..', 'site', slug, 'files', 'manifest.json')))
     commit = '<a href="%s/commit/%s"><code>%s</code></a>' % (m['repo'], m['commit'], m['commit'])
@@ -66,8 +67,16 @@ def page(slug, number):
 be read, printed or downloaded without KiCad.</p>
 <p>Exported from <a href="{m['repo']}">{m['repo'].rsplit('/', 1)[1]}</a> at {commit}
 ({m['date']}) with KiCad {m['kicad']}. These are snapshots: the repository is the source, and
-<code>build/export_kicad.py</code> regenerates this page when it changes.</p>
-<h2>Schematics</h2>"""]
+<code>build/export_kicad.py</code> regenerates this page when it changes.</p>"""]
+    if latest:
+        since = ('That is still the latest commit on the main branch.' if latest[0] == m['commit']
+                 else 'The KiCad files are unchanged on the main branch up to <a href="%s/commit/%s">'
+                      '<code>%s</code></a> (%s).' % (m['repo'], latest[0], latest[0], latest[1]))
+        body.append(f"""<div class="note">
+  <h4>The files the module was built from</h4>
+  <p>The module is built and working, and these are its final schematics and boards. {since}</p>
+</div>""")
+    body.append('<h2>Schematics</h2>')
     body += [_schematic(s, m) for s in m['schematics']]
     body.append('<h2>Boards</h2>')
     body += [_board(b, m) for b in m['boards']]

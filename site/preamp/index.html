@@ -35,13 +35,13 @@ try {
 <h1>The microphone preamp</h1>
 <p class="lede">A discrete, balanced microphone preamp: two transistor pairs doing the gain,
 one op amp turning it into a line output, switchable 48&nbsp;V phantom power, and a single gain
-control between the two halves. The board has been ordered and is being built.</p>
+control between the two halves. The module is built and working.</p>
 
 <div class="note">
   <h4>Where this comes from</h4>
   <p>The circuit, the board and every connection on these pages are read from the team's own
-  KiCad project in <a href="https://github.com/UTS-500-Series/Pre-Amp">UTS-500-Series/Pre-Amp</a> at <code>5e6a308</code>. That
-  board has been ordered and is being built.</p>
+  KiCad project in <a href="https://github.com/UTS-500-Series/Pre-Amp">UTS-500-Series/Pre-Amp</a> at <code>5e6a308</code>, the
+  layout the board was made from. The module is <strong>built and working</strong>.</p>
   <p>The sheet itself has no component values. The build uses the values of the design it
   redraws, Rod Elliott's <a href="https://sound-au.com/project66.htm">ESP Project 66</a> with the phantom feed from
   <a href="https://sound-au.com/project96.htm">Project 96</a>, so these pages give those values on our reference
@@ -87,7 +87,7 @@ them. An NE5532 then takes the difference of the two pair outputs and drives the
 <div class="tw"><table><thead><tr><th class="r"></th><th class="n">Value</th><th class="">Source</th></tr></thead><tbody><tr><td class="r">Gain</td><td class="n">About 6&nbsp;dB to 56&nbsp;dB on one knob</td><td class="">Maximum ESP's; minimum ours, from the values</td></tr><tr><td class="r">Input impedance</td><td class="n">4.4&nbsp;k&Omega; (6.6&nbsp;k&Omega; of bias resistors, with the phantom feed across it)</td><td class="">Ours, from ESP's values</td></tr><tr><td class="r">Noise</td><td class="n">1.9&nbsp;nV/&radic;Hz, a 0.9&nbsp;dB noise figure from 200&nbsp;&Omega;, with 2N4403 input transistors</td><td class="">ESP, measured</td></tr><tr><td class="r">Maximum input</td><td class="n">About 1.5&nbsp;V RMS before clipping</td><td class="">ESP</td></tr><tr><td class="r">Output</td><td class="n">Impedance-balanced, 100&nbsp;&Omega; each leg</td><td class="">ESP's values</td></tr><tr><td class="r">Supply</td><td class="n">&plusmn;16&nbsp;V, about 15&nbsp;mA per rail; 48&nbsp;V phantom from J1 pin 15</td><td class="">Ours</td></tr></tbody></table></div>
 
 <h2>How far along it is</h2>
-<div class="tw"><table><thead><tr><th class="r"></th><th class="">State</th></tr></thead><tbody><tr><td class="r">Schematic</td><td class="">Complete as a circuit: one sheet, 46 parts, every part connected</td></tr><tr><td class="r">Component values</td><td class="">ESP's Project 66 and 96 values, on our references (the sheet itself still reads R and C)</td></tr><tr><td class="r">PCB</td><td class="">Ordered: all 46 footprints placed and every net routed on two layers</td></tr><tr><td class="r">Build</td><td class="">In progress</td></tr><tr><td class="r">Edge connector</td><td class="">Power, ground and +48&nbsp;V only; audio goes in and out on flying leads</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="r"></th><th class="">State</th></tr></thead><tbody><tr><td class="r">Schematic</td><td class="">Complete as a circuit: one sheet, 46 parts, every part connected</td></tr><tr><td class="r">Component values</td><td class="">ESP's Project 66 and 96 values, on our references (the sheet itself still reads R and C)</td></tr><tr><td class="r">PCB</td><td class="">Made from the repository: all 46 footprints placed and every net routed on two layers</td></tr><tr><td class="r">Build</td><td class="">Built and working</td></tr><tr><td class="r">Edge connector</td><td class="">Power, ground and +48&nbsp;V only; audio goes in and out on flying leads</td></tr></tbody></table></div>
 <p>Build notes, and the full value list, are on <a href="board.html">The board and building
 it</a>.</p>
 

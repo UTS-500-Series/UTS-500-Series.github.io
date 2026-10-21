@@ -14,17 +14,17 @@ also render correctly if this is ever demoted to an ordinary project site.
 
 | Module | Status | Source |
 |---|---|---|
-| Compressor | **Being built** — schematic complete, verified and simulated, main and front boards ordered (3 Oct), parts bought from Altronics, DigiKey and Jaycar, printable faceplate | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
-| Preamp | **Being built** — board ordered from the routed layout; values from ESP Projects 66 and 96, since the sheet has none | [`UTS-500-Series/Pre-Amp`](https://github.com/UTS-500-Series/Pre-Amp) |
-| Equaliser | **Being built** — whole circuit on one sheet with values (low and high shelves, two parametric bands, balanced in and out); four-layer main card and a pot board ordered (8 Oct) | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
+| Compressor | **Built and working** — schematic verified and simulated, main and front boards (ordered 3 Oct), parts from Altronics, DigiKey and Jaycar, 3D-printed faceplate, meters calibrated | [`UTS-500-Series/Compressor`](https://github.com/UTS-500-Series/Compressor) |
+| Preamp | **Built and working** — board made from the routed layout; values from ESP Projects 66 and 96, since the sheet has none | [`UTS-500-Series/Pre-Amp`](https://github.com/UTS-500-Series/Pre-Amp) |
+| Equaliser | **Built and working** — whole circuit on one sheet with values (low and high shelves, two parametric bands, balanced in and out); four-layer main card and a pot board (ordered 8 Oct) | [`UTS-500-Series/Equaliser`](https://github.com/UTS-500-Series/Equaliser) |
 
-Only the compressor has a finished, verified design. Its pages are generated from `design.py` in the compressor
+All three modules are built and working, and each one's design files page holds the schematics and boards it was built from. The compressor's pages are generated from `design.py` in the compressor
 repository, which the KiCad schematic is verified against pin by pin, so its figures come
 from the design rather than from memory.
 
 The equaliser section is written from its own repository. Its sheet, `Combined_EQ.kicad_sch`, holds the whole circuit and is drawn and given a viewer by `build/_kicad_sch.py --module equaliser`. The response figures come from `build/_eq_response.py`, which solves the sheet's netlist from the input receiver to the line driver (ideal op amps, linear pots) and carries the team's LTspice run of the low-mid band alongside to show they agree. The four frequency pots sit on a second board joined by J2 and J3, which the solver connects pin for pin. Rerun both, with the Equaliser repository checked out beside this one, when the sheet changes.
 
-The preamp section is written from its own repository, a single KiCad 10 sheet. KiCad 10 cannot be installed where the site is built, so `build/_kicad_sch.py` draws that sheet as SVG and builds its viewer data straight from the `.kicad_sch` file. The sheet has no component values. The board is being built with the values of ESP Projects 66 and 96, the design it redraws, so `VALUES` in `content_preamp.py` maps those onto our references; `_kicad_sch.py` writes them onto the drawing and the viewer, and the pages say which values ESP gives and which it doesn't. Drop `VALUES` if values ever land in the repository.
+The preamp section is written from its own repository, a single KiCad 10 sheet. KiCad 10 cannot be installed where the site is built, so `build/_kicad_sch.py` draws that sheet as SVG and builds its viewer data straight from the `.kicad_sch` file. The sheet has no component values. The board is built with the values of ESP Projects 66 and 96, the design it redraws, so `VALUES` in `content_preamp.py` maps those onto our references; `_kicad_sch.py` writes them onto the drawing and the viewer, and the pages say which values ESP gives and which it doesn't. Drop `VALUES` if values ever land in the repository.
 
 ## Layout
 

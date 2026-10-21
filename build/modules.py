@@ -12,7 +12,7 @@ class Module:
                  content, repo=None, brand=None):
         self.slug, self.name, self.tagline = slug, name, tagline
         self.brand = brand or '%s module' % name   # subtitle under the suite name in the sidebar
-        self.status = status                  # 'built' | 'designed' | 'progress' | 'planned' | 'guide'
+        self.status = status                  # 'built' | 'building' | 'designed' | 'progress' | 'planned' | 'guide'
         self.description = description
         self.footer = footer
         self.content = content                # python module holding NAV and PAGES
@@ -35,24 +35,24 @@ class Module:
 MODULES = [
     Module('compressor', 'Compressor',
            'Feedback compressor built round a discrete current-steering gain cell. '
-           'Simulated, boards and parts ordered, being built, and a faceplate you can 3D print.',
-           'building',
+           'Built and working, with a 3D-printed faceplate and calibrated meters.',
+           'built',
            'How the UTS Mini Mixing Desk compressor module works, section by section.',
            'documentation generated from the KiCad project',
            content='content_compressor', repo='Compressor'),
 
     Module('preamp', 'Preamp',
            'Discrete low-noise balanced mic preamp with switchable phantom power. '
-           'Board ordered and being built, with ESP Project 66 values.',
-           'building',
+           'Built and working, with ESP Project 66 values.',
+           'built',
            'How the UTS Mini Mixing Desk microphone preamp works, from its KiCad schematic.',
            'written from the Pre-Amp repository at 5e6a308, with ESP Project 66 values',
            content='content_preamp', repo='Pre-Amp'),
 
     Module('equaliser', 'Equaliser',
            'Four bands: low and high shelves and two state-variable parametric mids, between a '
-           'balanced receiver and line driver. Boards ordered and being built.',
-           'building',
+           'balanced receiver and line driver. Built and working.',
+           'built',
            'How the UTS Mini Mixing Desk equaliser module works, and how far along it is.',
            'written from the Equaliser repository at 4d106d3',
            content='content_equaliser', repo='Equaliser'),

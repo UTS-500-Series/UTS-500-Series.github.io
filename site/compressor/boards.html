@@ -35,8 +35,9 @@ try {
 <h1>The boards</h1>
 <p class="lede">The compressor is two boards. The main board is the card that plugs into the
 rack; a small front board sits behind the faceplate and carries everything you touch or read.
-A 30-way ribbon joins them. Both are routed and pass DRC, and both were ordered on
-3 October from the Gerbers in the repository.</p>
+A 30-way ribbon joins them. Both pass DRC, were ordered on 3 October from the Gerbers in
+the repository, and are now built and working. The renders and plots here are of those
+boards.</p>
 
 <figure>
   <div class="pane"><img src="files/main-board-3d-angle.png" alt="Main board, KiCad 3D render" loading="lazy"></div>
@@ -47,7 +48,7 @@ A 30-way ribbon joins them. Both are routed and pass DRC, and both were ordered 
   <figcaption><span>Front board, KiCad 3D render. The side shown faces the panel</span><a href="files/front-board-3d-angle.png" target="_blank" rel="noopener">Open full size &rarr;</a></figcaption>
 </figure>
 
-<div class="tw"><table><thead><tr><th class="r"></th><th class="">Main board</th><th class="">Front board</th></tr></thead><tbody><tr><td class="r">Size</td><td class="">Standard 500-series card, from the template outline</td><td class="">35 &times; 110 mm</td></tr><tr><td class="r">Parts</td><td class="">137 (including two mounting holes)</td><td class="">33</td></tr><tr><td class="r">Carries</td><td class="">The whole audio path, sidechain, power, references and trimmers</td><td class="">Five pots, four toggles, both LED meters and their drivers</td></tr><tr><td class="r">Copper</td><td class="">Two layers, AGND poured on the bottom</td><td class="">Two layers</td></tr><tr><td class="r">Held by</td><td class="">An L-bracket from the back of the panel</td><td class="">The nuts on the pot and toggle bushings</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th class="r"></th><th class="">Main board</th><th class="">Front board</th></tr></thead><tbody><tr><td class="r">Size</td><td class="">Standard 500-series card, from the template outline</td><td class="">35 &times; 110 mm</td></tr><tr><td class="r">Parts</td><td class="">137 (including two mounting holes)</td><td class="">33</td></tr><tr><td class="r">Carries</td><td class="">The whole audio path, sidechain, power, references and trimmers</td><td class="">Five pots, four toggles, both LED meters and their drivers</td></tr><tr><td class="r">Copper</td><td class="">Two layers, AGND poured on the bottom</td><td class="">Two layers</td></tr><tr><td class="r">Held by</td><td class="">Two M3 screws into the printed faceplate&rsquo;s bracket (or a metal L-bracket)</td><td class="">The four toggle nuts</td></tr></tbody></table></div>
 
 <p>Track counts, layer plots and the PDFs of every layer are on the
 <a href="files.html">design files</a> page.</p>
@@ -115,8 +116,10 @@ reference netlist, <code>tools/design.py</code>. That comparison caught a wire j
       which is too tall for the panel side.</li>
 </ul>
 <p>The pot bodies stand 10.6 mm off the board and the toggles 10.4 mm, so the board sits
-<strong>about 10.6 mm behind the panel</strong>, with the pots resting against it. The LEDs
-need spacers of about 8 mm to reach their holes.</p>
+<strong>about 10.6 mm behind the panel</strong>, with the pots resting against it. On the built
+module the meter LEDs sit in the printed faceplate itself, held by a
+<a href="printed.html#retainer">retainer plate</a>, and their leads run back to the board; fit
+them last, with the faceplate on.</p>
 
 <h2>Joining and fixing them</h2>
 <ul>
@@ -128,12 +131,14 @@ need spacers of about 8 mm to reach their holes.</p>
       crimping.</li>
   <li><strong>Ribbon length.</strong> About 150 mm, folded once. It depends on where the board
       sits in your rack, so lay the boards out before crimping.</li>
-  <li><strong>Front board to panel:</strong> just the nine bushing nuts.</li>
-  <li><strong>Main board to panel:</strong> an L-bracket (25 &times; 25 mm aluminium angle, or a
-      short angle on standoffs) from the back of the panel to the two M3 holes
-      <code>H1</code> and <code>H2</code> near the board's front edge. <code>H2</code> is plated
-      and tied to <code>CHASSIS</code>, so the bracket also grounds the panel. Mask the anodise
-      where the bracket touches it.</li>
+  <li><strong>Front board to panel:</strong> the four toggle nuts. The pots have no bushing or
+      nut of their own.</li>
+  <li><strong>Main board to panel:</strong> on the built module, the
+      <a href="printed.html#bracket">bracket printed into the faceplate</a>, with M3 &times; 6
+      screws through the two holes <code>H1</code> and <code>H2</code> near the board's front
+      edge. With a metal panel, use an L-bracket (25 &times; 25 mm aluminium angle) instead:
+      <code>H2</code> is plated and tied to <code>CHASSIS</code>, so a metal bracket also grounds
+      the panel. Mask the anodise where the bracket touches it.</li>
 </ul>
 <p>The <a href="../faceplate/index.html">faceplate fit guide</a> covers the same joint for every
 module.</p>
@@ -158,23 +163,22 @@ fine for a prototype but wears with repeated insertion.</p>
 layout: the first set committed was plotted before the main board was last re-routed, and
 would have built the old copper.</p>
 
-<div class="note warn">
-  <h4>Check when the boards arrive</h4>
+<div class="note">
+  <h4>From the build</h4>
   <ul>
-    <li><strong>The main board was routed by script.</strong> IN&plusmn; and OUT&plusmn; run as
-        pairs on the top layer and the ground pour on the bottom is one piece. It passes DRC
-        with nothing unconnected, but no one reviewed the routing by eye before it was ordered,
-        so check continuity on the audio path before powering it.</li>
-    <li><strong>Panel thickness.</strong> A 3.18 mm panel leaves the pots under 2 mm of
-        thread: counterbore the pot holes or use a thinner panel
-        (<a href="panel.html">front panel</a>). The <a href="printed.html">printed
-        faceplate</a> has the counterbores built in.</li>
-    <li><strong>Pot direction.</strong> If pin 3 is the clockwise end, as is usual, RATIO
-        turns clockwise for a harder ratio (its outer pins are swapped for that) and THRESHOLD
-        turns clockwise for a higher threshold (see <a href="simulation.html">the
-        simulation</a>).</li>
-    <li><strong>Ribbon length</strong> is an estimate until the boards are in a rack.</li>
+    <li><strong>The boards work as ordered.</strong> The main board was routed by script and
+        passed DRC with nothing unconnected, and the module built from it works.</li>
+    <li><strong>Pot direction.</strong> RATIO turns clockwise for a harder ratio (its outer pins
+        are swapped for that), and THRESHOLD turns clockwise for a <em>higher</em> threshold, so
+        fully clockwise means no compression. That catches people out at bring-up.</li>
+    <li><strong>Trimpots.</strong> The 3296W footprints for <code>RV1</code>, <code>RV7</code>
+        and <code>RV8</code> have no screw mark and all-round pads, so the silkscreen
+        doesn&rsquo;t show which way round they go. Either way works; it only reverses the
+        adjustment direction.</li>
   </ul>
+  <p>Changes for the next revision, such as more mounting holes on the main board and a screw
+  mark on the trimpots, are collected in
+  <a href="https://github.com/UTS-500-Series/Compressor/issues/15">issue #15</a>.</p>
 </div>
 
 <div class="next"><a href="printed.html">&larr; Printing the faceplate</a><a href="simulation.html">The simulation &rarr;</a></div>
