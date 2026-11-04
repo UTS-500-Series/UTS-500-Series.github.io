@@ -8,6 +8,32 @@ from shell import table
 
 VIEWS = [('top', 'Top'), ('angle', 'Angled'), ('bottom', 'Bottom')]
 
+# The A3 drawing sheet made for the demonstration: site/<slug>/drawings/<slug>-a3-drawing.pdf
+# plus a .png preview. They live outside files/ because export_kicad.py rewrites that folder.
+SHEETS = {
+    'compressor': 'Main board, front board and printed faceplate, with dimensions, board data '
+                  'and 3D views of the assembly.',
+    'equaliser': 'Main card and top board as ordered on one panel, how they stack, and 3D views '
+                 'of the stacked card. The front panel on the sheet is a mock-up.',
+    'preamp': 'Both sides of the card, board data and 3D views. The front panel on the sheet '
+              'is a mock-up.',
+}
+
+
+def _sheet(slug):
+    here = os.path.dirname(os.path.abspath(__file__))
+    pdf = 'drawings/%s-a3-drawing.pdf' % slug
+    if slug not in SHEETS or not os.path.exists(os.path.join(here, '..', 'site', slug, pdf)):
+        return ''
+    mb = os.path.getsize(os.path.join(here, '..', 'site', slug, pdf)) / 1e6
+    return f"""<h2>A3 drawing sheet</h2>
+<p>{SHEETS[slug]} Print it at 100&nbsp;% on A3 and the board views are true size.
+<a href="{pdf}">Download the PDF</a> ({mb:.1f}&nbsp;MB).</p>
+<figure>
+  <div class="pane"><a href="{pdf}"><img src="drawings/{slug}-a3-drawing.png" alt="A3 drawing sheet" loading="lazy"></a></div>
+  <figcaption><span>A3 drawing sheet</span><a href="{pdf}" target="_blank" rel="noopener">Open the PDF &rarr;</a></figcaption>
+</figure>"""
+
 
 def _fig(path, caption, cls=''):
     return f"""<figure>
@@ -76,6 +102,8 @@ be read, printed or downloaded without KiCad.</p>
   <h4>The files the module was built from</h4>
   <p>The module is built and working, and these are its final schematics and boards. {since}</p>
 </div>""")
+    if _sheet(slug):
+        body.append(_sheet(slug))
     body.append('<h2>Schematics</h2>')
     body += [_schematic(s, m) for s in m['schematics']]
     body.append('<h2>Boards</h2>')

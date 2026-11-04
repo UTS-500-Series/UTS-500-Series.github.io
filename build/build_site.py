@@ -101,7 +101,7 @@ built that way.</p>
 <h2>How far along each module is</h2>
 <p>All three modules are <strong>built and working</strong> (October 2026). The schematics
 and boards on each module&rsquo;s design files page are the ones the built modules were made
-from.</p>
+from, and each design files page also has the module&rsquo;s A3 drawing sheet as a PDF.</p>
 <p>The compressor is a main card and a front board behind the faceplate, joined by a ribbon,
 with boards ordered on 3 October. The whole circuit was simulated in ngspice and its values
 corrected from that before ordering, its parts came from Altronics, DigiKey and Jaycar, its
